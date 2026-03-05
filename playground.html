@@ -3,23 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>配色系统 V4 · 三色分离</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=DM+Serif+Display:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>配色实验室 · XHS 海报工坊</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=DM+Serif+Display:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-height:100vh;}
 
   /* ===== CONTROL ===== */
-  .ctrl{position:sticky;top:0;z-index:100;background:rgba(6,6,6,.94);backdrop-filter:blur(20px);border-bottom:1px solid #1a1a1a;}
+  .ctrl{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,rgba(15,15,15,.98),rgba(6,6,6,.94));backdrop-filter:blur(20px);border-bottom:1px solid #1a1a1a;}
   .ci{max-width:1440px;margin:0 auto;padding:12px 28px;}
   .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
   .row+.row{margin-top:8px;}
+  .ctrl-group{display:flex;align-items:center;gap:12px;padding:4px 10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-radius:8px;}
   .lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase;white-space:nowrap;}
   .sep{width:1px;height:24px;background:#1f1f1f;margin:0 2px;}
 
-  .ctog{display:flex;border:1px solid #222;border-radius:5px;overflow:hidden;}
+  .ctog{display:flex;border:1px solid #222;border-radius:6px;overflow:hidden;}
   .cbtn{padding:5px 11px;background:transparent;border:none;border-right:1px solid #222;color:#555;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;}
-  .cbtn:last-child{border-right:none;}.cbtn:hover{color:#aaa;}.cbtn.active{background:rgba(255,255,255,.06);color:#fff;}
+  .cbtn:last-child{border-right:none;}.cbtn:hover{color:#aaa;background:rgba(255,255,255,.03);}.cbtn.active{background:rgba(255,255,255,.06);color:#fff;}
 
   /* HEX slots with color role indicator */
   .hex-slot{display:flex;align-items:center;border:1px solid #222;border-radius:5px;overflow:hidden;background:rgba(255,255,255,.02);transition:border-color .25s;}
@@ -37,8 +38,8 @@
   /* Role colors in labels */
   .role-bg{color:#888;}.role-accent{color:#e03131;}.role-sec{color:#ff6b35;}.role-txt{color:#ccc;}
 
-  .save-btn{padding:5px 14px;border:1px solid #333;border-radius:5px;background:transparent;color:#888;font-size:11px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px;}
-  .save-btn:hover{border-color:#555;color:#fff;}.save-btn .icon{font-size:13px;}
+  .save-btn{padding:5px 14px;border:1px solid #333;border-radius:6px;background:transparent;color:#888;font-size:11px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;transition:all .25s;display:flex;align-items:center;gap:6px;}
+  .save-btn:hover{border-color:#555;color:#fff;box-shadow:0 0 12px rgba(255,255,255,.04);}.save-btn .icon{font-size:13px;}
 
   /* Chips */
   .chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
@@ -77,14 +78,20 @@
   .modal .mb.cf{background:#fff;color:#111;font-weight:600;}.modal .mb.cf:hover{background:#eee;}
 
   /* ===== CARDS ===== */
-  .hdr{padding:28px 28px 6px;max-width:1440px;margin:0 auto;}
-  .hdr h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+  .hdr{padding:32px 28px 10px;max-width:100%;margin:0 auto;}
+  .hdr h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;margin-bottom:6px;letter-spacing:-.3px;}
   .hdr p{color:#555;font-size:12px;line-height:1.6;}
+  .hdr .divider{width:40px;height:1px;background:#222;margin-top:10px;}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(370px,1fr));gap:36px;padding:14px 28px 60px;max-width:1440px;margin:0 auto;}
-  .sblk{display:flex;flex-direction:column;gap:8px;}
-  .stag{font-size:11px;color:#555;}
-  .card{width:360px;height:480px;border-radius:4px;overflow:hidden;position:relative;transition:transform .3s,box-shadow .3s;cursor:pointer;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:40px;padding:14px 28px 60px;max-width:100%;margin:0 auto;}
+  .sblk{display:flex;flex-direction:column;gap:10px;padding:12px;background:rgba(255,255,255,.015);border:1px solid rgba(255,255,255,.04);border-radius:10px;}
+  .stag{font-size:12px;color:#555;padding-left:4px;border-left:2px solid #333;}
+  .sblk.filtered-out{display:none;}
+  .has-content .ghost{opacity:.12;filter:blur(1.5px);transition:opacity .3s,filter .3s;}
+  .has-content.ghost-hide .ghost{display:none;}
+  .has-content.ghost-show .ghost{opacity:1;filter:none;}
+  .c2 .c2sub{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);line-height:1.6;opacity:.7;}
+  .card{width:100%;height:480px;border-radius:4px;overflow:hidden;position:relative;transition:transform .3s,box-shadow .3s;cursor:pointer;}
   .card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.5);}
   .card,.card *{transition:background .3s,color .3s,border-color .3s,box-shadow .3s,text-shadow .3s;}
 
@@ -208,47 +215,196 @@
   .c7 .cr .lb2{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted);}
   .c7 .cr .ar{font-size:16px;color:var(--accent);}
 
+  /* Drag & Drop */
+  .drag-ghost{opacity:.3;}
+  .drag-chosen{box-shadow:0 0 0 2px rgba(255,255,255,.15);}
+  .stag{cursor:grab;}
+  .stag:active{cursor:grabbing;}
+
+  /* Zoom */
+  #zoomWrap{transform-origin:top center;transition:transform .3s ease;}
+  .zoom-slider{width:80px;accent-color:#555;cursor:pointer;}
+  .zoom-val{font-family:'Space Mono',monospace;font-size:10px;color:#888;min-width:32px;}
+
+  .tag-badge{font-size:9px;padding:1px 6px;border-radius:3px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#666;font-family:'Noto Sans SC',sans-serif;margin-left:4px;vertical-align:middle;}
+
   @media(max-width:860px){.grid{grid-template-columns:1fr;justify-items:center;}}
+
+  /* ===== HAND-DRAWN MODULE ===== */
+  @font-face{
+    font-family:'Excalifont';
+    src:url('https://unpkg.com/@excalidraw/excalidraw@0.17.0/dist/prod/Excalifont-Regular-a88b72a0.woff2') format('woff2');
+    font-weight:normal;font-style:normal;font-display:swap;
+  }
+  .hd-font{font-family:'ZCOOL KuaiLe','Excalifont',cursive;}
+
+  /* Lined paper background */
+  .hd-lined{
+    background:var(--bg);
+    background-image:
+      repeating-linear-gradient(transparent,transparent 31px,var(--border) 31px,var(--border) 32px);
+    background-position:0 20px;
+  }
+  /* Dot grid background */
+  .hd-dotgrid{
+    background:var(--bg);
+    background-image:radial-gradient(circle,var(--muted) .8px,transparent .8px);
+    background-size:20px 20px;
+  }
+  /* Shared hand-drawn stroke style */
+  .hd-stroke{stroke-linecap:round;stroke-linejoin:round;}
+
+  /* --- C8 手绘笔记风 --- */
+  .c8{color:var(--fg);padding:0;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+  .c8 .margin-line{position:absolute;left:42px;top:0;bottom:0;width:2px;background:var(--accent);opacity:.45;}
+  .c8 .tape{position:absolute;top:-4px;right:30px;width:56px;height:22px;background:var(--secS);border:1.5px solid var(--sec);transform:rotate(3deg);border-radius:1px;opacity:.7;}
+  .c8 .body{padding:36px 26px 20px 56px;flex:1;display:flex;flex-direction:column;gap:14px;}
+  .c8 h2{font-size:26px;line-height:1.45;font-weight:400;position:relative;}
+  .c8 .wave-ul{display:block;height:8px;margin-top:2px;}
+  .c8 .sub{font-size:13px;color:var(--muted);line-height:1.7;}
+  .c8 .doodle-foot{margin-top:auto;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted);padding-top:8px;border-top:1.5px dashed var(--border);}
+  .c8 .doodle-foot .star{color:var(--accent);font-size:16px;}
+  .c8 .tag8{background:var(--secS);color:var(--sec);padding:2px 8px;border-radius:2px;font-size:10px;}
+
+  /* --- C9 白板思维导图 --- */
+  .c9{display:flex;align-items:center;justify-content:center;padding:0;overflow:hidden;}
+  .c9 svg{width:100%;height:100%;}
+  .c9 text{font-family:'ZCOOL KuaiLe','Excalifont',cursive;}
+
+  /* --- C10 手绘清单风 --- */
+  .c10{color:var(--fg);padding:28px 30px;display:flex;flex-direction:column;gap:6px;}
+  .c10 h2{font-size:24px;margin-bottom:8px;font-weight:400;}
+  .c10 .item{display:flex;align-items:center;gap:10px;font-size:14px;line-height:2.2;color:var(--fg);}
+  .c10 .item.done{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:2px;}
+  .c10 .item svg{flex-shrink:0;}
+  .c10 .divider-line{height:8px;margin:4px 0;}
+  .c10 .highlight-circle{margin-top:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--accent);}
+
+  /* --- C11 手绘数据卡 --- */
+  .c11{color:var(--fg);padding:24px 26px;display:flex;flex-direction:column;gap:10px;position:relative;}
+  .c11 .tag11{font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;}
+  .c11 h2{font-size:52px;font-weight:400;line-height:1.1;}
+  .c11 h2 span{font-size:18px;color:var(--muted);font-weight:400;}
+  .c11 .chart-area{flex:1;display:flex;align-items:flex-end;justify-content:center;}
+  .c11 .chart-area svg{width:100%;max-width:310px;}
+  .c11 .note11{font-size:11px;color:var(--muted);text-align:right;}
+
+  /* --- C12 涂鸦标注风 --- */
+  .c12{color:var(--fg);padding:32px 28px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden;background:var(--bg);}
+  .c12 .label12{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
+  .c12 h2{font-size:20px;line-height:1.6;font-weight:400;}
+  .c12 .body12{font-size:14px;line-height:2;color:var(--muted);position:relative;}
+  .c12 .body12 strong{color:var(--fg);font-weight:400;}
+  .c12 .anno-layer{position:absolute;inset:0;pointer-events:none;}
+  .c12 .anno-layer svg{width:100%;height:100%;}
+  .c12 .bubble{margin-top:auto;background:var(--secS);border:1.5px solid var(--sec);border-radius:12px 12px 12px 2px;padding:10px 14px;font-size:12px;color:var(--sec);position:relative;}
+  .c12 .bubble::after{content:'';position:absolute;bottom:-6px;left:18px;width:10px;height:6px;background:var(--secS);clip-path:polygon(0 0,100% 0,50% 100%);}
+
+  /* ===== DIY TOOLS ===== */
+  .export-btn{position:absolute;top:8px;right:8px;z-index:10;padding:5px 12px;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:6px;color:#fff;font-size:10px;font-family:'Space Mono',monospace;cursor:pointer;opacity:0;transition:all .25s;letter-spacing:1px;}
+  .card:hover .export-btn{opacity:1;}
+  .export-btn:hover{background:rgba(0,0,0,.9);border-color:rgba(255,255,255,.3);box-shadow:0 0 14px rgba(255,255,255,.06);}
+  .export-btn.loading{pointer-events:none;opacity:.5;}
+
+  [contenteditable="true"]{outline:1px dashed var(--accent,#e03131);outline-offset:2px;cursor:text;min-height:1em;}
+  [contenteditable="true"]:focus{outline:2px solid var(--accent,#e03131);outline-offset:2px;}
+
+  .tool-btn{padding:5px 14px;border:1px solid #333;border-radius:6px;background:transparent;color:#888;font-size:11px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;transition:all .25s;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+  .tool-btn:hover{border-color:#555;color:#fff;box-shadow:0 0 12px rgba(255,255,255,.04);}
+  .tool-btn.on{border-color:#e03131;color:#e03131;background:rgba(224,49,49,.06);}
+  .tool-btn:disabled{opacity:.35;cursor:default;pointer-events:none;}
+
+  .svg-edit-input{position:fixed;z-index:200;background:rgba(0,0,0,.85);border:1px solid rgba(255,255,255,.25);border-radius:4px;color:#fff;font-size:14px;padding:4px 10px;font-family:'ZCOOL KuaiLe',cursive;outline:none;text-align:center;min-width:80px;}
+
+  /* ===== CONTENT BAR ===== */
+  .content-bar{max-height:0;overflow:hidden;transition:max-height .45s ease;background:rgba(6,6,6,.96);border-bottom:1px solid #1a1a1a;}
+  .content-bar.open{max-height:320px;}
+  .cb-inner{max-width:1440px;margin:0 auto;padding:14px 28px;display:grid;grid-template-columns:1.2fr 1fr;gap:24px;}
+  .cb-main label,.cb-fixed label{display:block;font-size:9px;color:#555;letter-spacing:2px;text-transform:uppercase;font-family:'Space Mono',monospace;margin-bottom:4px;}
+  .cb-main textarea,.cb-fixed textarea,.cb-fixed input{width:100%;background:#111;border:1px solid #222;border-radius:4px;color:#ddd;padding:6px 10px;font-size:12px;resize:none;font-family:'Noto Sans SC',sans-serif;transition:border-color .2s;outline:none;}
+  .cb-main textarea:focus,.cb-fixed input:focus{border-color:#444;}
+  .cb-main textarea{min-height:110px;line-height:1.6;}
+  .cb-preview{font-size:10px;color:#555;margin-top:6px;font-family:'Space Mono','Noto Sans SC',sans-serif;line-height:1.6;max-height:60px;overflow-y:auto;}
+  .cb-preview span{color:#888;}
+  .cb-preview .parse-label{color:#444;margin-right:4px;}
+  .cb-fixed{display:flex;flex-direction:column;gap:10px;}
+  .cb-field{}
+
 </style>
 </head>
 <body>
 
 <div class="ctrl"><div class="ci">
   <div class="row">
-    <div class="ctog">
-      <button class="cbtn" onclick="setCount(2)" id="cn2">2色</button>
-      <button class="cbtn active" onclick="setCount(3)" id="cn3">3色</button>
-      <button class="cbtn" onclick="setCount(4)" id="cn4">4色</button>
+    <div class="ctrl-group">
+      <div class="ctog">
+        <button class="cbtn" onclick="setCount(2)" id="cn2">2色</button>
+        <button class="cbtn active" onclick="setCount(3)" id="cn3">3色</button>
+        <button class="cbtn" onclick="setCount(4)" id="cn4">4色</button>
+      </div>
+      <div class="sep"></div>
+      <div class="ctog">
+        <button class="cbtn active" onclick="setRatio('3:4')" id="r34">3:4</button>
+        <button class="cbtn" onclick="setRatio('1:1')" id="r11">1:1</button>
+        <button class="cbtn" onclick="setRatio('2:3')" id="r23">2:3</button>
+      </div>
     </div>
     <div class="sep"></div>
 
-    <div class="hex-slot" id="s-bg">
-      <div class="sw" id="sw-bg" style="background:#0e0e0e"><input type="color" value="#0e0e0e" onchange="nP('bg',this.value)"></div>
-      <div class="si"><div class="sl">背景 <span class="role role-bg">BG</span></div><input class="hi" id="in-bg" value="#0e0e0e" maxlength="7" oninput="hT('bg')"></div>
-      <button class="lb" onclick="tL('bg')">🔓</button>
-    </div>
-    <div class="hex-slot" id="s-accent">
-      <div class="sw" id="sw-accent" style="background:#e03131"><input type="color" value="#e03131" onchange="nP('accent',this.value)"></div>
-      <div class="si"><div class="sl">强调 <span class="role role-accent">A</span></div><input class="hi" id="in-accent" value="#e03131" maxlength="7" oninput="hT('accent')"></div>
-      <button class="lb" onclick="tL('accent')">🔓</button>
-    </div>
-    <div class="hex-slot" id="s-sec">
-      <div class="sw" id="sw-sec" style="background:#ff6b35"><input type="color" value="#ff6b35" onchange="nP('sec',this.value)"></div>
-      <div class="si"><div class="sl">辅助 <span class="role role-sec">S</span></div><input class="hi" id="in-sec" value="#ff6b35" maxlength="7" oninput="hT('sec')"></div>
-      <button class="lb" onclick="tL('sec')">🔓</button>
-    </div>
-    <div class="hex-slot hidden" id="s-text">
-      <div class="sw" id="sw-text" style="background:#f0f0f0"><input type="color" value="#f0f0f0" onchange="nP('text',this.value)"></div>
-      <div class="si"><div class="sl">文字 <span class="role role-txt">T</span></div><input class="hi" id="in-text" value="#f0f0f0" maxlength="7" oninput="hT('text')"></div>
-      <button class="lb" onclick="tL('text')">🔓</button>
+    <div class="ctrl-group">
+      <div class="hex-slot" id="s-bg">
+        <div class="sw" id="sw-bg" style="background:#0e0e0e"><input type="color" value="#0e0e0e" onchange="nP('bg',this.value)"></div>
+        <div class="si"><div class="sl">背景 <span class="role role-bg">BG</span></div><input class="hi" id="in-bg" value="#0e0e0e" maxlength="7" oninput="hT('bg')"></div>
+        <button class="lb" onclick="tL('bg')">🔓</button>
+      </div>
+      <div class="hex-slot" id="s-accent">
+        <div class="sw" id="sw-accent" style="background:#e03131"><input type="color" value="#e03131" onchange="nP('accent',this.value)"></div>
+        <div class="si"><div class="sl">强调 <span class="role role-accent">A</span></div><input class="hi" id="in-accent" value="#e03131" maxlength="7" oninput="hT('accent')"></div>
+        <button class="lb" onclick="tL('accent')">🔓</button>
+      </div>
+      <div class="hex-slot" id="s-sec">
+        <div class="sw" id="sw-sec" style="background:#ff6b35"><input type="color" value="#ff6b35" onchange="nP('sec',this.value)"></div>
+        <div class="si"><div class="sl">辅助 <span class="role role-sec">S</span></div><input class="hi" id="in-sec" value="#ff6b35" maxlength="7" oninput="hT('sec')"></div>
+        <button class="lb" onclick="tL('sec')">🔓</button>
+      </div>
+      <div class="hex-slot hidden" id="s-text">
+        <div class="sw" id="sw-text" style="background:#f0f0f0"><input type="color" value="#f0f0f0" onchange="nP('text',this.value)"></div>
+        <div class="si"><div class="sl">文字 <span class="role role-txt">T</span></div><input class="hi" id="in-text" value="#f0f0f0" maxlength="7" oninput="hT('text')"></div>
+        <button class="lb" onclick="tL('text')">🔓</button>
+      </div>
     </div>
     <div class="sep"></div>
     <button class="save-btn" onclick="openSave()"><span class="icon">💾</span>保存</button>
+    <div class="sep"></div>
+    <button class="tool-btn" id="contentToggle" onclick="toggleContent()">输入内容</button>
+    <button class="tool-btn" id="editToggle" onclick="toggleEdit()">微调</button>
+    <div class="sep"></div>
+    <div class="ctog" id="filterTog">
+      <button class="cbtn active" onclick="filterCards('all',this)">全部</button>
+      <button class="cbtn" onclick="filterCards('重点',this)">重点</button>
+      <button class="cbtn" onclick="filterCards('金句',this)">金句</button>
+      <button class="cbtn" onclick="filterCards('数据',this)">数据</button>
+      <button class="cbtn" onclick="filterCards('流程',this)">流程</button>
+    </div>
+    <div class="sep"></div>
+    <div class="ctog" id="ghostTog">
+      <button class="cbtn active" onclick="setGhost('blur',this)">模糊</button>
+      <button class="cbtn" onclick="setGhost('hide',this)">隐藏</button>
+      <button class="cbtn" onclick="setGhost('show',this)">显示</button>
+    </div>
+    <div class="sep"></div>
+    <div class="ctrl-group zoom-ctrl">
+      <span class="lbl">缩放</span>
+      <button class="cbtn" onclick="setZoom(1)">100%</button>
+      <input type="range" id="zoomRange" min="30" max="100" value="100" oninput="setZoom(this.value/100)" class="zoom-slider">
+      <span class="zoom-val" id="zoomVal">100%</span>
+    </div>
   </div>
 
   <div class="row">
     <span class="lbl">随机</span>
     <div class="space-hint"><kbd>空格</kbd> 刷新</div>
+    <button class="tool-btn" id="undoBtn" onclick="undoColor()" disabled>↩ 撤回</button>
     <div class="sep"></div>
     <div class="chips" id="chips">
       <button class="chip active" onclick="setSt('any')" data-st="any">随意</button>
@@ -268,6 +424,31 @@
   </div>
 </div></div>
 
+<!-- Content Input Bar -->
+<div class="content-bar" id="contentBar">
+  <div class="cb-inner">
+    <div class="cb-main">
+      <label>主文案</label>
+      <textarea id="f-main" rows="5" placeholder="粘贴你的文案（50-200字），系统自动拆分为标题、副文案、金句，适配 8 张文案模板..."></textarea>
+      <div class="cb-preview" id="parsePreview"></div>
+    </div>
+    <div class="cb-fixed">
+      <div class="cb-field">
+        <label>标签</label>
+        <input id="f-kicker" placeholder="出海营销...">
+      </div>
+      <div class="cb-field">
+        <label>署名</label>
+        <input id="f-author" placeholder="Derek...">
+      </div>
+      <div class="cb-field">
+        <label>系列</label>
+        <input id="f-series" placeholder="VOL.01...">
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal -->
 <div class="modal-overlay" id="modal"><div class="modal">
   <h3>保存当前配色</h3>
@@ -276,26 +457,156 @@
   <div class="ma"><button class="mb cc" onclick="closeM()">取消</button><button class="mb cf" onclick="doSave()">保存</button></div>
 </div></div>
 
+<div id="zoomWrap">
 <div class="hdr">
-  <h1>三色分离：背景 · 强调 · 辅助 各司其职</h1>
-  <p>每个颜色都有明确的管辖范围。上方 legend 标注了对应关系。</p>
+  <h1>配色实验室 — 12 Templates × Infinite Palettes</h1>
+  <p>背景 · 强调 · 辅助，三色各司其职。空格随机探索，找到你的风格。</p>
+  <div class="divider"></div>
 </div>
 
 <div class="grid" id="G">
-  <div class="sblk"><div class="stag">① 杂志编辑风</div><div class="card c1"><div class="top"><span class="tag">出海营销</span><span>VIBE MARKETING</span></div><h2>朋友的宠物用品<br>上了亚马逊<br>但<em>没人搜得到</em></h2><div class="sub">产品没问题，供应链没问题，<br>卡在「海外用户怎么找到我」这一步。</div><div class="iss">VOL.01 — 一人公司 × 出海</div></div></div>
+  <div class="sblk" data-tags="重点"><div class="stag">① 杂志编辑风 <span class="tag-badge">重点</span></div><div class="card c1"><div class="top"><span class="tag">出海营销</span><span class="ghost">VIBE MARKETING</span></div><h2>朋友的宠物用品<br>上了亚马逊<br>但<em>没人搜得到</em></h2><div class="sub">产品没问题，供应链没问题，<br>卡在「海外用户怎么找到我」这一步。</div><div class="iss">VOL.01 — 一人公司 × 出海</div></div></div>
 
-  <div class="sblk"><div class="stag">② 暗黑科技风</div><div class="card c2"><div class="gbg"></div><div class="ct"><div class="sb"><div class="dot"></div><span>CASE STUDY LIVE</span></div><h2>Google 前两页<br>全是测评博客<br>他的产品？<span class="hl">不存在</span></h2><div><div class="dr"><div><div class="dl">外包报价</div><div class="dv">¥3-5万</div></div><div><div class="dl">AI 交付</div><div class="dv">1 周</div></div><div><div class="dl">人数</div><div class="dv">1人</div></div></div><div class="bt">// VIBE_MARKETING_OS.v1</div></div></div></div></div>
+  <div class="sblk" data-tags="重点"><div class="stag">② 暗黑科技风 <span class="tag-badge">重点</span></div><div class="card c2"><div class="gbg"></div><div class="ct"><div class="sb"><div class="dot"></div><span>CASE STUDY LIVE</span></div><h2>Google 前两页<br>全是测评博客<br>他的产品？<span class="hl">不存在</span></h2><p class="c2sub"></p><div><div class="dr ghost"><div><div class="dl">外包报价</div><div class="dv">¥3-5万</div></div><div><div class="dl">AI 交付</div><div class="dv">1 周</div></div><div><div class="dl">人数</div><div class="dv">1人</div></div></div><div class="bt">// VIBE_MARKETING_OS.v1</div></div></div></div></div>
 
-  <div class="sblk"><div class="stag">③ New York 杂志风</div><div class="card c3"><div class="mh"><span class="logo">Vibe Marketing</span><span class="dt">Vol.01</span></div><div class="hz"><div class="kk">跨境 · 出海营销</div><h2 class="hl2">上了亚马逊<br>却<i>隐身</i>了</h2><p class="dk">产品搞定了，供应链搞定了。<br>唯独「被找到」这件事，没人做。</p></div><div class="ps"><span class="qm">"</span>你只要懂三件事——在哪搜、搜什么词、看什么会下单。<span class="by">— Derek</span></div></div></div>
+  <div class="sblk" data-tags="金句"><div class="stag">③ New York 杂志风 <span class="tag-badge">金句</span></div><div class="card c3"><div class="mh"><span class="logo ghost">Vibe Marketing</span><span class="dt">Vol.01</span></div><div class="hz"><div class="kk">跨境 · 出海营销</div><h2 class="hl2">上了亚马逊<br>却<i>隐身</i>了</h2><p class="dk">产品搞定了，供应链搞定了。<br>唯独「被找到」这件事，没人做。</p></div><div class="ps"><span class="qm">"</span>你只要懂三件事——在哪搜、搜什么词、看什么会下单。<span class="by">— Derek</span></div></div></div>
 
-  <div class="sblk"><div class="stag">④ 数据叙事风</div><div class="card c4"><div class="gbg"></div><div class="ct"><div class="tg">CASE</div><div class="bs"><span class="n">3-5</span><span class="u">万/月</span></div><p class="cp">海外营销公司的报价。<br>但懂 <strong>Vibe Marketing</strong> 的人，<br>用 AI 辅助，<u>一周</u>交付大半。</p><div class="bars"><div class="bi"><span class="bl">传统外包</span><div class="bt2"><div class="bf1"></div></div><span class="bv">¥3-5万</span></div><div class="bi"><span class="bl">AI + 1人</span><div class="bt2"><div class="bf2"></div></div><span class="bv dim">≈ ¥0</span></div></div><div class="ft"><span>SRC: FIELD RESEARCH</span><span>2025.Q1</span></div></div></div></div>
+  <div class="sblk" data-tags="数据"><div class="stag">④ 数据叙事风 <span class="tag-badge">数据</span></div><div class="card c4"><div class="gbg"></div><div class="ct"><div class="tg">CASE</div><div class="bs"><span class="n">3-5</span><span class="u">万/月</span></div><p class="cp">海外营销公司的报价。<br>但懂 <strong>Vibe Marketing</strong> 的人，<br>用 AI 辅助，<u>一周</u>交付大半。</p><div class="bars"><div class="bi"><span class="bl">传统外包</span><div class="bt2"><div class="bf1"></div></div><span class="bv">¥3-5万</span></div><div class="bi"><span class="bl">AI + 1人</span><div class="bt2"><div class="bf2"></div></div><span class="bv dim">≈ ¥0</span></div></div><div class="ft"><span>SRC: FIELD RESEARCH</span><span>2025.Q1</span></div></div></div></div>
 
-  <div class="sblk"><div class="stag">⑤ NY + SVG 插画</div><div class="card c5"><div class="tb"><span class="logo">Vibe Marketing</span><span class="vol">VOL.01</span></div><div class="hero"><div class="ht"><div class="kk">出海案例</div><h2 class="hl3">产品上架了<br>却在搜索中<br><i>隐身</i></h2><p class="dk">产品、物流都搞定了。唯独没人看得到。</p></div><div class="hi"><svg viewBox="0 0 120 160" fill="none"><rect x="35" y="10" width="50" height="24" rx="12" stroke="var(--fg)" stroke-width="2.5" fill="none"/><circle cx="60" cy="22" r="4" fill="var(--accent)"/><path d="M60 34C60 60,40 70,50 100C55 115,65 120,60 140" stroke="var(--fg)" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="90" cy="110" r="18" stroke="var(--sec)" stroke-width="2" fill="var(--secS)" stroke-dasharray="4 3"/><line x1="82" y1="102" x2="98" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/><line x1="98" y1="102" x2="82" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/></svg></div></div><div class="bs2"><span>一人公司 × 出海</span><span class="au">by Derek</span></div></div></div>
+  <div class="sblk" data-tags="金句"><div class="stag">⑤ NY + SVG 插画 <span class="tag-badge">金句</span></div><div class="card c5"><div class="tb"><span class="logo ghost">Vibe Marketing</span><span class="vol">VOL.01</span></div><div class="hero"><div class="ht"><div class="kk">出海案例</div><h2 class="hl3">产品上架了<br>却在搜索中<br><i>隐身</i></h2><p class="dk">产品、物流都搞定了。唯独没人看得到。</p></div><div class="hi"><svg viewBox="0 0 120 160" fill="none"><rect x="35" y="10" width="50" height="24" rx="12" stroke="var(--fg)" stroke-width="2.5" fill="none"/><circle cx="60" cy="22" r="4" fill="var(--accent)"/><path d="M60 34C60 60,40 70,50 100C55 115,65 120,60 140" stroke="var(--fg)" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="90" cy="110" r="18" stroke="var(--sec)" stroke-width="2" fill="var(--secS)" stroke-dasharray="4 3"/><line x1="82" y1="102" x2="98" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/><line x1="98" y1="102" x2="82" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/></svg></div></div><div class="bs2"><span class="ghost">一人公司 × 出海</span><span class="au">by Derek</span></div></div></div>
 
-  <div class="sblk"><div class="stag">⑥ Data + 环形图</div><div class="card c6"><div class="gbg"></div><div class="ct"><div class="tg">ANALYSIS</div><div class="tt">出海准备<br><strong>完成了多少？</strong></div><div class="drow"><div class="donut" id="donut"><div class="dh"><span class="pct">43%</span><span class="pl">DONE</span></div></div><div class="leg"><div class="li"><div class="ld ss"></div>已完成：产品/物流/上架</div><div class="li"><div class="ld pp"></div>未完成：内容/SEO/社媒</div></div></div><div class="ins"><strong>关键缺口：</strong>所有「被发现」的环节都是空白。</div><div class="ft"><span>VIBE MARKETING OS</span><span>DATA #01</span></div></div></div></div>
+  <div class="sblk" data-tags="数据"><div class="stag">⑥ Data + 环形图 <span class="tag-badge">数据</span></div><div class="card c6"><div class="gbg"></div><div class="ct"><div class="tg">ANALYSIS</div><div class="tt">出海准备<br><strong>完成了多少？</strong></div><div class="drow"><div class="donut" id="donut"><div class="dh"><span class="pct">43%</span><span class="pl">DONE</span></div></div><div class="leg"><div class="li"><div class="ld ss"></div>已完成：产品/物流/上架</div><div class="li"><div class="ld pp"></div>未完成：内容/SEO/社媒</div></div></div><div class="ins"><strong>关键缺口：</strong>所有「被发现」的环节都是空白。</div><div class="ft"><span>VIBE MARKETING OS</span><span>DATA #01</span></div></div></div></div>
 
-  <div class="sblk"><div class="stag">⑦ 暗色图文叠加</div><div class="card c7"><div class="iz" id="iz"><div class="psvg"><svg width="110" height="130" viewBox="0 0 110 130" fill="none"><rect x="25" y="10" width="60" height="28" rx="14" stroke="var(--muted)" stroke-width="2" fill="none"/><path d="M55 38C55 68,33 78,43 110" stroke="var(--muted)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="55" cy="65" r="28" fill="var(--secS)"/></svg></div><div class="ot"><div class="sm">宠物牵引绳</div><div class="bg2">在 Google<br>隐身了</div></div><div class="gf"></div></div><div class="tz"><p class="bt3">搜 <strong>"best dog harness"</strong>，前两页全是竞品。他的产品？不存在。</p><div class="cr"><span class="lb2">VIBE MARKETING · CASE 01</span><span class="ar">→</span></div></div></div></div>
+  <div class="sblk" data-tags="重点"><div class="stag">⑦ 暗色图文叠加 <span class="tag-badge">重点</span></div><div class="card c7"><div class="iz" id="iz"><div class="psvg"><svg width="110" height="130" viewBox="0 0 110 130" fill="none"><rect x="25" y="10" width="60" height="28" rx="14" stroke="var(--muted)" stroke-width="2" fill="none"/><path d="M55 38C55 68,33 78,43 110" stroke="var(--muted)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="55" cy="65" r="28" fill="var(--secS)"/></svg></div><div class="ot"><div class="sm">宠物牵引绳</div><div class="bg2">在 Google<br>隐身了</div></div><div class="gf"></div></div><div class="tz"><p class="bt3">搜 <strong>"best dog harness"</strong>，前两页全是竞品。他的产品？不存在。</p><div class="cr"><span class="lb2">VIBE MARKETING · CASE 01</span><span class="ar ghost">→</span></div></div></div></div>
+  <!-- C8 · 手绘笔记风 -->
+  <div class="sblk" data-tags="金句"><div class="stag">⑧ 手绘笔记风 <span class="tag-badge">金句</span></div><div class="card c8 hd-lined hd-font">
+    <div class="margin-line"></div>
+    <div class="tape"></div>
+    <div class="body">
+      <h2>朋友的产品<br>上了亚马逊<br>却没人找到
+        <svg class="wave-ul" viewBox="0 0 200 8" fill="none"><path d="M0 5 Q10 0,20 5 T40 5 T60 5 T80 5 T100 5 T120 5 T140 5 T160 5 T180 5 T200 5" stroke="var(--accent)" stroke-width="2.5" class="hd-stroke" fill="none"/></svg>
+      </h2>
+      <p class="sub">产品没问题，供应链没问题，<br>卡在「被发现」这一步。<br>搜 best dog harness，前两页全是竞品。</p>
+      <div class="doodle-foot">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1 L10.5 6.5 L16 7 L11.8 10.5 L13 16 L9 12.8 L5 16 L6.2 10.5 L2 7 L7.5 6.5Z" stroke="var(--accent)" stroke-width="1.5" fill="none" class="hd-stroke"/></svg>
+        <span class="tag8">#出海营销</span>
+        <span class="tag8">#一人公司</span>
+      </div>
+    </div>
+  </div></div>
+
+  <!-- C9 · 白板思维导图 -->
+  <div class="sblk" data-tags="流程"><div class="stag">⑨ 白板思维导图 <span class="tag-badge">流程</span></div><div class="card c9 hd-dotgrid">
+    <svg viewBox="0 0 360 480" fill="none">
+      <!-- Center node -->
+      <rect x="110" y="195" width="140" height="52" rx="4" stroke="var(--fg)" stroke-width="2.5" fill="var(--bg)" class="hd-stroke" transform="rotate(-0.8 180 221)"/>
+      <text x="180" y="226" text-anchor="middle" fill="var(--fg)" font-size="18">出海营销</text>
+      <!-- Top-left node -->
+      <rect x="22" y="62" width="110" height="42" rx="4" stroke="var(--accent)" stroke-width="2" fill="var(--bg)" class="hd-stroke" transform="rotate(1.2 77 83)"/>
+      <text x="77" y="88" text-anchor="middle" fill="var(--accent)" font-size="13">SEO 优化</text>
+      <path d="M77 104 C82 145,125 175,140 195" stroke="var(--accent)" stroke-width="2" fill="none" class="hd-stroke"/>
+      <polygon points="138,190 144,198 134,196" fill="var(--accent)"/>
+      <!-- Top-right node -->
+      <rect x="228" y="72" width="110" height="42" rx="4" stroke="var(--sec)" stroke-width="2" fill="var(--bg)" class="hd-stroke" transform="rotate(-1.5 283 93)"/>
+      <text x="283" y="98" text-anchor="middle" fill="var(--sec)" font-size="13">社媒内容</text>
+      <path d="M283 114 C278 150,240 180,220 198" stroke="var(--sec)" stroke-width="2" fill="none" class="hd-stroke"/>
+      <polygon points="223,193 217,201 225,199" fill="var(--sec)"/>
+      <!-- Bottom node -->
+      <rect x="115" y="330" width="130" height="42" rx="4" stroke="var(--sec)" stroke-width="2" fill="var(--bg)" class="hd-stroke" transform="rotate(0.6 180 351)"/>
+      <text x="180" y="356" text-anchor="middle" fill="var(--sec)" font-size="13">测评合作</text>
+      <path d="M180 247 C178 278,179 305,180 330" stroke="var(--sec)" stroke-width="2" fill="none" class="hd-stroke"/>
+      <polygon points="176,325 184,325 180,333" fill="var(--sec)"/>
+      <!-- Doodle stars -->
+      <path d="M310 400 L315 385 L320 400 L305 390 L325 390Z" stroke="var(--accent)" stroke-width="1.2" fill="none" class="hd-stroke"/>
+      <circle cx="48" cy="420" r="12" stroke="var(--muted)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
+      <!-- Label -->
+      <text x="180" y="460" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="'Space Mono',monospace">VIBE MARKETING · MIND MAP</text>
+    </svg>
+  </div></div>
+
+  <!-- C10 · 手绘清单风 -->
+  <div class="sblk" data-tags="流程"><div class="stag">⑩ 手绘清单风 <span class="tag-badge">流程</span></div><div class="card c10 hd-font" style="background:var(--bg)">
+    <h2>出海 Checklist ✓</h2>
+    <div class="item done">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--muted)" stroke-width="1.8" class="hd-stroke"/><path d="M5 5 L15 15 M15 5 L5 15" stroke="var(--accent)" stroke-width="2.2" class="hd-stroke"/></svg>
+      产品上架亚马逊
+    </div>
+    <div class="item done">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--muted)" stroke-width="1.8" class="hd-stroke"/><path d="M5 5 L15 15 M15 5 L5 15" stroke="var(--accent)" stroke-width="2.2" class="hd-stroke"/></svg>
+      物流链路打通
+    </div>
+    <div class="item done">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--muted)" stroke-width="1.8" class="hd-stroke"/><path d="M5 5 L15 15 M15 5 L5 15" stroke="var(--accent)" stroke-width="2.2" class="hd-stroke"/></svg>
+      定价策略确定
+    </div>
+    <svg class="divider-line" viewBox="0 0 300 8" fill="none"><path d="M0 4 C30 2,60 6,90 4 C120 2,150 6,180 4 C210 2,240 6,270 4 L300 4" stroke="var(--border)" stroke-width="1.5" class="hd-stroke"/></svg>
+    <div class="item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--sec)" stroke-width="1.8" class="hd-stroke"/></svg>
+      关键词 SEO 优化
+    </div>
+    <div class="item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--sec)" stroke-width="1.8" class="hd-stroke"/></svg>
+      社媒内容投放
+    </div>
+    <div class="item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--sec)" stroke-width="1.8" class="hd-stroke"/></svg>
+      测评博主合作
+    </div>
+    <div class="highlight-circle">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--accent)" stroke-width="2" fill="none" class="hd-stroke" stroke-dasharray="3 2"/></svg>
+      3 项待完成 — 全是「被发现」的环节
+    </div>
+  </div></div>
+
+  <!-- C11 · 手绘数据卡 -->
+  <div class="sblk" data-tags="数据"><div class="stag">⑪ 手绘数据卡 <span class="tag-badge">数据</span></div><div class="card c11 hd-dotgrid hd-font">
+    <div class="tag11">Case Study · 成本对比</div>
+    <h2>¥3-5万 <span>/月</span></h2>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;">传统外包海外营销的月均报价。<br>而 AI + 一人团队，接近零成本。</p>
+    <div class="chart-area">
+      <svg viewBox="0 0 310 160" fill="none">
+        <!-- Axes -->
+        <path d="M42 10 L42 128 L298 128" stroke="var(--fg)" stroke-width="2.2" class="hd-stroke"/>
+        <!-- Bar 1: tallest -->
+        <rect x="62" y="24" width="52" height="104" rx="3" stroke="var(--sec)" stroke-width="2.2" fill="var(--secS)" class="hd-stroke" transform="rotate(-0.5 88 76)"/>
+        <text x="88" y="148" text-anchor="middle" fill="var(--muted)" font-size="10">外包</text>
+        <!-- Bar 2 -->
+        <rect x="138" y="58" width="52" height="70" rx="3" stroke="var(--accent)" stroke-width="2.2" fill="var(--accentS)" class="hd-stroke" transform="rotate(0.8 164 93)"/>
+        <text x="164" y="148" text-anchor="middle" fill="var(--muted)" font-size="10">Freelance</text>
+        <!-- Bar 3: shortest -->
+        <rect x="214" y="108" width="52" height="20" rx="3" stroke="var(--sec)" stroke-width="2.5" fill="var(--sec)" class="hd-stroke" transform="rotate(-0.3 240 118)"/>
+        <text x="240" y="148" text-anchor="middle" fill="var(--muted)" font-size="10">AI+1人</text>
+        <!-- Arrow pointing to bar 1 -->
+        <path d="M110 18 C135 14,148 20,152 28" stroke="var(--accent)" stroke-width="1.8" fill="none" class="hd-stroke"/>
+        <polygon points="150,24 156,30 148,30" fill="var(--accent)"/>
+        <text x="110" y="14" fill="var(--accent)" font-size="9">贵!</text>
+      </svg>
+    </div>
+    <div class="note11">DATA · VIBE MARKETING OS</div>
+  </div></div>
+
+  <!-- C12 · 涂鸦标注风 -->
+  <div class="sblk" data-tags="金句"><div class="stag">⑫ 涂鸦标注风 <span class="tag-badge">金句</span></div><div class="card c12 hd-font">
+    <div class="label12">Field Notes · 出海观察</div>
+    <h2>产品已上架，<br>但完全「隐身」了</h2>
+    <div class="body12" style="position:relative;">
+      <p>搜 <strong>best dog harness</strong>，Google 前两页全是测评博客。他的产品？不在任何结果里。<br><br>产品没问题，供应链没问题，价格也有竞争力。唯独缺了一件事：<strong>被看到</strong>。</p>
+      <div class="anno-layer">
+        <svg viewBox="0 0 304 140" fill="none">
+          <!-- Circle around keyword area -->
+          <ellipse cx="95" cy="15" rx="72" ry="14" stroke="var(--accent)" stroke-width="2" fill="none" class="hd-stroke" transform="rotate(-2 95 15)"/>
+          <!-- Arrow from circle -->
+          <path d="M168 18 C195 12,220 18,238 30" stroke="var(--accent)" stroke-width="1.8" fill="none" class="hd-stroke"/>
+          <polygon points="235,26 242,33 234,32" fill="var(--accent)"/>
+          <!-- Highlight bar -->
+          <rect x="180" y="92" width="82" height="16" rx="2" fill="var(--accentS)" transform="rotate(-1 221 100)"/>
+        </svg>
+      </div>
+    </div>
+    <div class="bubble">💡 所有「被发现」的环节都是空白 —— 这就是 Vibe Marketing 要解决的</div>
+  </div></div>
 </div>
+</div><!-- /zoomWrap -->
 
 <script>
 const h2r=h=>{h=h.replace('#','');if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];return{r:parseInt(h.substr(0,2),16),g:parseInt(h.substr(2,2),16),b:parseInt(h.substr(4,2),16)};};
@@ -324,34 +635,50 @@ function derive(bg,accent,sec,txt){
 
 function applyV(v){
   const g=document.getElementById('G');
-  Object.entries(v).forEach(([k,val])=>g.style.setProperty(k,val));
+  Object.entries(v).forEach(([k,val])=>{g.style.setProperty(k,val);});
   // Donut: sec for filled, accent for remainder
   document.getElementById('donut').style.background=`conic-gradient(${v['--sec']} 0deg 300deg, ${v['--accent']} 300deg 360deg)`;
-  // Image zone gradient
+  // Image zone gradient (C7)
   const{r,g:gg,b}=h2r(v['--sec']);
-  document.getElementById('iz').style.background=`radial-gradient(ellipse at 60% 40%,rgba(${r},${gg},${b},.12) 0%,${v['--bg']} 70%)`;
+  const izEl=document.getElementById('iz');
+  izEl.style.background=`radial-gradient(ellipse at 60% 40%,rgba(${r},${gg},${b},.12) 0%,${v['--bg']} 70%)`;
   // Legend swatches
   document.getElementById('leg-bg').style.background=v['--bg'];
   document.getElementById('leg-accent').style.background=v['--accent'];
   document.getElementById('leg-sec').style.background=v['--sec'];
 }
 
-let cc=3,locked={bg:false,accent:false,sec:false,text:false},rStyle='any',saved=[];
+let cc=3,locked={bg:false,accent:false,sec:false,text:false},rStyle='any',saved=[],editMode=false,currentRatio='3:4';
+let colorHistory=[];
+function pushHistory(){colorHistory.push({bg:gS('bg'),accent:gS('accent'),sec:gS('sec'),text:gS('text')});if(colorHistory.length>50)colorHistory.shift();document.getElementById('undoBtn').disabled=false;}
+function undoColor(){if(!colorHistory.length)return;const prev=colorHistory.pop();sS('bg',prev.bg);sS('accent',prev.accent);sS('sec',prev.sec);sS('text',prev.text);refresh();if(!colorHistory.length)document.getElementById('undoBtn').disabled=true;}
 
 function gS(id){return document.getElementById('in-'+id).value;}
 function sS(id,v){document.getElementById('in-'+id).value=v;document.getElementById('sw-'+id).style.background=v;const nc=document.querySelector('#s-'+id+' input[type=color]');if(nc)nc.value=v;}
 function refresh(){const bg=gS('bg'),a=gS('accent'),s=cc>=3?gS('sec'):null,t=cc>=4?gS('text'):null;applyV(derive(bg,a,s,t));updJ();}
 
-function setCount(n){cc=n;document.querySelectorAll('.cbtn').forEach(b=>b.classList.remove('active'));document.getElementById('cn'+n).classList.add('active');document.getElementById('s-sec').classList.toggle('hidden',n<3);document.getElementById('s-text').classList.toggle('hidden',n<4);refresh();}
+function setCount(n){cc=n;['cn2','cn3','cn4'].forEach(id=>document.getElementById(id).classList.remove('active'));document.getElementById('cn'+n).classList.add('active');document.getElementById('s-sec').classList.toggle('hidden',n<3);document.getElementById('s-text').classList.toggle('hidden',n<4);refresh();}
 
-function hT(id){let v=document.getElementById('in-'+id).value.trim();if(!v.startsWith('#'))v='#'+v;if(/^#[0-9a-fA-F]{6}$/.test(v)){document.getElementById('sw-'+id).style.background=v;const nc=document.querySelector('#s-'+id+' input[type=color]');if(nc)nc.value=v;daChips();refresh();}}
-function nP(id,v){document.getElementById('in-'+id).value=v;document.getElementById('sw-'+id).style.background=v;daChips();refresh();}
+function hT(id){let v=document.getElementById('in-'+id).value.trim();if(!v.startsWith('#'))v='#'+v;if(/^#[0-9a-fA-F]{6}$/.test(v)){pushHistory();document.getElementById('sw-'+id).style.background=v;const nc=document.querySelector('#s-'+id+' input[type=color]');if(nc)nc.value=v;daChips();refresh();}}
+function nP(id,v){pushHistory();document.getElementById('in-'+id).value=v;document.getElementById('sw-'+id).style.background=v;daChips();refresh();}
 function tL(id){locked[id]=!locked[id];document.getElementById('s-'+id).classList.toggle('locked',locked[id]);document.querySelector('#s-'+id+' .lb').textContent=locked[id]?'🔒':'🔓';}
 function daChips(){document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('active'));document.querySelector('[data-st="any"]').classList.add('active');rStyle='any';}
 function setSt(s){rStyle=s;document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('active'));const el=document.querySelector(`[data-st="${s}"]`);if(el)el.classList.add('active');}
 
+const RATIO_MAP={'3:4':{h:480,css:'370px'},'1:1':{h:360,css:'370px'},'2:3':{h:540,css:'370px'}};
+function setRatio(r){
+  currentRatio=r;
+  ['r34','r11','r23'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  const btnId=r==='3:4'?'r34':r==='1:1'?'r11':'r23';
+  document.getElementById(btnId).classList.add('active');
+  const{h}=RATIO_MAP[r];
+  document.querySelectorAll('.card').forEach(c=>c.style.height=h+'px');
+  document.querySelectorAll('.grid').forEach(g=>g.style.gridTemplateColumns=`repeat(auto-fill,minmax(280px,1fr))`);
+}
+
 // Random: ensure accent & secondary are visually distinct
 function gen(){
+  pushHistory();
   if(rStyle!=='any'&&rStyle.startsWith('s-')){const idx=+rStyle.replace('s-','');const p=saved[idx];if(p){if(!locked.bg)sS('bg',p.bg);if(!locked.accent)sS('accent',p.accent);if(!locked.sec&&p.sec)sS('sec',p.sec);if(!locked.text&&p.text)sS('text',p.text);refresh();return;}}
   const hBase=randInt(0,360);const isDark=Math.random()>.35;
   if(!locked.bg){const l=isDark?randInt(3,10):randInt(90,97);sS('bg',hsl2hex(hBase,randInt(0,10),l));}
@@ -366,7 +693,7 @@ function gen(){
   refresh();
 }
 
-document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.code==='Space'){e.preventDefault();gen();}});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable)return;if(e.code==='Space'){e.preventDefault();gen();}if(e.key==='z'&&(e.metaKey||e.ctrlKey)){e.preventDefault();undoColor();}});
 
 // Save system
 function loadS(){try{const r=window._sp;if(r)saved=r;}catch(e){}renderC();}
@@ -382,7 +709,371 @@ function renderC(){const c=document.getElementById('chips');c.innerHTML=`<button
 function updJ(){const bg=gS('bg'),a=gS('accent');let ps=[`<span class="v">"bg"</span>:"${bg}"`,`<span class="v">"accent"</span>:"${a}"`];if(cc>=3)ps.push(`<span class="v">"secondary"</span>:"${gS('sec')}"`);if(cc>=4)ps.push(`<span class="v">"text"</span>:"${gS('text')}"`);document.getElementById('jout').innerHTML=`<span class="k">"theme"</span>:{${ps.join(',')}}  `;}
 function copyJ(){const bg=gS('bg'),a=gS('accent');let o={bg,accent:a};if(cc>=3)o.secondary=gS('sec');if(cc>=4)o.text=gS('text');navigator.clipboard.writeText(JSON.stringify({theme:o},null,2)).then(()=>{const b=document.querySelector('.cpb');b.textContent='COPIED!';setTimeout(()=>b.textContent='COPY',1500);});}
 
-window.addEventListener('DOMContentLoaded',()=>{loadS();refresh();});
+// ===== EXPORT (html-to-image) =====
+let htmlToImage=null;
+async function loadHTI(){
+  if(htmlToImage)return htmlToImage;
+  htmlToImage=await import('https://esm.sh/html-to-image@1.11.13');
+  return htmlToImage;
+}
+
+function injectExportBtns(){
+  document.querySelectorAll('.card').forEach(card=>{
+    if(card.querySelector('.export-btn'))return;
+    const btn=document.createElement('button');
+    btn.className='export-btn';
+    btn.textContent='导出 PNG';
+    btn.onclick=e=>{e.stopPropagation();exportCard(card,btn);};
+    card.appendChild(btn);
+  });
+}
+
+// Resolve CSS var() in SVG attributes + inline computed backgrounds for html-to-image
+function resolveVarsForExport(card){
+  const saved=[];
+  const cardStyle=getComputedStyle(card);
+  // 1) SVG attribute var() → computed value
+  card.querySelectorAll('svg *').forEach(el=>{
+    ['fill','stroke','stop-color','flood-color','lighting-color'].forEach(attr=>{
+      const val=el.getAttribute(attr);
+      if(val&&val.includes('var(')){
+        saved.push({el,attr,orig:val,type:'svgAttr'});
+        const m=val.match(/var\(\s*(--[^,)]+)/);
+        if(m)el.setAttribute(attr,cardStyle.getPropertyValue(m[1]).trim()||val);
+      }
+    });
+  });
+  // 2) Inline computed background/color on card + all children that use CSS vars
+  //    This fixes dotgrid, lined-paper, conic-gradient etc losing var() on export
+  [card,...card.querySelectorAll('*')].forEach(el=>{
+    const cs=getComputedStyle(el);
+    const props=['background','background-image','background-color','color','border-color','border-top-color','border-bottom-color','border-left-color','border-right-color','outline-color'];
+    props.forEach(prop=>{
+      const cv=cs.getPropertyValue(prop);
+      if(cv&&cv!=='none'&&cv!==''){
+        // Only inline if the element's stylesheet value actually uses var()
+        // We check by seeing if inline style differs from computed
+        const inlineVal=el.style.getPropertyValue(prop);
+        if(!inlineVal){
+          saved.push({el,attr:prop,orig:inlineVal,type:'cssInline'});
+          el.style.setProperty(prop,cv);
+        }
+      }
+    });
+  });
+  return saved;
+}
+function restoreVarsAfterExport(saved){
+  saved.forEach(({el,attr,orig,type})=>{
+    if(type==='svgAttr')el.setAttribute(attr,orig);
+    else{
+      if(orig)el.style.setProperty(attr,orig);
+      else el.style.removeProperty(attr);
+    }
+  });
+}
+
+async function exportCard(card,btn){
+  const hti=await loadHTI();
+  btn.classList.add('loading');btn.textContent='导出中…';
+  // Temporarily hide edit outlines and export buttons
+  const wasEdit=editMode;
+  if(wasEdit)toggleEdit();
+  card.querySelectorAll('.export-btn').forEach(b=>b.style.display='none');
+  // Inline all CSS var() values for serialization
+  const svgSaved=resolveVarsForExport(card);
+  try{
+    const expH=RATIO_MAP[currentRatio]?.h||480;
+    const pxRatio=1080/360;
+    const dataUrl=await hti.toPng(card,{pixelRatio:pxRatio,width:360,height:expH,cacheBust:true,
+      filter:n=>!n.classList||!n.classList.contains('export-btn')});
+    const link=document.createElement('a');
+    const name=card.closest('.sblk')?.querySelector('.stag')?.textContent?.replace(/[^\w\u4e00-\u9fff]/g,'')||'poster';
+    link.download=`poster-${name}.png`;
+    link.href=dataUrl;
+    link.click();
+  }catch(err){
+    alert('导出失败：'+err.message);
+  }finally{
+    restoreVarsAfterExport(svgSaved);
+    card.querySelectorAll('.export-btn').forEach(b=>b.style.display='');
+    btn.classList.remove('loading');btn.textContent='导出 PNG';
+    if(wasEdit)toggleEdit();
+  }
+}
+
+// ===== EDIT MODE =====
+const EDIT_SELS='.card h2,.card p,.card .sub,.card .kk,.card .dk,.card .cp,.card .bt3,.card .body12 p,.card .item,.card .bubble,.card .sm,.card .bg2,.card .tt,.card .ins,.card .tag,.card .tg,.card .iss,.card .mh .logo,.card .mh .dt,.card .hl2,.card .ps,.card .bs2,.card .au,.card .lb2,.card .tag8,.card .tag11,.card .note11,.card .label12,.card .sb span,.card .dl,.card .dv,.card .bt,.card .bl,.card .bv,.card .pct,.card .pl,.card .ft span,.card .hl3,.card .vol,.card .cr .lb2';
+
+function toggleEdit(){
+  editMode=!editMode;
+  const btn=document.getElementById('editToggle');
+  btn.classList.toggle('on',editMode);
+  btn.textContent=editMode?'关闭微调':'微调';
+  document.querySelectorAll(EDIT_SELS).forEach(el=>{
+    if(editMode){el.setAttribute('contenteditable','true');el.spellcheck=false;}
+    else{el.removeAttribute('contenteditable');}
+  });
+  // SVG text elements — click to edit via overlay input
+  if(editMode){
+    document.querySelectorAll('.card svg text').forEach(t=>{
+      t.style.cursor='pointer';
+      t._editHandler=()=>openSvgEdit(t);
+      t.addEventListener('click',t._editHandler);
+    });
+  }else{
+    document.querySelectorAll('.card svg text').forEach(t=>{
+      t.style.cursor='';
+      if(t._editHandler){t.removeEventListener('click',t._editHandler);delete t._editHandler;}
+    });
+    // Remove any open SVG edit inputs
+    document.querySelectorAll('.svg-edit-input').forEach(el=>el.remove());
+  }
+}
+
+function openSvgEdit(textEl){
+  // Remove existing
+  document.querySelectorAll('.svg-edit-input').forEach(el=>el.remove());
+  const rect=textEl.getBoundingClientRect();
+  const input=document.createElement('input');
+  input.className='svg-edit-input';
+  input.value=textEl.textContent;
+  input.style.left=(rect.left+rect.width/2)+'px';
+  input.style.top=(rect.top-6)+'px';
+  input.style.transform='translate(-50%,-100%)';
+  const commit=()=>{textEl.textContent=input.value;input.remove();};
+  input.addEventListener('blur',commit);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();commit();}if(e.key==='Escape')input.remove();});
+  document.body.appendChild(input);
+  input.focus();input.select();
+}
+
+// ===== CONTENT INPUT =====
+function toggleContent(){
+  const bar=document.getElementById('contentBar');
+  const btn=document.getElementById('contentToggle');
+  bar.classList.toggle('open');
+  btn.classList.toggle('on',bar.classList.contains('open'));
+  btn.textContent=bar.classList.contains('open')?'收起内容':'输入内容';
+}
+
+const CONTENT_MAP={
+  c1:{headline:'h2',subtitle:'.sub',kicker:'.top .tag',series:'.iss'},
+  c2:{headline:'h2',subtitle:'.c2sub',kicker:'.sb span:not(.dot)',series:'.bt'},
+  c3:{headline:'.hl2',subtitle:'.dk',kicker:'.kk',quote:'.ps',author:'.ps .by',series:'.mh .dt'},
+  c4:{subtitle:'.cp',kicker:'.tg',series:'.ft span:last-child'},
+  c5:{headline:'.hl3',subtitle:'.dk',kicker:'.kk',author:'.bs2 .au',series:'.vol'},
+  c6:{headline:'.tt',subtitle:'.ins',kicker:'.tg',series:'.ft span:last-child'},
+  c7:{headline:'.iz .ot .bg2',subtitle:'.bt3',kicker:'.iz .ot .sm',series:'.cr .lb2'},
+  c8:{headline:'h2',subtitle:'.sub',kicker:'.tag8'},
+  c9:{headline:'svg text[y="226"]'},
+  c10:{headline:'h2'},
+  c11:{headline:'h2',subtitle:'p:not([class])',kicker:'.tag11',series:'.note11'},
+  c12:{headline:'h2',subtitle:'.body12 p',kicker:'.label12',quote:'.bubble'}
+};
+
+// --- Auto-split raw text into headline / subtitle / quote ---
+function parseContent(text){
+  if(!text.trim()) return {headline:'',subtitle:'',quote:''};
+  const lines=text.split(/\n+/).map(l=>l.trim()).filter(Boolean);
+
+  if(lines.length===1){
+    const sents=lines[0].split(/(?<=[。！？!?；;])\s*/).filter(Boolean);
+    if(sents.length>=3) return {headline:sents[0],subtitle:sents[1],quote:sents.slice(2).join('')};
+    if(sents.length===2) return {headline:sents[0],subtitle:sents[1],quote:''};
+    return {headline:lines[0],subtitle:'',quote:''};
+  }
+  if(lines.length===2) return {headline:lines[0],subtitle:lines[1],quote:''};
+  return {headline:lines[0],subtitle:lines[1],quote:lines.slice(2).join('\n')};
+}
+
+function updatePreview(parsed){
+  const el=document.getElementById('parsePreview');
+  if(!el) return;
+  if(!parsed.headline&&!parsed.subtitle&&!parsed.quote){el.innerHTML='';return;}
+  const parts=[];
+  if(parsed.headline) parts.push('<span class="parse-label">标题:</span> <span>"'+escH(parsed.headline)+'"</span>');
+  if(parsed.subtitle) parts.push('<span class="parse-label">副标:</span> <span>"'+escH(parsed.subtitle)+'"</span>');
+  if(parsed.quote) parts.push('<span class="parse-label">金句:</span> <span>"'+escH(parsed.quote.replace(/\n/g,' '))+'"</span>');
+  el.innerHTML=parts.join('<br>');
+}
+function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// --- Unified field writer with special-case handling ---
+function applyField(card,map,field,value,cls){
+  if(!value||!map[field]) return;
+  const el=card.querySelector(map[field]);
+  if(!el) return;
+  // SVG text
+  if(el.tagName==='text'){el.textContent=value;return;}
+  // C8 h2: preserve wave-ul SVG child
+  if(cls==='c8'&&field==='headline'){
+    const svg=el.querySelector('svg.wave-ul');
+    el.innerHTML=value.replace(/\n/g,'<br>');
+    if(svg)el.appendChild(svg);
+    return;
+  }
+  // C3 quote (.ps): preserve .qm and .by children
+  if(cls==='c3'&&field==='quote'){
+    const qm=el.querySelector('.qm');
+    const by=el.querySelector('.by');
+    el.innerHTML='';
+    if(qm)el.appendChild(qm);
+    el.appendChild(document.createTextNode(value));
+    return;
+  }
+  // C3 author (.ps .by): just set text
+  if(cls==='c3'&&field==='author'){
+    el.textContent=value;
+    return;
+  }
+  // C2 headline: highlight end portion — Chinese punctuation split, fallback to last ~4 chars
+  if(cls==='c2'&&field==='headline'){
+    const text=value.replace(/\n/g,'<br>');
+    // Try splitting at last Chinese punctuation
+    const puncMatch=text.match(/^(.*[。！？!?，、])(.+)$/s);
+    if(puncMatch){
+      el.innerHTML=puncMatch[1]+'<span class="hl">'+puncMatch[2]+'</span>';
+      return;
+    }
+    // Try splitting at last space (English fallback)
+    const spaceMatch=text.match(/^(.+\s)(\S+)$/s);
+    if(spaceMatch){
+      el.innerHTML=spaceMatch[1]+'<span class="hl">'+spaceMatch[2]+'</span>';
+      return;
+    }
+    // No punctuation, no space: highlight last ~4 chars of last line
+    const lines=text.split('<br>');
+    const last=lines[lines.length-1];
+    if(last.length>4){
+      lines[lines.length-1]=last.slice(0,-4)+'<span class="hl">'+last.slice(-4)+'</span>';
+    }else{
+      lines[lines.length-1]='<span class="hl">'+last+'</span>';
+    }
+    el.innerHTML=lines.join('<br>');
+    return;
+  }
+  // Default
+  el.innerHTML=value.replace(/\n/g,'<br>');
+}
+
+// --- Content distribution by template group ---
+const GROUP_A=['c1','c2','c3','c5','c7','c8','c12'];  // text templates
+const GROUP_B=['c4','c6','c11'];                        // data templates (fixed info only)
+// C9 = mindmap (receives nothing), C10 = checklist (headline only)
+
+function propagateContent(){
+  const raw=document.getElementById('f-main').value;
+  const parsed=parseContent(raw);
+  const fixed={
+    kicker:document.getElementById('f-kicker').value,
+    author:document.getElementById('f-author').value,
+    series:document.getElementById('f-series').value
+  };
+
+  updatePreview(parsed);
+
+  const hasContent=!!parsed.headline;
+
+  // A group: text templates — receive parsed + fixed
+  GROUP_A.forEach(cls=>{
+    const card=document.querySelector(`.card.${cls}`);
+    if(!card) return;
+    const map=CONTENT_MAP[cls];
+    applyField(card,map,'headline',parsed.headline,cls);
+    applyField(card,map,'subtitle',parsed.subtitle,cls);
+    applyField(card,map,'quote',parsed.quote,cls);
+    applyField(card,map,'author',fixed.author,cls);
+    applyField(card,map,'kicker',fixed.kicker,cls);
+    applyField(card,map,'series',fixed.series,cls);
+    // Ghost: toggle has-content + apply current ghost mode
+    card.classList.toggle('has-content',hasContent);
+    card.classList.remove('ghost-hide','ghost-show');
+    if(hasContent&&ghostMode==='hide') card.classList.add('ghost-hide');
+    else if(hasContent&&ghostMode==='show') card.classList.add('ghost-show');
+  });
+
+  // B group: data templates — only fixed (kicker + series)
+  GROUP_B.forEach(cls=>{
+    const card=document.querySelector(`.card.${cls}`);
+    if(!card) return;
+    const map=CONTENT_MAP[cls];
+    applyField(card,map,'kicker',fixed.kicker,cls);
+    applyField(card,map,'series',fixed.series,cls);
+  });
+
+  // C group: C10 checklist — headline only
+  const c10=document.querySelector('.card.c10');
+  if(c10&&parsed.headline){
+    applyField(c10,CONTENT_MAP.c10,'headline',parsed.headline,'c10');
+  }
+
+  // C9 mindmap: receives nothing
+}
+
+// --- Card filter (tag-based) ---
+const TEXT_CARDS=['c1','c2','c3','c5','c7','c8','c12'];
+const DATA_CARDS=['c4','c6','c9','c10','c11'];
+function filterCards(tag,btn){
+  document.querySelectorAll('#filterTog .cbtn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.querySelectorAll('.sblk').forEach(blk=>{
+    if(tag==='all'){
+      blk.classList.remove('filtered-out');
+    }else{
+      const tags=(blk.dataset.tags||'').split(',');
+      blk.classList.toggle('filtered-out',!tags.includes(tag));
+    }
+  });
+}
+
+// --- Ghost system ---
+let ghostMode='blur';
+function setGhost(mode,btn){
+  ghostMode=mode;
+  document.querySelectorAll('#ghostTog .cbtn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  document.querySelectorAll('.card.has-content').forEach(card=>{
+    card.classList.remove('ghost-hide','ghost-show');
+    if(mode==='hide') card.classList.add('ghost-hide');
+    else if(mode==='show') card.classList.add('ghost-show');
+  });
+}
+
+let _contentTimer=null;
+function debouncedPropagate(){clearTimeout(_contentTimer);_contentTimer=setTimeout(propagateContent,150);}
+
+// ===== ZOOM =====
+let currentZoom=1;
+function setZoom(s){
+  currentZoom=Math.max(.3,Math.min(1,s));
+  const wrap=document.getElementById('zoomWrap');
+  wrap.style.transform=`scale(${currentZoom})`;
+  wrap.style.height=currentZoom<1?wrap.scrollHeight*currentZoom+'px':'auto';
+  document.getElementById('zoomRange').value=Math.round(currentZoom*100);
+  document.getElementById('zoomVal').textContent=Math.round(currentZoom*100)+'%';
+}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+  loadS();refresh();injectExportBtns();
+  // Bind content input events
+  ['f-main','f-kicker','f-author','f-series'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.addEventListener('input',debouncedPropagate);
+  });
+  // SortableJS — drag to reorder cards within each grid
+  try{
+    const{default:Sortable}=await import('https://esm.sh/sortablejs@1.15.6');
+    new Sortable(document.getElementById('G'),{
+      animation:200,
+      ghostClass:'drag-ghost',
+      chosenClass:'drag-chosen',
+      handle:'.stag',
+      filter:'.filtered-out',
+      draggable:'.sblk',
+    });
+  }catch(e){/* SortableJS load failed — drag disabled, no-op */}
+});
 </script>
 
 </body>
