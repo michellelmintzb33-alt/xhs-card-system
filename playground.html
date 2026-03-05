@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>配色系统 V4 · 三色分离</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=DM+Serif+Display:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-height:100vh;}
+
+  /* ===== CONTROL ===== */
+  .ctrl{position:sticky;top:0;z-index:100;background:rgba(6,6,6,.94);backdrop-filter:blur(20px);border-bottom:1px solid #1a1a1a;}
+  .ci{max-width:1440px;margin:0 auto;padding:12px 28px;}
+  .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+  .row+.row{margin-top:8px;}
+  .lbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase;white-space:nowrap;}
+  .sep{width:1px;height:24px;background:#1f1f1f;margin:0 2px;}
+
+  .ctog{display:flex;border:1px solid #222;border-radius:5px;overflow:hidden;}
+  .cbtn{padding:5px 11px;background:transparent;border:none;border-right:1px solid #222;color:#555;font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;}
+  .cbtn:last-child{border-right:none;}.cbtn:hover{color:#aaa;}.cbtn.active{background:rgba(255,255,255,.06);color:#fff;}
+
+  /* HEX slots with color role indicator */
+  .hex-slot{display:flex;align-items:center;border:1px solid #222;border-radius:5px;overflow:hidden;background:rgba(255,255,255,.02);transition:border-color .25s;}
+  .hex-slot:hover{border-color:#3a3a3a;}.hex-slot:focus-within{border-color:#555;}
+  .hex-slot .sw{width:32px;height:32px;flex-shrink:0;cursor:pointer;border-right:1px solid #222;position:relative;transition:background .3s;}
+  .hex-slot .sw input[type="color"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+  .hex-slot .si{padding:2px 8px;display:flex;flex-direction:column;gap:0;}
+  .hex-slot .sl{font-size:7px;color:#555;font-family:'Space Mono',monospace;letter-spacing:1px;}
+  .hex-slot .role{font-size:7px;font-family:'Space Mono',monospace;letter-spacing:.5px;margin-top:1px;}
+  .hex-slot .hi{background:transparent;border:none;outline:none;font-family:'Space Mono',monospace;font-size:12px;color:#ccc;width:72px;}
+  .hex-slot .lb{width:28px;height:32px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-left:1px solid #222;cursor:pointer;font-size:11px;color:#333;transition:color .2s;}
+  .hex-slot .lb:hover{color:#888;}.hex-slot.locked .lb{color:#ff6b35;}
+  .hex-slot.hidden{display:none;}
+
+  /* Role colors in labels */
+  .role-bg{color:#888;}.role-accent{color:#e03131;}.role-sec{color:#ff6b35;}.role-txt{color:#ccc;}
+
+  .save-btn{padding:5px 14px;border:1px solid #333;border-radius:5px;background:transparent;color:#888;font-size:11px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;transition:all .2s;display:flex;align-items:center;gap:6px;}
+  .save-btn:hover{border-color:#555;color:#fff;}.save-btn .icon{font-size:13px;}
+
+  /* Chips */
+  .chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+  .chip{padding:4px 10px;border:1px solid #222;border-radius:12px;background:transparent;color:#555;font-size:10px;cursor:pointer;font-family:'Noto Sans SC',sans-serif;transition:all .2s;display:flex;align-items:center;gap:5px;}
+  .chip:hover{border-color:#444;color:#aaa;}.chip.active{border-color:#666;color:#fff;background:rgba(255,255,255,.06);}
+  .chip .cdot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+  .chip .del{display:none;font-size:10px;color:#666;cursor:pointer;margin-left:2px;}
+  .chip:hover .del{display:inline;}.chip .del:hover{color:#e03131;}
+
+  .space-hint{font-family:'Space Mono',monospace;font-size:10px;color:#333;padding:4px 10px;border:1px dashed #222;border-radius:4px;display:flex;align-items:center;gap:6px;}
+  .space-hint kbd{background:#1a1a1a;border:1px solid #333;border-radius:3px;padding:1px 6px;font-size:9px;color:#888;}
+
+  /* JSON bar */
+  .jbar{margin-top:8px;padding:6px 12px;background:rgba(255,255,255,.02);border-radius:5px;border:1px solid #1a1a1a;font-family:'Space Mono',monospace;font-size:10px;color:#555;display:flex;align-items:center;gap:10px;overflow-x:auto;}
+  .jbar code{color:#888;white-space:nowrap;}.jbar code .k{color:#e8a87c;}.jbar code .v{color:#82c99a;}
+  .cpb{margin-left:auto;padding:3px 10px;border:1px solid #222;border-radius:3px;background:transparent;color:#555;font-size:9px;cursor:pointer;font-family:'Space Mono',monospace;flex-shrink:0;transition:all .2s;}
+  .cpb:hover{border-color:#444;color:#ccc;}
+
+  /* Color map legend */
+  .legend-bar{margin-top:6px;display:flex;gap:16px;flex-wrap:wrap;padding:6px 0;}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:9px;color:#555;font-family:'Space Mono',monospace;letter-spacing:.3px;}
+  .legend-swatch{width:10px;height:10px;border-radius:2px;border:1px solid rgba(255,255,255,.1);}
+
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;}
+  .modal-overlay.show{display:flex;}
+  .modal{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:24px;width:320px;display:flex;flex-direction:column;gap:14px;}
+  .modal h3{font-size:14px;font-weight:700;}
+  .modal .prow{display:flex;gap:6px;}
+  .modal .psw{width:40px;height:24px;border-radius:4px;border:1px solid #333;}
+  .modal .ni{background:#0a0a0a;border:1px solid #2a2a2a;border-radius:6px;padding:10px 14px;color:#fff;font-size:14px;outline:none;width:100%;}
+  .modal .ni:focus{border-color:#555;}.modal .ni::placeholder{color:#444;}
+  .modal .ma{display:flex;gap:8px;justify-content:flex-end;}
+  .modal .mb{padding:7px 18px;border-radius:5px;border:none;font-size:12px;cursor:pointer;transition:all .2s;}
+  .modal .mb.cc{background:transparent;border:1px solid #333;color:#888;}.modal .mb.cc:hover{border-color:#555;color:#ccc;}
+  .modal .mb.cf{background:#fff;color:#111;font-weight:600;}.modal .mb.cf:hover{background:#eee;}
+
+  /* ===== CARDS ===== */
+  .hdr{padding:28px 28px 6px;max-width:1440px;margin:0 auto;}
+  .hdr h1{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:4px;}
+  .hdr p{color:#555;font-size:12px;line-height:1.6;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(370px,1fr));gap:36px;padding:14px 28px 60px;max-width:1440px;margin:0 auto;}
+  .sblk{display:flex;flex-direction:column;gap:8px;}
+  .stag{font-size:11px;color:#555;}
+  .card{width:360px;height:480px;border-radius:4px;overflow:hidden;position:relative;transition:transform .3s,box-shadow .3s;cursor:pointer;}
+  .card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.5);}
+  .card,.card *{transition:background .3s,color .3s,border-color .3s,box-shadow .3s,text-shadow .3s;}
+
+  /*
+    COLOR ROLE MAP:
+    --bg     = card background
+    --fg     = main text
+    --accent = emphasis (headlines italic, kicker, quote marks, underlines, status dots)
+    --sec    = data/secondary (numbers, bar fills, donut, tags, insight border, bottom strips)
+    --muted  = derived: subdued text
+    --border = derived: lines/borders
+  */
+
+  /* --- C1 杂志编辑 --- */
+  .c1{background:var(--bg);color:var(--fg);padding:30px 26px;display:flex;flex-direction:column;justify-content:space-between;font-family:'Noto Serif SC',serif;}
+  .c1 .top{display:flex;justify-content:space-between;align-items:center;font-size:10px;letter-spacing:3px;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:10px;}
+  .c1 .top .tag{background:var(--sec);color:var(--bg);font-size:9px;padding:3px 9px;letter-spacing:2px;font-family:'Noto Sans SC',sans-serif;}
+  .c1 h2{font-size:29px;font-weight:900;line-height:1.35;}
+  .c1 h2 em{font-style:normal;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:6px;text-decoration-thickness:3px;}
+  .c1 .sub{font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);padding-top:12px;}
+  .c1 .iss{font-family:'Noto Sans SC',sans-serif;font-size:10px;color:var(--sec);letter-spacing:1px;}
+
+  /* --- C2 暗黑科技 --- */
+  .c2{background:var(--bg);color:var(--fg);display:flex;flex-direction:column;position:relative;overflow:hidden;}
+  .c2 .gbg{position:absolute;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:40px 40px;}
+  .c2 .ct{position:relative;z-index:1;padding:22px;display:flex;flex-direction:column;height:100%;justify-content:space-between;}
+  .c2 .sb{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--accent);font-family:'Space Mono',monospace;letter-spacing:1px;}
+  .c2 .dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:p 2s ease infinite;}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+  .c2 h2{font-family:'Noto Sans SC',sans-serif;font-size:23px;font-weight:900;line-height:1.4;}
+  .c2 h2 .hl{color:var(--accent);text-shadow:0 0 30px var(--accentA);}
+  .c2 .dr{display:flex;gap:16px;padding:12px 0;border-top:1px solid var(--border);}
+  .c2 .dl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;font-family:monospace;}
+  .c2 .dv{font-size:17px;font-weight:700;font-family:monospace;color:var(--sec);margin-top:4px;}
+  .c2 .bt{font-size:8px;color:var(--sec);font-family:monospace;letter-spacing:1px;opacity:.6;}
+
+  /* --- C3 NY Editorial --- */
+  .c3{background:var(--bg);color:var(--fg);display:flex;flex-direction:column;}
+  .c3 .mh{padding:11px 20px;display:flex;justify-content:space-between;align-items:baseline;border-bottom:3px solid var(--fg);}
+  .c3 .mh .logo{font-family:'DM Serif Display',serif;font-size:12px;font-style:italic;}
+  .c3 .mh .dt{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;}
+  .c3 .hz{flex:1;padding:16px 20px 0;display:flex;flex-direction:column;justify-content:center;}
+  .c3 .kk{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--accent);margin-bottom:12px;font-weight:700;}
+  .c3 .hl2{font-family:'Playfair Display',serif;font-weight:900;font-size:38px;line-height:1.08;letter-spacing:-1.5px;margin-bottom:10px;}
+  .c3 .hl2 i{font-style:italic;color:var(--accent);}
+  .c3 .dk{font-family:'Instrument Serif',serif;font-style:italic;font-size:14px;line-height:1.5;color:var(--muted);}
+  .c3 .ps{margin-top:auto;padding:12px 20px;background:var(--sec);color:var(--bg);font-family:'Playfair Display',serif;font-size:12px;font-style:italic;line-height:1.5;}
+  .c3 .ps .qm{font-size:26px;color:var(--accent);font-style:normal;vertical-align:-3px;margin-right:3px;}
+  .c3 .ps .by{display:block;font-family:'Space Mono',monospace;font-size:8px;font-style:normal;letter-spacing:2px;opacity:.6;margin-top:6px;}
+
+  /* --- C4 Data Story --- */
+  .c4{background:var(--bg);color:var(--fg);display:flex;flex-direction:column;position:relative;overflow:hidden;}
+  .c4 .gbg{position:absolute;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:48px 48px;}
+  .c4 .ct{position:relative;z-index:1;padding:20px;display:flex;flex-direction:column;height:100%;gap:10px;}
+  .c4 .tg{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--sec);border:1px solid var(--sec);padding:3px 9px;width:fit-content;opacity:.8;}
+  .c4 .bs{display:flex;align-items:baseline;gap:8px;}
+  .c4 .bs .n{font-family:'Syne',sans-serif;font-size:64px;font-weight:800;line-height:1;color:var(--sec);}
+  .c4 .bs .u{font-size:16px;font-weight:300;color:var(--muted);}
+  .c4 .cp{font-size:12px;line-height:1.6;color:var(--muted);font-weight:300;}
+  .c4 .cp strong{color:var(--fg);font-weight:700;}
+  .c4 .cp u{text-decoration-color:var(--accent);text-underline-offset:3px;text-decoration-thickness:2px;}
+  .c4 .bars{padding:10px 0;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;margin-top:auto;}
+  .c4 .bi{display:flex;align-items:center;gap:8px;}
+  .c4 .bl{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);width:60px;text-align:right;flex-shrink:0;}
+  .c4 .bt2{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden;}
+  .c4 .bf1{width:85%;height:100%;border-radius:4px;background:var(--sec);}
+  .c4 .bf2{width:15%;height:100%;border-radius:4px;background:var(--accent);}
+  .c4 .bv{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--sec);width:48px;}
+  .c4 .bv.dim{color:var(--accent);}
+  .c4 .ft{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:1px;display:flex;justify-content:space-between;}
+
+  /* --- C5 NY+SVG --- */
+  .c5{background:var(--bg);color:var(--fg);display:flex;flex-direction:column;}
+  .c5 .tb{padding:11px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--fg);}
+  .c5 .tb .logo{font-family:'DM Serif Display',serif;font-size:12px;font-style:italic;}
+  .c5 .tb .vol{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);}
+  .c5 .hero{flex:1;display:grid;grid-template-columns:1fr 115px;}
+  .c5 .ht{padding:18px 0 18px 20px;display:flex;flex-direction:column;justify-content:center;gap:7px;}
+  .c5 .kk{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--accent);font-weight:700;}
+  .c5 .hl3{font-family:'Playfair Display',serif;font-size:25px;font-weight:900;line-height:1.15;letter-spacing:-1px;}
+  .c5 .hl3 i{font-style:italic;color:var(--accent);}
+  .c5 .dk{font-family:'Instrument Serif',serif;font-style:italic;font-size:11px;color:var(--muted);line-height:1.5;}
+  .c5 .hi{display:flex;align-items:center;justify-content:center;padding:10px;}
+  .c5 .hi svg{width:95px;}
+  .c5 .bs2{padding:10px 20px;background:var(--sec);color:var(--bg);font-family:'Space Mono',monospace;font-size:9px;display:flex;justify-content:space-between;align-items:center;}
+  .c5 .bs2 .au{font-family:'Instrument Serif',serif;font-style:italic;font-size:11px;}
+
+  /* --- C6 Data+Donut --- */
+  .c6{background:var(--bg);color:var(--fg);display:flex;flex-direction:column;position:relative;overflow:hidden;}
+  .c6 .gbg{position:absolute;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:48px 48px;}
+  .c6 .ct{position:relative;z-index:1;padding:20px;display:flex;flex-direction:column;height:100%;gap:12px;}
+  .c6 .tg{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--sec);border:1px solid var(--border);padding:3px 9px;width:fit-content;}
+  .c6 .tt{font-size:14px;font-weight:700;line-height:1.5;opacity:.85;}
+  .c6 .tt strong{font-size:16px;opacity:1;}
+  .c6 .drow{display:flex;align-items:center;gap:16px;}
+  .c6 .donut{width:86px;height:86px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .c6 .dh{width:54px;height:54px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;}
+  .c6 .dh .pct{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--sec);line-height:1;}
+  .c6 .dh .pl{font-size:7px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+  .c6 .leg{display:flex;flex-direction:column;gap:4px;font-size:10px;color:var(--muted);}
+  .c6 .li{display:flex;align-items:center;gap:6px;}
+  .c6 .ld{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+  .c6 .ld.pp{background:var(--sec);}
+  .c6 .ld.ss{background:var(--accent);}
+  .c6 .ins{background:var(--secS);border-left:3px solid var(--sec);padding:10px 12px;font-size:11px;line-height:1.6;color:var(--muted);margin-top:auto;}
+  .c6 .ins strong{color:var(--sec);}
+  .c6 .ft{font-family:'Space Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:1px;display:flex;justify-content:space-between;}
+
+  /* --- C7 暗色图文 --- */
+  .c7{background:var(--bg);color:var(--fg);display:flex;flex-direction:column;}
+  .c7 .iz{height:190px;position:relative;overflow:hidden;}
+  .c7 .iz .ot{position:absolute;left:20px;bottom:16px;z-index:2;}
+  .c7 .iz .ot .sm{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:3px;color:var(--sec);margin-bottom:5px;}
+  .c7 .iz .ot .bg2{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;line-height:1.1;}
+  .c7 .iz .gf{position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(transparent,var(--bg));}
+  .c7 .iz .psvg{position:absolute;right:14px;top:50%;transform:translateY(-50%);}
+  .c7 .tz{flex:1;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between;}
+  .c7 .bt3{font-family:'Instrument Serif',serif;font-size:13px;font-style:italic;line-height:1.7;color:var(--muted);}
+  .c7 .bt3 strong{color:var(--fg);font-style:normal;font-family:'Noto Sans SC',sans-serif;font-weight:700;}
+  .c7 .cr{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border);}
+  .c7 .cr .lb2{font-family:'Space Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted);}
+  .c7 .cr .ar{font-size:16px;color:var(--accent);}
+
+  @media(max-width:860px){.grid{grid-template-columns:1fr;justify-items:center;}}
+</style>
+</head>
+<body>
+
+<div class="ctrl"><div class="ci">
+  <div class="row">
+    <div class="ctog">
+      <button class="cbtn" onclick="setCount(2)" id="cn2">2色</button>
+      <button class="cbtn active" onclick="setCount(3)" id="cn3">3色</button>
+      <button class="cbtn" onclick="setCount(4)" id="cn4">4色</button>
+    </div>
+    <div class="sep"></div>
+
+    <div class="hex-slot" id="s-bg">
+      <div class="sw" id="sw-bg" style="background:#0e0e0e"><input type="color" value="#0e0e0e" onchange="nP('bg',this.value)"></div>
+      <div class="si"><div class="sl">背景 <span class="role role-bg">BG</span></div><input class="hi" id="in-bg" value="#0e0e0e" maxlength="7" oninput="hT('bg')"></div>
+      <button class="lb" onclick="tL('bg')">🔓</button>
+    </div>
+    <div class="hex-slot" id="s-accent">
+      <div class="sw" id="sw-accent" style="background:#e03131"><input type="color" value="#e03131" onchange="nP('accent',this.value)"></div>
+      <div class="si"><div class="sl">强调 <span class="role role-accent">A</span></div><input class="hi" id="in-accent" value="#e03131" maxlength="7" oninput="hT('accent')"></div>
+      <button class="lb" onclick="tL('accent')">🔓</button>
+    </div>
+    <div class="hex-slot" id="s-sec">
+      <div class="sw" id="sw-sec" style="background:#ff6b35"><input type="color" value="#ff6b35" onchange="nP('sec',this.value)"></div>
+      <div class="si"><div class="sl">辅助 <span class="role role-sec">S</span></div><input class="hi" id="in-sec" value="#ff6b35" maxlength="7" oninput="hT('sec')"></div>
+      <button class="lb" onclick="tL('sec')">🔓</button>
+    </div>
+    <div class="hex-slot hidden" id="s-text">
+      <div class="sw" id="sw-text" style="background:#f0f0f0"><input type="color" value="#f0f0f0" onchange="nP('text',this.value)"></div>
+      <div class="si"><div class="sl">文字 <span class="role role-txt">T</span></div><input class="hi" id="in-text" value="#f0f0f0" maxlength="7" oninput="hT('text')"></div>
+      <button class="lb" onclick="tL('text')">🔓</button>
+    </div>
+    <div class="sep"></div>
+    <button class="save-btn" onclick="openSave()"><span class="icon">💾</span>保存</button>
+  </div>
+
+  <div class="row">
+    <span class="lbl">随机</span>
+    <div class="space-hint"><kbd>空格</kbd> 刷新</div>
+    <div class="sep"></div>
+    <div class="chips" id="chips">
+      <button class="chip active" onclick="setSt('any')" data-st="any">随意</button>
+    </div>
+  </div>
+
+  <!-- Color map legend -->
+  <div class="legend-bar">
+    <div class="legend-item"><div class="legend-swatch" id="leg-bg"></div>背景 → 卡片底色</div>
+    <div class="legend-item"><div class="legend-swatch" id="leg-accent"></div>强调 → 标题重点、kicker、引号、箭头、下划线</div>
+    <div class="legend-item"><div class="legend-swatch" id="leg-sec"></div>辅助 → 数据数字、进度条、环形图、标签、底栏</div>
+  </div>
+
+  <div class="jbar">
+    <code id="jout"></code>
+    <button class="cpb" onclick="copyJ()">COPY</button>
+  </div>
+</div></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal"><div class="modal">
+  <h3>保存当前配色</h3>
+  <div class="prow" id="mprev"></div>
+  <input class="ni" id="sname" placeholder="取个名字..." maxlength="20">
+  <div class="ma"><button class="mb cc" onclick="closeM()">取消</button><button class="mb cf" onclick="doSave()">保存</button></div>
+</div></div>
+
+<div class="hdr">
+  <h1>三色分离：背景 · 强调 · 辅助 各司其职</h1>
+  <p>每个颜色都有明确的管辖范围。上方 legend 标注了对应关系。</p>
+</div>
+
+<div class="grid" id="G">
+  <div class="sblk"><div class="stag">① 杂志编辑风</div><div class="card c1"><div class="top"><span class="tag">出海营销</span><span>VIBE MARKETING</span></div><h2>朋友的宠物用品<br>上了亚马逊<br>但<em>没人搜得到</em></h2><div class="sub">产品没问题，供应链没问题，<br>卡在「海外用户怎么找到我」这一步。</div><div class="iss">VOL.01 — 一人公司 × 出海</div></div></div>
+
+  <div class="sblk"><div class="stag">② 暗黑科技风</div><div class="card c2"><div class="gbg"></div><div class="ct"><div class="sb"><div class="dot"></div><span>CASE STUDY LIVE</span></div><h2>Google 前两页<br>全是测评博客<br>他的产品？<span class="hl">不存在</span></h2><div><div class="dr"><div><div class="dl">外包报价</div><div class="dv">¥3-5万</div></div><div><div class="dl">AI 交付</div><div class="dv">1 周</div></div><div><div class="dl">人数</div><div class="dv">1人</div></div></div><div class="bt">// VIBE_MARKETING_OS.v1</div></div></div></div></div>
+
+  <div class="sblk"><div class="stag">③ New York 杂志风</div><div class="card c3"><div class="mh"><span class="logo">Vibe Marketing</span><span class="dt">Vol.01</span></div><div class="hz"><div class="kk">跨境 · 出海营销</div><h2 class="hl2">上了亚马逊<br>却<i>隐身</i>了</h2><p class="dk">产品搞定了，供应链搞定了。<br>唯独「被找到」这件事，没人做。</p></div><div class="ps"><span class="qm">"</span>你只要懂三件事——在哪搜、搜什么词、看什么会下单。<span class="by">— Derek</span></div></div></div>
+
+  <div class="sblk"><div class="stag">④ 数据叙事风</div><div class="card c4"><div class="gbg"></div><div class="ct"><div class="tg">CASE</div><div class="bs"><span class="n">3-5</span><span class="u">万/月</span></div><p class="cp">海外营销公司的报价。<br>但懂 <strong>Vibe Marketing</strong> 的人，<br>用 AI 辅助，<u>一周</u>交付大半。</p><div class="bars"><div class="bi"><span class="bl">传统外包</span><div class="bt2"><div class="bf1"></div></div><span class="bv">¥3-5万</span></div><div class="bi"><span class="bl">AI + 1人</span><div class="bt2"><div class="bf2"></div></div><span class="bv dim">≈ ¥0</span></div></div><div class="ft"><span>SRC: FIELD RESEARCH</span><span>2025.Q1</span></div></div></div></div>
+
+  <div class="sblk"><div class="stag">⑤ NY + SVG 插画</div><div class="card c5"><div class="tb"><span class="logo">Vibe Marketing</span><span class="vol">VOL.01</span></div><div class="hero"><div class="ht"><div class="kk">出海案例</div><h2 class="hl3">产品上架了<br>却在搜索中<br><i>隐身</i></h2><p class="dk">产品、物流都搞定了。唯独没人看得到。</p></div><div class="hi"><svg viewBox="0 0 120 160" fill="none"><rect x="35" y="10" width="50" height="24" rx="12" stroke="var(--fg)" stroke-width="2.5" fill="none"/><circle cx="60" cy="22" r="4" fill="var(--accent)"/><path d="M60 34C60 60,40 70,50 100C55 115,65 120,60 140" stroke="var(--fg)" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="90" cy="110" r="18" stroke="var(--sec)" stroke-width="2" fill="var(--secS)" stroke-dasharray="4 3"/><line x1="82" y1="102" x2="98" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/><line x1="98" y1="102" x2="82" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/></svg></div></div><div class="bs2"><span>一人公司 × 出海</span><span class="au">by Derek</span></div></div></div>
+
+  <div class="sblk"><div class="stag">⑥ Data + 环形图</div><div class="card c6"><div class="gbg"></div><div class="ct"><div class="tg">ANALYSIS</div><div class="tt">出海准备<br><strong>完成了多少？</strong></div><div class="drow"><div class="donut" id="donut"><div class="dh"><span class="pct">43%</span><span class="pl">DONE</span></div></div><div class="leg"><div class="li"><div class="ld ss"></div>已完成：产品/物流/上架</div><div class="li"><div class="ld pp"></div>未完成：内容/SEO/社媒</div></div></div><div class="ins"><strong>关键缺口：</strong>所有「被发现」的环节都是空白。</div><div class="ft"><span>VIBE MARKETING OS</span><span>DATA #01</span></div></div></div></div>
+
+  <div class="sblk"><div class="stag">⑦ 暗色图文叠加</div><div class="card c7"><div class="iz" id="iz"><div class="psvg"><svg width="110" height="130" viewBox="0 0 110 130" fill="none"><rect x="25" y="10" width="60" height="28" rx="14" stroke="var(--muted)" stroke-width="2" fill="none"/><path d="M55 38C55 68,33 78,43 110" stroke="var(--muted)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="55" cy="65" r="28" fill="var(--secS)"/></svg></div><div class="ot"><div class="sm">宠物牵引绳</div><div class="bg2">在 Google<br>隐身了</div></div><div class="gf"></div></div><div class="tz"><p class="bt3">搜 <strong>"best dog harness"</strong>，前两页全是竞品。他的产品？不存在。</p><div class="cr"><span class="lb2">VIBE MARKETING · CASE 01</span><span class="ar">→</span></div></div></div></div>
+</div>
+
+<script>
+const h2r=h=>{h=h.replace('#','');if(h.length===3)h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];return{r:parseInt(h.substr(0,2),16),g:parseInt(h.substr(2,2),16),b:parseInt(h.substr(4,2),16)};};
+const r2h=(r,g,b)=>'#'+[r,g,b].map(x=>Math.max(0,Math.min(255,Math.round(x))).toString(16).padStart(2,'0')).join('');
+const lum=h=>{const{r,g,b}=h2r(h);return(.299*r+.587*g+.114*b)/255;};
+const mix=(a,b,t)=>{const c=h2r(a),d=h2r(b);return r2h(c.r+(d.r-c.r)*t,c.g+(d.g-c.g)*t,c.b+(d.b-c.b)*t);};
+const rgba=(h,a)=>{const{r,g,b}=h2r(h);return`rgba(${r},${g},${b},${a})`;};
+const hsl2hex=(h,s,l)=>{s/=100;l/=100;const a=s*Math.min(l,1-l);const f=n=>{const k=(n+h/30)%12;const c=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*c).toString(16).padStart(2,'0');};return'#'+f(0)+f(8)+f(4);};
+const randInt=(a,b)=>Math.floor(a+Math.random()*(b-a+1));
+
+// Derive: all cards use SAME bg, accent/sec clearly separated
+function derive(bg,accent,sec,txt){
+  sec=sec||accent;
+  const dk=lum(bg)<.45;
+  const fg=txt||(dk?'#f0f0f0':'#111111');
+  const muted=dk?mix(bg,'#ffffff',.3):mix(bg,'#000000',.38);
+  const border=dk?mix(bg,'#ffffff',.1):mix(bg,'#000000',.1);
+  const grid=dk?rgba('#ffffff',.035):rgba('#000000',.06);
+  return{
+    '--bg':bg,'--fg':fg,
+    '--accent':accent,'--accentA':rgba(accent,.3),'--accentS':rgba(accent,.12),
+    '--sec':sec,'--secS':rgba(sec,.1),
+    '--muted':muted,'--border':border,'--grid':grid,
+  };
+}
+
+function applyV(v){
+  const g=document.getElementById('G');
+  Object.entries(v).forEach(([k,val])=>g.style.setProperty(k,val));
+  // Donut: sec for filled, accent for remainder
+  document.getElementById('donut').style.background=`conic-gradient(${v['--sec']} 0deg 300deg, ${v['--accent']} 300deg 360deg)`;
+  // Image zone gradient
+  const{r,g:gg,b}=h2r(v['--sec']);
+  document.getElementById('iz').style.background=`radial-gradient(ellipse at 60% 40%,rgba(${r},${gg},${b},.12) 0%,${v['--bg']} 70%)`;
+  // Legend swatches
+  document.getElementById('leg-bg').style.background=v['--bg'];
+  document.getElementById('leg-accent').style.background=v['--accent'];
+  document.getElementById('leg-sec').style.background=v['--sec'];
+}
+
+let cc=3,locked={bg:false,accent:false,sec:false,text:false},rStyle='any',saved=[];
+
+function gS(id){return document.getElementById('in-'+id).value;}
+function sS(id,v){document.getElementById('in-'+id).value=v;document.getElementById('sw-'+id).style.background=v;const nc=document.querySelector('#s-'+id+' input[type=color]');if(nc)nc.value=v;}
+function refresh(){const bg=gS('bg'),a=gS('accent'),s=cc>=3?gS('sec'):null,t=cc>=4?gS('text'):null;applyV(derive(bg,a,s,t));updJ();}
+
+function setCount(n){cc=n;document.querySelectorAll('.cbtn').forEach(b=>b.classList.remove('active'));document.getElementById('cn'+n).classList.add('active');document.getElementById('s-sec').classList.toggle('hidden',n<3);document.getElementById('s-text').classList.toggle('hidden',n<4);refresh();}
+
+function hT(id){let v=document.getElementById('in-'+id).value.trim();if(!v.startsWith('#'))v='#'+v;if(/^#[0-9a-fA-F]{6}$/.test(v)){document.getElementById('sw-'+id).style.background=v;const nc=document.querySelector('#s-'+id+' input[type=color]');if(nc)nc.value=v;daChips();refresh();}}
+function nP(id,v){document.getElementById('in-'+id).value=v;document.getElementById('sw-'+id).style.background=v;daChips();refresh();}
+function tL(id){locked[id]=!locked[id];document.getElementById('s-'+id).classList.toggle('locked',locked[id]);document.querySelector('#s-'+id+' .lb').textContent=locked[id]?'🔒':'🔓';}
+function daChips(){document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('active'));document.querySelector('[data-st="any"]').classList.add('active');rStyle='any';}
+function setSt(s){rStyle=s;document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('active'));const el=document.querySelector(`[data-st="${s}"]`);if(el)el.classList.add('active');}
+
+// Random: ensure accent & secondary are visually distinct
+function gen(){
+  if(rStyle!=='any'&&rStyle.startsWith('s-')){const idx=+rStyle.replace('s-','');const p=saved[idx];if(p){if(!locked.bg)sS('bg',p.bg);if(!locked.accent)sS('accent',p.accent);if(!locked.sec&&p.sec)sS('sec',p.sec);if(!locked.text&&p.text)sS('text',p.text);refresh();return;}}
+  const hBase=randInt(0,360);const isDark=Math.random()>.35;
+  if(!locked.bg){const l=isDark?randInt(3,10):randInt(90,97);sS('bg',hsl2hex(hBase,randInt(0,10),l));}
+  if(!locked.accent){const h2=(hBase+randInt(-20,20)+360)%360;sS('accent',hsl2hex(h2,randInt(55,95),randInt(42,62)));}
+  if(!locked.sec&&cc>=3){
+    // Force secondary to be visually different: min 40° hue offset
+    const aH=randInt(0,360);const offset=randInt(40,180)*(Math.random()>.5?1:-1);
+    const h3=(aH+offset+360)%360;
+    sS('sec',hsl2hex(h3,randInt(50,90),randInt(40,60)));
+  }
+  if(!locked.text&&cc>=4){const bgL=lum(gS('bg'));sS('text',bgL<.45?hsl2hex(0,0,randInt(88,96)):hsl2hex(0,0,randInt(6,15)));}
+  refresh();
+}
+
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.code==='Space'){e.preventDefault();gen();}});
+
+// Save system
+function loadS(){try{const r=window._sp;if(r)saved=r;}catch(e){}renderC();}
+function persistS(){window._sp=saved;}
+function openSave(){const m=document.getElementById('modal');const prev=document.getElementById('mprev');const cols=[gS('bg'),gS('accent')];if(cc>=3)cols.push(gS('sec'));if(cc>=4)cols.push(gS('text'));prev.innerHTML=cols.map(c=>`<div class="psw" style="background:${c}"></div>`).join('');document.getElementById('sname').value='';m.classList.add('show');setTimeout(()=>document.getElementById('sname').focus(),100);}
+function closeM(){document.getElementById('modal').classList.remove('show');}
+function doSave(){const name=document.getElementById('sname').value.trim()||('配色'+(saved.length+1));saved.push({name,bg:gS('bg'),accent:gS('accent'),sec:cc>=3?gS('sec'):null,text:cc>=4?gS('text'):null});persistS();renderC();closeM();}
+document.getElementById('sname').addEventListener('keydown',e=>{if(e.code==='Enter'){e.preventDefault();doSave();}});
+function delS(i,e){e.stopPropagation();saved.splice(i,1);persistS();if(rStyle===`s-${i}`)setSt('any');renderC();}
+function appS(i){const p=saved[i];if(!p)return;sS('bg',p.bg);sS('accent',p.accent);if(p.sec)sS('sec',p.sec);if(p.text)sS('text',p.text);setSt(`s-${i}`);refresh();}
+function renderC(){const c=document.getElementById('chips');c.innerHTML=`<button class="chip ${rStyle==='any'?'active':''}" onclick="setSt('any')" data-st="any">随意</button>`;saved.forEach((p,i)=>{const a=rStyle===`s-${i}`;const ch=document.createElement('button');ch.className=`chip ${a?'active':''}`;ch.setAttribute('data-st',`s-${i}`);ch.onclick=()=>appS(i);ch.innerHTML=`<div class="cdot" style="background:linear-gradient(135deg,${p.bg} 33%,${p.accent} 33% 66%,${p.sec||p.accent} 66%)"></div>${p.name}<span class="del" onclick="delS(${i},event)">✕</span>`;c.appendChild(ch);});}
+
+function updJ(){const bg=gS('bg'),a=gS('accent');let ps=[`<span class="v">"bg"</span>:"${bg}"`,`<span class="v">"accent"</span>:"${a}"`];if(cc>=3)ps.push(`<span class="v">"secondary"</span>:"${gS('sec')}"`);if(cc>=4)ps.push(`<span class="v">"text"</span>:"${gS('text')}"`);document.getElementById('jout').innerHTML=`<span class="k">"theme"</span>:{${ps.join(',')}}  `;}
+function copyJ(){const bg=gS('bg'),a=gS('accent');let o={bg,accent:a};if(cc>=3)o.secondary=gS('sec');if(cc>=4)o.text=gS('text');navigator.clipboard.writeText(JSON.stringify({theme:o},null,2)).then(()=>{const b=document.querySelector('.cpb');b.textContent='COPIED!';setTimeout(()=>b.textContent='COPY',1500);});}
+
+window.addEventListener('DOMContentLoaded',()=>{loadS();refresh();});
+</script>
+
+</body>
+</html>
