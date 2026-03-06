@@ -72,9 +72,11 @@ async function exportCard(card,btn){
   // Inline all CSS var() values for serialization
   const svgSaved=resolveVarsForExport(card);
   try{
-    const expH=RATIO_MAP[currentRatio]?.h||480;
-    const pxRatio=1080/360;
-    const dataUrl=await hti.toPng(card,{pixelRatio:pxRatio,width:360,height:expH,cacheBust:true,
+    const expW=currentSize?.w||1080;
+    const expH=currentSize?.h||1440;
+    const previewH=Math.round(360*expH/expW);
+    const pxRatio=expW/360;
+    const dataUrl=await hti.toPng(card,{pixelRatio:pxRatio,width:360,height:previewH,cacheBust:true,
       filter:n=>!n.classList||!n.classList.contains('export-btn')});
     const link=document.createElement('a');
     const name=card.closest('.sblk')?.querySelector('.stag')?.textContent?.replace(/[^\w\u4e00-\u9fff]/g,'')||'poster';
