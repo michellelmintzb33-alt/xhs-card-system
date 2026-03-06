@@ -11,29 +11,65 @@
 
 <div class="workspace">
 <div class="left-panel">
-  <div class="lp-section">
-    <div class="lp-section-title">主要内容</div>
-    <textarea class="lp-input" id="f-main" rows="5" placeholder="粘贴你的文案（50-200字），系统自动拆分为标题、副文案、金句..."></textarea>
-    <div class="cb-preview" id="parsePreview"></div>
+  <!-- Group 1: 内容 -->
+  <div class="lp-group">
+    <div class="lp-group-label">内容</div>
+    <div class="lp-section">
+      <div class="lp-section-title">主要内容</div>
+      <textarea class="lp-input" id="f-main" rows="5" placeholder="粘贴你的文案（50-200字），系统自动拆分为标题、副文案、金句..."></textarea>
+      <div class="cb-preview" id="parsePreview"></div>
+      <input class="lp-input" id="f-highlight" placeholder="高亮关键词（逗号分隔）...">
+      <div class="lp-actions">
+        <button class="lp-action-btn" onclick="clearTemplateContent()">清空内容</button>
+        <button class="lp-action-btn" onclick="restoreDefaults()">恢复默认</button>
+      </div>
+    </div>
   </div>
-  <div class="lp-section">
-    <div class="lp-section-title">辅助标签</div>
-    <input class="lp-input" id="f-kicker" placeholder="标签...">
-    <input class="lp-input" id="f-series" placeholder="VOL.01...">
+
+  <!-- Group 2: 元数据 -->
+  <div class="lp-group">
+    <div class="lp-group-label">元数据</div>
+    <div class="lp-section">
+      <div class="lp-section-title">辅助标签</div>
+      <input class="lp-input" id="f-kicker" placeholder="标签...">
+      <input class="lp-input" id="f-series" placeholder="VOL.01...">
+    </div>
+    <div class="lp-section">
+      <div class="lp-section-title">固定元素</div>
+      <input class="lp-input" id="f-author" placeholder="署名...">
+    </div>
   </div>
-  <div class="lp-section">
-    <div class="lp-section-title">固定元素</div>
-    <input class="lp-input" id="f-author" placeholder="署名...">
+
+  <!-- Group 3: 数据 -->
+  <div class="lp-group">
+    <div class="lp-group-label">数据</div>
+    <div class="lp-section">
+      <div class="lp-section-title">结构化数据</div>
+      <textarea class="lp-input" id="f-data" rows="3" placeholder="月均成本: ¥8000&#10;AI交付: 1周&#10;人数: 1人"></textarea>
+    </div>
+    <div class="lp-section">
+      <div class="lp-section-title">列表内容</div>
+      <textarea class="lp-input" id="f-list" rows="5" placeholder="已完成事项&#10;待完成事项&#10;用 --- 分隔已完成/待完成"></textarea>
+    </div>
   </div>
-  <div class="lp-section">
-    <div class="lp-section-title">结构化数据</div>
-    <textarea class="lp-input" id="f-data" rows="3" placeholder="月均成本: ¥8000&#10;AI交付: 1周&#10;人数: 1人"></textarea>
-  </div>
-  <div class="lp-section">
-    <div class="lp-section-title">列表内容</div>
-    <textarea class="lp-input" id="f-list" rows="5" placeholder="已完成事项&#10;待完成事项&#10;用 --- 分隔已完成/待完成"></textarea>
+
+  <!-- Group 4: 系列 -->
+  <div class="lp-group">
+    <div class="lp-group-label">系列</div>
+    <div class="lp-section series-section">
+      <div class="lp-section-title">模板系列</div>
+      <div class="series-list" id="seriesList"></div>
+      <div class="series-actions">
+        <button class="series-btn" onclick="openSaveSeries()">保存系列</button>
+        <button class="series-btn" onclick="exportSeries()">导出</button>
+        <button class="series-btn" onclick="document.getElementById('importFile').click()">导入</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importSeries(event)">
+      </div>
+    </div>
   </div>
 </div>
+
+<div class="divider" id="divider"></div>
 
 <div class="right-panel">
 <div class="ctrl"><div class="ci">
@@ -86,7 +122,10 @@
       <button class="cbtn" onclick="filterCards('金句',this)">金句</button>
       <button class="cbtn" onclick="filterCards('数据',this)">数据</button>
       <button class="cbtn" onclick="filterCards('流程',this)">流程</button>
+      <button class="cbtn" onclick="filterCards('selected',this)">已选</button>
     </div>
+    <div class="sep"></div>
+    <button class="tool-btn" id="restoreBtn" onclick="restoreRemoved()">恢复</button>
     <div class="sep"></div>
     <div class="ctog" id="ghostTog">
       <button class="cbtn active" onclick="setGhost('blur',this)">模糊</button>
@@ -125,23 +164,25 @@
   </div>
 </div></div>
 
+<div class="h-divider" id="hDivider"></div>
+<div class="scroll-area" id="scrollArea">
 <div id="zoomWrap">
 <div class="grid" id="G">
-  <div class="sblk" data-tags="重点"><div class="stag">① 杂志编辑风 <span class="tag-badge">重点</span></div><div class="card c1"><div class="top"><span class="tag">出海营销</span><span class="ghost">VIBE MARKETING</span></div><h2>朋友的宠物用品<br>上了亚马逊<br>但<em>没人搜得到</em></h2><div class="sub">产品没问题，供应链没问题，<br>卡在「海外用户怎么找到我」这一步。</div><div class="iss">VOL.01 — 一人公司 × 出海</div></div></div>
+  <div class="sblk" data-tags="重点" data-tpl="c1"><div class="stag">① 杂志编辑风 <span class="tag-badge">重点</span></div><div class="card c1"><div class="top"><span class="tag">出海营销</span><span class="ghost">VIBE MARKETING</span></div><h2>朋友的宠物用品<br>上了亚马逊<br>但<em>没人搜得到</em></h2><div class="sub">产品没问题，供应链没问题，<br>卡在「海外用户怎么找到我」这一步。</div><div class="iss">VOL.01 — 一人公司 × 出海</div></div></div>
 
-  <div class="sblk" data-tags="重点"><div class="stag">② 暗黑科技风 <span class="tag-badge">重点</span></div><div class="card c2"><div class="gbg"></div><div class="ct"><div class="sb"><div class="dot"></div><span>CASE STUDY LIVE</span></div><h2>Google 前两页<br>全是测评博客<br>他的产品？<span class="hl">不存在</span></h2><p class="c2sub"></p><div><div class="dr ghost"><div><div class="dl">外包报价</div><div class="dv">¥3-5万</div></div><div><div class="dl">AI 交付</div><div class="dv">1 周</div></div><div><div class="dl">人数</div><div class="dv">1人</div></div></div><div class="bt">// VIBE_MARKETING_OS.v1</div></div></div></div></div>
+  <div class="sblk" data-tags="重点" data-tpl="c2"><div class="stag">② 暗黑科技风 <span class="tag-badge">重点</span></div><div class="card c2"><div class="gbg"></div><div class="ct"><div class="sb"><div class="dot"></div><span>CASE STUDY LIVE</span></div><h2>Google 前两页<br>全是测评博客<br>他的产品？<span class="hl">不存在</span></h2><p class="c2sub"></p><div><div class="dr ghost"><div><div class="dl">外包报价</div><div class="dv">¥3-5万</div></div><div><div class="dl">AI 交付</div><div class="dv">1 周</div></div><div><div class="dl">人数</div><div class="dv">1人</div></div></div><div class="bt">// VIBE_MARKETING_OS.v1</div></div></div></div></div>
 
-  <div class="sblk" data-tags="金句"><div class="stag">③ New York 杂志风 <span class="tag-badge">金句</span></div><div class="card c3"><div class="mh"><span class="logo ghost">Vibe Marketing</span><span class="dt">Vol.01</span></div><div class="hz"><div class="kk">跨境 · 出海营销</div><h2 class="hl2">上了亚马逊<br>却<i>隐身</i>了</h2><p class="dk">产品搞定了，供应链搞定了。<br>唯独「被找到」这件事，没人做。</p></div><div class="ps"><span class="qm">"</span>你只要懂三件事——在哪搜、搜什么词、看什么会下单。<span class="by">— Derek</span></div></div></div>
+  <div class="sblk" data-tags="金句" data-tpl="c3"><div class="stag">③ New York 杂志风 <span class="tag-badge">金句</span></div><div class="card c3"><div class="mh"><span class="logo ghost">Vibe Marketing</span><span class="dt">Vol.01</span></div><div class="hz"><div class="kk">跨境 · 出海营销</div><h2 class="hl2">上了亚马逊<br>却<i>隐身</i>了</h2><p class="dk">产品搞定了，供应链搞定了。<br>唯独「被找到」这件事，没人做。</p></div><div class="ps"><span class="qm">"</span>你只要懂三件事——在哪搜、搜什么词、看什么会下单。<span class="by">— Derek</span></div></div></div>
 
-  <div class="sblk" data-tags="数据"><div class="stag">④ 数据叙事风 <span class="tag-badge">数据</span></div><div class="card c4"><div class="gbg"></div><div class="ct"><div class="tg">CASE</div><div class="bs"><span class="n">3-5</span><span class="u">万/月</span></div><p class="cp">海外营销公司的报价。<br>但懂 <strong>Vibe Marketing</strong> 的人，<br>用 AI 辅助，<u>一周</u>交付大半。</p><div class="bars"><div class="bi"><span class="bl">传统外包</span><div class="bt2"><div class="bf1"></div></div><span class="bv">¥3-5万</span></div><div class="bi"><span class="bl">AI + 1人</span><div class="bt2"><div class="bf2"></div></div><span class="bv dim">≈ ¥0</span></div></div><div class="ft"><span>SRC: FIELD RESEARCH</span><span>2025.Q1</span></div></div></div></div>
+  <div class="sblk" data-tags="数据" data-tpl="c4"><div class="stag">④ 数据叙事风 <span class="tag-badge">数据</span></div><div class="card c4"><div class="gbg"></div><div class="ct"><div class="tg">CASE</div><div class="bs"><span class="n">3-5</span><span class="u">万/月</span></div><p class="cp">海外营销公司的报价。<br>但懂 <strong>Vibe Marketing</strong> 的人，<br>用 AI 辅助，<u>一周</u>交付大半。</p><div class="bars"><div class="bi"><span class="bl">传统外包</span><div class="bt2"><div class="bf1"></div></div><span class="bv">¥3-5万</span></div><div class="bi"><span class="bl">AI + 1人</span><div class="bt2"><div class="bf2"></div></div><span class="bv dim">≈ ¥0</span></div></div><div class="ft"><span>SRC: FIELD RESEARCH</span><span>2025.Q1</span></div></div></div></div>
 
-  <div class="sblk" data-tags="金句"><div class="stag">⑤ NY + SVG 插画 <span class="tag-badge">金句</span></div><div class="card c5"><div class="tb"><span class="logo ghost">Vibe Marketing</span><span class="vol">VOL.01</span></div><div class="hero"><div class="ht"><div class="kk">出海案例</div><h2 class="hl3">产品上架了<br>却在搜索中<br><i>隐身</i></h2><p class="dk">产品、物流都搞定了。唯独没人看得到。</p></div><div class="hi"><svg viewBox="0 0 120 160" fill="none"><rect x="35" y="10" width="50" height="24" rx="12" stroke="var(--fg)" stroke-width="2.5" fill="none"/><circle cx="60" cy="22" r="4" fill="var(--accent)"/><path d="M60 34C60 60,40 70,50 100C55 115,65 120,60 140" stroke="var(--fg)" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="90" cy="110" r="18" stroke="var(--sec)" stroke-width="2" fill="var(--secS)" stroke-dasharray="4 3"/><line x1="82" y1="102" x2="98" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/><line x1="98" y1="102" x2="82" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/></svg></div></div><div class="bs2"><span class="ghost">一人公司 × 出海</span><span class="au">by Derek</span></div></div></div>
+  <div class="sblk" data-tags="金句" data-tpl="c5"><div class="stag">⑤ NY + SVG 插画 <span class="tag-badge">金句</span></div><div class="card c5"><div class="tb"><span class="logo ghost">Vibe Marketing</span><span class="vol">VOL.01</span></div><div class="hero"><div class="ht"><div class="kk">出海案例</div><h2 class="hl3">产品上架了<br>却在搜索中<br><i>隐身</i></h2><p class="dk">产品、物流都搞定了。唯独没人看得到。</p></div><div class="hi"><svg viewBox="0 0 120 160" fill="none"><rect x="35" y="10" width="50" height="24" rx="12" stroke="var(--fg)" stroke-width="2.5" fill="none"/><circle cx="60" cy="22" r="4" fill="var(--accent)"/><path d="M60 34C60 60,40 70,50 100C55 115,65 120,60 140" stroke="var(--fg)" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="90" cy="110" r="18" stroke="var(--sec)" stroke-width="2" fill="var(--secS)" stroke-dasharray="4 3"/><line x1="82" y1="102" x2="98" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/><line x1="98" y1="102" x2="82" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/></svg></div></div><div class="bs2"><span class="ghost">一人公司 × 出海</span><span class="au">by Derek</span></div></div></div>
 
-  <div class="sblk" data-tags="数据"><div class="stag">⑥ Data + 环形图 <span class="tag-badge">数据</span></div><div class="card c6"><div class="gbg"></div><div class="ct"><div class="tg">ANALYSIS</div><div class="tt">出海准备<br><strong>完成了多少？</strong></div><div class="drow"><div class="donut" id="donut"><div class="dh"><span class="pct">43%</span><span class="pl">DONE</span></div></div><div class="leg"><div class="li"><div class="ld ss"></div>已完成：产品/物流/上架</div><div class="li"><div class="ld pp"></div>未完成：内容/SEO/社媒</div></div></div><div class="ins"><strong>关键缺口：</strong>所有「被发现」的环节都是空白。</div><div class="ft"><span>VIBE MARKETING OS</span><span>DATA #01</span></div></div></div></div>
+  <div class="sblk" data-tags="数据" data-tpl="c6"><div class="stag">⑥ Data + 环形图 <span class="tag-badge">数据</span></div><div class="card c6"><div class="gbg"></div><div class="ct"><div class="tg">ANALYSIS</div><div class="tt">出海准备<br><strong>完成了多少？</strong></div><div class="drow"><div class="donut" id="donut"><div class="dh"><span class="pct">43%</span><span class="pl">DONE</span></div></div><div class="leg"><div class="li"><div class="ld ss"></div>已完成：产品/物流/上架</div><div class="li"><div class="ld pp"></div>未完成：内容/SEO/社媒</div></div></div><div class="ins"><strong>关键缺口：</strong>所有「被发现」的环节都是空白。</div><div class="ft"><span>VIBE MARKETING OS</span><span>DATA #01</span></div></div></div></div>
 
-  <div class="sblk" data-tags="重点"><div class="stag">⑦ 暗色图文叠加 <span class="tag-badge">重点</span></div><div class="card c7"><div class="iz" id="iz"><div class="psvg"><svg width="110" height="130" viewBox="0 0 110 130" fill="none"><rect x="25" y="10" width="60" height="28" rx="14" stroke="var(--muted)" stroke-width="2" fill="none"/><path d="M55 38C55 68,33 78,43 110" stroke="var(--muted)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="55" cy="65" r="28" fill="var(--secS)"/></svg></div><div class="ot"><div class="sm">宠物牵引绳</div><div class="bg2">在 Google<br>隐身了</div></div><div class="gf"></div></div><div class="tz"><p class="bt3">搜 <strong>"best dog harness"</strong>，前两页全是竞品。他的产品？不存在。</p><div class="cr"><span class="lb2">VIBE MARKETING · CASE 01</span><span class="ar ghost">→</span></div></div></div></div>
+  <div class="sblk" data-tags="重点" data-tpl="c7"><div class="stag">⑦ 暗色图文叠加 <span class="tag-badge">重点</span></div><div class="card c7"><div class="iz" id="iz"><div class="psvg"><svg width="110" height="130" viewBox="0 0 110 130" fill="none"><rect x="25" y="10" width="60" height="28" rx="14" stroke="var(--muted)" stroke-width="2" fill="none"/><path d="M55 38C55 68,33 78,43 110" stroke="var(--muted)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="55" cy="65" r="28" fill="var(--secS)"/></svg></div><div class="ot"><div class="sm">宠物牵引绳</div><div class="bg2">在 Google<br>隐身了</div></div><div class="gf"></div></div><div class="tz"><p class="bt3">搜 <strong>"best dog harness"</strong>，前两页全是竞品。他的产品？不存在。</p><div class="cr"><span class="lb2">VIBE MARKETING · CASE 01</span><span class="ar ghost">→</span></div></div></div></div>
   <!-- C8 · 手绘笔记风 -->
-  <div class="sblk" data-tags="金句"><div class="stag">⑧ 手绘笔记风 <span class="tag-badge">金句</span></div><div class="card c8 hd-lined hd-font">
+  <div class="sblk" data-tags="金句" data-tpl="c8"><div class="stag">⑧ 手绘笔记风 <span class="tag-badge">金句</span></div><div class="card c8 hd-lined hd-font">
     <div class="margin-line"></div>
     <div class="tape"></div>
     <div class="body">
@@ -158,7 +199,7 @@
   </div></div>
 
   <!-- C9 · 白板思维导图 -->
-  <div class="sblk" data-tags="流程"><div class="stag">⑨ 白板思维导图 <span class="tag-badge">流程</span></div><div class="card c9 hd-dotgrid">
+  <div class="sblk" data-tags="流程" data-tpl="c9"><div class="stag">⑨ 白板思维导图 <span class="tag-badge">流程</span></div><div class="card c9 hd-dotgrid">
     <svg viewBox="0 0 360 480" fill="none">
       <!-- Center node -->
       <rect x="110" y="195" width="140" height="52" rx="4" stroke="var(--fg)" stroke-width="2.5" fill="var(--bg)" class="hd-stroke" transform="rotate(-0.8 180 221)"/>
@@ -187,7 +228,7 @@
   </div></div>
 
   <!-- C10 · 手绘清单风 -->
-  <div class="sblk" data-tags="流程"><div class="stag">⑩ 手绘清单风 <span class="tag-badge">流程</span></div><div class="card c10 hd-font" style="background:var(--bg)">
+  <div class="sblk" data-tags="流程" data-tpl="c10"><div class="stag">⑩ 手绘清单风 <span class="tag-badge">流程</span></div><div class="card c10 hd-font" style="background:var(--bg)">
     <h2>出海 Checklist ✓</h2>
     <div class="item done">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--muted)" stroke-width="1.8" class="hd-stroke"/><path d="M5 5 L15 15 M15 5 L5 15" stroke="var(--accent)" stroke-width="2.2" class="hd-stroke"/></svg>
@@ -221,7 +262,7 @@
   </div></div>
 
   <!-- C11 · 手绘数据卡 -->
-  <div class="sblk" data-tags="数据"><div class="stag">⑪ 手绘数据卡 <span class="tag-badge">数据</span></div><div class="card c11 hd-dotgrid hd-font">
+  <div class="sblk" data-tags="数据" data-tpl="c11"><div class="stag">⑪ 手绘数据卡 <span class="tag-badge">数据</span></div><div class="card c11 hd-dotgrid hd-font">
     <div class="tag11">Case Study · 成本对比</div>
     <h2>¥3-5万 <span>/月</span></h2>
     <p style="font-size:13px;color:var(--muted);line-height:1.6;">传统外包海外营销的月均报价。<br>而 AI + 一人团队，接近零成本。</p>
@@ -248,7 +289,7 @@
   </div></div>
 
   <!-- C12 · 涂鸦标注风 -->
-  <div class="sblk" data-tags="金句"><div class="stag">⑫ 涂鸦标注风 <span class="tag-badge">金句</span></div><div class="card c12 hd-font">
+  <div class="sblk" data-tags="金句" data-tpl="c12"><div class="stag">⑫ 涂鸦标注风 <span class="tag-badge">金句</span></div><div class="card c12 hd-font">
     <div class="label12">Field Notes · 出海观察</div>
     <h2>产品已上架，<br>但完全「隐身」了</h2>
     <div class="body12" style="position:relative;">
@@ -269,15 +310,25 @@
   </div></div>
 </div>
 </div><!-- /zoomWrap -->
+</div><!-- /scrollArea -->
 </div><!-- /right-panel -->
 </div><!-- /workspace -->
 
-<!-- Modal -->
+<!-- Modal: Color Save -->
 <div class="modal-overlay" id="modal"><div class="modal">
   <h3>保存当前配色</h3>
   <div class="prow" id="mprev"></div>
   <input class="ni" id="sname" placeholder="取个名字..." maxlength="20">
   <div class="ma"><button class="mb cc" onclick="closeM()">取消</button><button class="mb cf" onclick="doSave()">保存</button></div>
+</div></div>
+
+<!-- Modal: Series Save -->
+<div class="modal-overlay" id="seriesModal"><div class="modal">
+  <h3>保存模板系列</h3>
+  <div class="prow" id="smPrev"></div>
+  <div class="series-sel-count" id="smCount">已选 0 个模板</div>
+  <input class="ni" id="seriesName" placeholder="系列名称..." maxlength="30">
+  <div class="ma"><button class="mb cc" onclick="closeSeriesModal()">取消</button><button class="mb cf" onclick="doSaveSeries()">保存</button></div>
 </div></div>
 
 <script src="js/templates.js"></script>
@@ -393,13 +444,69 @@ function setZoom(s){
   document.getElementById('zoomVal').textContent=Math.round(currentZoom*100)+'%';
 }
 
+// ===== RESIZABLE DIVIDER =====
+(function(){
+  const divider=document.getElementById('divider');
+  const left=document.querySelector('.left-panel');
+  const workspace=document.querySelector('.workspace');
+  let dragging=false;
+  divider.addEventListener('mousedown',e=>{
+    e.preventDefault();dragging=true;
+    divider.classList.add('dragging');
+    document.body.style.cursor='col-resize';
+    document.body.style.userSelect='none';
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const rect=workspace.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    const pct=Math.min(Math.max(x/rect.width*100,10),60);
+    left.style.width=pct+'%';
+  });
+  document.addEventListener('mouseup',()=>{
+    if(!dragging)return;dragging=false;
+    divider.classList.remove('dragging');
+    document.body.style.cursor='';
+    document.body.style.userSelect='';
+  });
+})();
+
+// ===== HORIZONTAL DIVIDER (top/bottom split) =====
+(function(){
+  const hDiv=document.getElementById('hDivider');
+  const ctrl=document.querySelector('.ctrl');
+  const rp=document.querySelector('.right-panel');
+  let dragging=false;
+  hDiv.addEventListener('mousedown',e=>{
+    e.preventDefault();dragging=true;
+    hDiv.classList.add('dragging');
+    document.body.style.cursor='row-resize';
+    document.body.style.userSelect='none';
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const rect=rp.getBoundingClientRect();
+    const y=e.clientY-rect.top;
+    const min=80,max=rect.height*.7;
+    ctrl.style.height=Math.min(Math.max(y,min),max)+'px';
+  });
+  document.addEventListener('mouseup',()=>{
+    if(!dragging)return;dragging=false;
+    hDiv.classList.remove('dragging');
+    document.body.style.cursor='';
+    document.body.style.userSelect='';
+  });
+})();
+
 window.addEventListener('DOMContentLoaded',async()=>{
-  loadS();refresh();injectExportBtns();
+  loadS();refresh();injectExportBtns();injectSelectUI();loadSeriesList();
   // Bind content input events
   ['f-main','f-kicker','f-author','f-series'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.addEventListener('input',debouncedPropagate);
   });
+  snapshotDefaults();
+  document.getElementById('f-highlight').addEventListener('input',debouncedHighlight);
   // SortableJS — drag to reorder cards within each grid
   try{
     const{default:Sortable}=await import('https://esm.sh/sortablejs@1.15.6');

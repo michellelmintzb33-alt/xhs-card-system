@@ -191,6 +191,9 @@ function propagateContent(){
   }
 
   // C9 mindmap: receives nothing
+
+  // Re-apply keyword highlights after content propagation
+  applyKeywordHighlights();
 }
 
 // --- Card filter (tag-based) ---
@@ -202,6 +205,8 @@ function filterCards(tag,btn){
   document.querySelectorAll('.sblk').forEach(blk=>{
     if(tag==='all'){
       blk.classList.remove('filtered-out');
+    }else if(tag==='selected'){
+      blk.classList.toggle('filtered-out',!blk.classList.contains('selected'));
     }else{
       const tags=(blk.dataset.tags||'').split(',');
       blk.classList.toggle('filtered-out',!tags.includes(tag));
@@ -224,3 +229,232 @@ function setGhost(mode,btn){
 
 let _contentTimer=null;
 function debouncedPropagate(){clearTimeout(_contentTimer);_contentTimer=setTimeout(propagateContent,150);}
+
+// ===== KEYWORD HIGHLIGHT SYSTEM =====
+let _hlKeywords=[];
+let _hlTimer=null;
+function debouncedHighlight(){clearTimeout(_hlTimer);_hlTimer=setTimeout(updateHighlightKeywords,200);}
+
+function updateHighlightKeywords(){
+  const raw=(document.getElementById('f-highlight')||{}).value||'';
+  _hlKeywords=raw.split(/[,，\s]+/).map(s=>s.trim()).filter(Boolean);
+  applyKeywordHighlights();
+}
+
+function stripHighlights(el){
+  el.querySelectorAll('mark.kw-hl').forEach(mark=>{
+    const parent=mark.parentNode;
+    parent.replaceChild(document.createTextNode(mark.textContent),mark);
+  });
+  el.normalize();
+}
+
+function highlightTextNode(node,pattern){
+  const text=node.textContent;
+  const match=pattern.exec(text);
+  if(!match) return;
+  const before=text.slice(0,match.index);
+  const matched=text.slice(match.index,match.index+match[0].length);
+  const after=text.slice(match.index+match[0].length);
+  const frag=document.createDocumentFragment();
+  if(before) frag.appendChild(document.createTextNode(before));
+  const mark=document.createElement('mark');
+  mark.className='kw-hl';
+  mark.textContent=matched;
+  frag.appendChild(mark);
+  if(after) frag.appendChild(document.createTextNode(after));
+  node.parentNode.replaceChild(frag,node);
+}
+
+function applyKeywordHighlights(){
+  if(!_hlKeywords.length){
+    // Strip all highlights
+    Object.keys(CONTENT_MAP).forEach(cls=>{
+      const card=document.querySelector(`.card.${cls}`);
+      if(!card) return;
+      const map=CONTENT_MAP[cls];
+      Object.keys(map).forEach(field=>{
+        const el=card.querySelector(map[field]);
+        if(el&&el.tagName!=='text') stripHighlights(el);
+      });
+    });
+    return;
+  }
+  const escaped=_hlKeywords.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+  const patternStr=escaped.join('|');
+
+  Object.keys(CONTENT_MAP).forEach(cls=>{
+    const card=document.querySelector(`.card.${cls}`);
+    if(!card) return;
+    const map=CONTENT_MAP[cls];
+    Object.keys(map).forEach(field=>{
+      const el=card.querySelector(map[field]);
+      if(!el||el.tagName==='text') return;
+      stripHighlights(el);
+      const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null);
+      const textNodes=[];
+      let n;
+      while(n=walker.nextNode()) textNodes.push(n);
+      textNodes.forEach(tn=>{
+        let current=tn;
+        while(current&&current.nodeType===Node.TEXT_NODE){
+          const regex=new RegExp(patternStr,'i');
+          const m=regex.exec(current.textContent);
+          if(!m) break;
+          const before=current.textContent.slice(0,m.index);
+          const matched=current.textContent.slice(m.index,m.index+m[0].length);
+          const after=current.textContent.slice(m.index+m[0].length);
+          const frag=document.createDocumentFragment();
+          if(before) frag.appendChild(document.createTextNode(before));
+          const mark=document.createElement('mark');
+          mark.className='kw-hl';
+          mark.textContent=matched;
+          frag.appendChild(mark);
+          const afterNode=after?document.createTextNode(after):null;
+          if(afterNode) frag.appendChild(afterNode);
+          current.parentNode.replaceChild(frag,current);
+          current=afterNode;
+        }
+      });
+    });
+  });
+}
+
+// ===== DEFAULT CONTENT SNAPSHOT / CLEAR / RESTORE =====
+let _defaultContent={};
+
+function snapshotDefaults(){
+  _defaultContent={};
+  Object.keys(CONTENT_MAP).forEach(cls=>{
+    const card=document.querySelector(`.card.${cls}`);
+    if(!card) return;
+    const map=CONTENT_MAP[cls];
+    _defaultContent[cls]={};
+    Object.keys(map).forEach(field=>{
+      const el=card.querySelector(map[field]);
+      if(!el) return;
+      if(el.tagName==='text'){
+        _defaultContent[cls][field]=el.textContent;
+      }else{
+        _defaultContent[cls][field]=el.innerHTML;
+      }
+    });
+  });
+}
+
+function clearTemplateContent(){
+  Object.keys(CONTENT_MAP).forEach(cls=>{
+    const card=document.querySelector(`.card.${cls}`);
+    if(!card) return;
+    const map=CONTENT_MAP[cls];
+    Object.keys(map).forEach(field=>{
+      const el=card.querySelector(map[field]);
+      if(!el) return;
+      if(el.tagName==='text'){
+        el.textContent='';
+        return;
+      }
+      // C8 headline: preserve wave-ul SVG
+      if(cls==='c8'&&field==='headline'){
+        const svg=el.querySelector('svg.wave-ul');
+        el.innerHTML='';
+        if(svg) el.appendChild(svg);
+        return;
+      }
+      // C3 quote (.ps): preserve .qm and .by
+      if(cls==='c3'&&field==='quote'){
+        const qm=el.querySelector('.qm');
+        const by=el.querySelector('.by');
+        el.innerHTML='';
+        if(qm) el.appendChild(qm);
+        if(by) el.appendChild(by);
+        return;
+      }
+      el.innerHTML='';
+    });
+  });
+}
+
+function restoreDefaults(){
+  Object.keys(CONTENT_MAP).forEach(cls=>{
+    const card=document.querySelector(`.card.${cls}`);
+    if(!card) return;
+    const map=CONTENT_MAP[cls];
+    const snap=_defaultContent[cls];
+    if(!snap) return;
+    Object.keys(map).forEach(field=>{
+      const el=card.querySelector(map[field]);
+      if(!el||snap[field]===undefined) return;
+      if(el.tagName==='text'){
+        el.textContent=snap[field];
+      }else{
+        el.innerHTML=snap[field];
+      }
+    });
+    card.classList.remove('has-content','ghost-hide','ghost-show');
+  });
+  // Clear all left panel inputs
+  ['f-main','f-kicker','f-author','f-series','f-data','f-list','f-highlight'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  _hlKeywords=[];
+  const preview=document.getElementById('parsePreview');
+  if(preview) preview.innerHTML='';
+}
+
+// ===== SELECT & DELETE UI =====
+function injectSelectUI(){
+  document.querySelectorAll('.sblk').forEach(blk=>{
+    const stag=blk.querySelector('.stag');
+    if(!stag)return;
+    // Checkbox
+    const chk=document.createElement('label');
+    chk.className='tpl-check';
+    chk.innerHTML='<input type="checkbox"><span class="tpl-checkmark"></span>';
+    chk.querySelector('input').addEventListener('change',function(e){
+      e.stopPropagation();
+      blk.classList.toggle('selected',this.checked);
+    });
+    stag.prepend(chk);
+    // Delete button
+    const del=document.createElement('button');
+    del.className='tpl-del';
+    del.textContent='\u2715';
+    del.addEventListener('click',function(e){
+      e.stopPropagation();
+      blk.classList.add('removed');
+    });
+    stag.appendChild(del);
+  });
+}
+
+function restoreRemoved(){
+  document.querySelectorAll('.sblk.removed').forEach(blk=>blk.classList.remove('removed'));
+}
+
+function getSelectedTpls(){
+  return Array.from(document.querySelectorAll('.sblk.selected')).map(b=>b.dataset.tpl).filter(Boolean);
+}
+
+function setSelectedTpls(ids){
+  document.querySelectorAll('.sblk').forEach(blk=>{
+    const tpl=blk.dataset.tpl;
+    const chk=blk.querySelector('.tpl-check input');
+    if(ids.includes(tpl)){
+      blk.classList.add('selected');
+      if(chk)chk.checked=true;
+    }else{
+      blk.classList.remove('selected');
+      if(chk)chk.checked=false;
+    }
+  });
+}
+
+function clearSelections(){
+  document.querySelectorAll('.sblk').forEach(blk=>{
+    blk.classList.remove('selected','removed');
+    const chk=blk.querySelector('.tpl-check input');
+    if(chk)chk.checked=false;
+  });
+}
