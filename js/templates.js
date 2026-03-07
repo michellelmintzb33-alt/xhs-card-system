@@ -51,7 +51,10 @@ const CONTENT_MAP={
   c9:{headline:'svg text[y="226"]'},
   c10:{headline:'h2'},
   c11:{headline:'h2',subtitle:'p:not([class])',kicker:'.tag11',series:'.note11'},
-  c12:{headline:'h2',subtitle:'.body12 p',kicker:'.label12',quote:'.bubble'}
+  c12:{headline:'h2',subtitle:'.body12 p',kicker:'.label12',quote:'.bubble'},
+  c13:{headline:'h2',subtitle:'.sub13',kicker:'.kicker13',series:'.foot13 .tag13'},
+  c14:{headline:'h2'},
+  c15:{headline:'h2',subtitle:'.sub15',kicker:'.kicker15',quote:'.quote15',series:'.page15'}
 };
 
 // --- Auto-split raw text into headline / subtitle / quote ---
@@ -140,7 +143,7 @@ function applyField(card,map,field,value,cls){
 }
 
 // --- Content distribution by template group ---
-const GROUP_A=['c1','c2','c3','c5','c7','c8','c12'];  // text templates
+const GROUP_A=['c1','c2','c3','c5','c7','c8','c12','c13','c15'];  // text templates
 const GROUP_B=['c4','c6','c11'];                        // data templates (fixed info only)
 // C9 = mindmap (receives nothing), C10 = checklist (headline only)
 
@@ -190,6 +193,12 @@ function propagateContent(){
     applyField(c10,CONTENT_MAP.c10,'headline',parsed.headline,'c10');
   }
 
+  // C14 checklist — headline only
+  const c14=document.querySelector('.card.c14');
+  if(c14&&parsed.headline){
+    applyField(c14,CONTENT_MAP.c14,'headline',parsed.headline,'c14');
+  }
+
   // C9 mindmap: receives nothing
 
   // Re-apply keyword highlights after content propagation
@@ -197,8 +206,8 @@ function propagateContent(){
 }
 
 // --- Card filter (tag-based) ---
-const TEXT_CARDS=['c1','c2','c3','c5','c7','c8','c12'];
-const DATA_CARDS=['c4','c6','c9','c10','c11'];
+const TEXT_CARDS=['c1','c2','c3','c5','c7','c8','c12','c13','c15'];
+const DATA_CARDS=['c4','c6','c9','c10','c11','c14'];
 function filterCards(tag,btn){
   document.querySelectorAll('#filterTog .cbtn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
@@ -228,7 +237,7 @@ function setGhost(mode,btn){
 }
 
 let _contentTimer=null;
-function debouncedPropagate(){clearTimeout(_contentTimer);_contentTimer=setTimeout(propagateContent,150);}
+function debouncedPropagate(){clearTimeout(_contentTimer);_contentTimer=setTimeout(()=>{propagateContent();if(typeof _exploreActive!=='undefined'&&_exploreActive)refreshExploreContent();},150);}
 
 // ===== KEYWORD HIGHLIGHT SYSTEM =====
 let _hlKeywords=[];
@@ -408,15 +417,6 @@ function injectSelectUI(){
   document.querySelectorAll('.sblk').forEach(blk=>{
     const stag=blk.querySelector('.stag');
     if(!stag)return;
-    // Checkbox
-    const chk=document.createElement('label');
-    chk.className='tpl-check';
-    chk.innerHTML='<input type="checkbox"><span class="tpl-checkmark"></span>';
-    chk.querySelector('input').addEventListener('change',function(e){
-      e.stopPropagation();
-      blk.classList.toggle('selected',this.checked);
-    });
-    stag.prepend(chk);
     // Delete button
     const del=document.createElement('button');
     del.className='tpl-del';

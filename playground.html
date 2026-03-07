@@ -116,7 +116,10 @@
     <div class="sep"></div>
     <button class="save-btn" onclick="openSave()"><span class="icon">💾</span>保存</button>
     <div class="sep"></div>
+    <button class="tool-btn" id="exploreBtn" onclick="enterExplore()">探索配色</button>
+    <div class="sep"></div>
     <button class="tool-btn" id="editToggle" onclick="toggleEdit()">微调</button>
+    <button class="tool-btn" id="contentOnlyBtn" onclick="toggleContentOnly()">仅内容</button>
     <div class="sep"></div>
     <div class="ctog" id="filterTog">
       <button class="cbtn active" onclick="filterCards('all',this)">全部</button>
@@ -138,7 +141,7 @@
     <div class="ctrl-group zoom-ctrl">
       <span class="lbl">缩放</span>
       <button class="cbtn" onclick="setZoom(1)">100%</button>
-      <input type="range" id="zoomRange" min="30" max="100" value="100" oninput="setZoom(this.value/100)" class="zoom-slider">
+      <input type="range" id="zoomRange" min="10" max="100" value="100" oninput="setZoom(this.value/100)" class="zoom-slider">
       <span class="zoom-val" id="zoomVal">100%</span>
     </div>
   </div>
@@ -170,32 +173,31 @@
 <div class="scroll-area" id="scrollArea">
 <div id="zoomWrap">
 <div class="grid" id="G">
-  <div class="sblk" data-tags="重点" data-tpl="c1"><div class="stag">① 杂志编辑风 <span class="tag-badge">重点</span></div><div class="card c1"><div class="top"><span class="tag">出海营销</span><span class="ghost">VIBE MARKETING</span></div><h2>朋友的宠物用品<br>上了亚马逊<br>但<em>没人搜得到</em></h2><div class="sub">产品没问题，供应链没问题，<br>卡在「海外用户怎么找到我」这一步。</div><div class="iss">VOL.01 — 一人公司 × 出海</div></div></div>
+  <div class="sblk" data-tags="重点" data-tpl="c1"><div class="stag">① 杂志编辑风 <span class="tag-badge">重点</span></div><div class="card c1"><div class="top"><span class="tag"></span><span class="ghost">VIBE MARKETING</span></div><h2></h2><div class="sub"></div><div class="iss"></div></div></div>
 
-  <div class="sblk" data-tags="重点" data-tpl="c2"><div class="stag">② 暗黑科技风 <span class="tag-badge">重点</span></div><div class="card c2"><div class="gbg"></div><div class="ct"><div class="sb"><div class="dot"></div><span>CASE STUDY LIVE</span></div><h2>Google 前两页<br>全是测评博客<br>他的产品？<span class="hl">不存在</span></h2><p class="c2sub"></p><div><div class="dr ghost"><div><div class="dl">外包报价</div><div class="dv">¥3-5万</div></div><div><div class="dl">AI 交付</div><div class="dv">1 周</div></div><div><div class="dl">人数</div><div class="dv">1人</div></div></div><div class="bt">// VIBE_MARKETING_OS.v1</div></div></div></div></div>
+  <div class="sblk" data-tags="重点" data-tpl="c2"><div class="stag">② 暗黑科技风 <span class="tag-badge">重点</span></div><div class="card c2"><div class="gbg"></div><div class="ct"><div class="sb"><div class="dot deco"></div><span></span></div><h2></h2><p class="c2sub"></p><div><div class="dr ghost deco"><div><div class="dl"></div><div class="dv"></div></div><div><div class="dl"></div><div class="dv"></div></div><div><div class="dl"></div><div class="dv"></div></div></div><div class="bt"></div></div></div></div></div>
 
-  <div class="sblk" data-tags="金句" data-tpl="c3"><div class="stag">③ New York 杂志风 <span class="tag-badge">金句</span></div><div class="card c3"><div class="mh"><span class="logo ghost">Vibe Marketing</span><span class="dt">Vol.01</span></div><div class="hz"><div class="kk">跨境 · 出海营销</div><h2 class="hl2">上了亚马逊<br>却<i>隐身</i>了</h2><p class="dk">产品搞定了，供应链搞定了。<br>唯独「被找到」这件事，没人做。</p></div><div class="ps"><span class="qm">"</span>你只要懂三件事——在哪搜、搜什么词、看什么会下单。<span class="by">— Derek</span></div></div></div>
+  <div class="sblk" data-tags="金句" data-tpl="c3"><div class="stag">③ New York 杂志风 <span class="tag-badge">金句</span></div><div class="card c3"><div class="mh"><span class="logo ghost">Vibe Marketing</span><span class="dt"></span></div><div class="hz"><div class="kk"></div><h2 class="hl2"></h2><p class="dk"></p></div><div class="ps"><span class="qm deco">"</span><span class="by"></span></div></div></div>
 
-  <div class="sblk" data-tags="数据" data-tpl="c4"><div class="stag">④ 数据叙事风 <span class="tag-badge">数据</span></div><div class="card c4"><div class="gbg"></div><div class="ct"><div class="tg">CASE</div><div class="bs"><span class="n">3-5</span><span class="u">万/月</span></div><p class="cp">海外营销公司的报价。<br>但懂 <strong>Vibe Marketing</strong> 的人，<br>用 AI 辅助，<u>一周</u>交付大半。</p><div class="bars"><div class="bi"><span class="bl">传统外包</span><div class="bt2"><div class="bf1"></div></div><span class="bv">¥3-5万</span></div><div class="bi"><span class="bl">AI + 1人</span><div class="bt2"><div class="bf2"></div></div><span class="bv dim">≈ ¥0</span></div></div><div class="ft"><span>SRC: FIELD RESEARCH</span><span>2025.Q1</span></div></div></div></div>
+  <div class="sblk" data-tags="数据" data-tpl="c4"><div class="stag">④ 数据叙事风 <span class="tag-badge">数据</span></div><div class="card c4"><div class="gbg"></div><div class="ct"><div class="tg"></div><div class="bs deco"><span class="n"></span><span class="u"></span></div><p class="cp"></p><div class="bars deco"><div class="bi"><span class="bl"></span><div class="bt2"><div class="bf1"></div></div><span class="bv"></span></div><div class="bi"><span class="bl"></span><div class="bt2"><div class="bf2"></div></div><span class="bv dim"></span></div></div><div class="ft"><span class="deco"></span><span></span></div></div></div></div>
 
-  <div class="sblk" data-tags="金句" data-tpl="c5"><div class="stag">⑤ NY + SVG 插画 <span class="tag-badge">金句</span></div><div class="card c5"><div class="tb"><span class="logo ghost">Vibe Marketing</span><span class="vol">VOL.01</span></div><div class="hero"><div class="ht"><div class="kk">出海案例</div><h2 class="hl3">产品上架了<br>却在搜索中<br><i>隐身</i></h2><p class="dk">产品、物流都搞定了。唯独没人看得到。</p></div><div class="hi"><svg viewBox="0 0 120 160" fill="none"><rect x="35" y="10" width="50" height="24" rx="12" stroke="var(--fg)" stroke-width="2.5" fill="none"/><circle cx="60" cy="22" r="4" fill="var(--accent)"/><path d="M60 34C60 60,40 70,50 100C55 115,65 120,60 140" stroke="var(--fg)" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="90" cy="110" r="18" stroke="var(--sec)" stroke-width="2" fill="var(--secS)" stroke-dasharray="4 3"/><line x1="82" y1="102" x2="98" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/><line x1="98" y1="102" x2="82" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/></svg></div></div><div class="bs2"><span class="ghost">一人公司 × 出海</span><span class="au">by Derek</span></div></div></div>
+  <div class="sblk" data-tags="金句" data-tpl="c5"><div class="stag">⑤ NY + SVG 插画 <span class="tag-badge">金句</span></div><div class="card c5"><div class="tb"><span class="logo ghost">Vibe Marketing</span><span class="vol"></span></div><div class="hero"><div class="ht"><div class="kk"></div><h2 class="hl3"></h2><p class="dk"></p></div><div class="hi deco"><svg viewBox="0 0 120 160" fill="none"><rect x="35" y="10" width="50" height="24" rx="12" stroke="var(--fg)" stroke-width="2.5" fill="none"/><circle cx="60" cy="22" r="4" fill="var(--accent)"/><path d="M60 34C60 60,40 70,50 100C55 115,65 120,60 140" stroke="var(--fg)" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="90" cy="110" r="18" stroke="var(--sec)" stroke-width="2" fill="var(--secS)" stroke-dasharray="4 3"/><line x1="82" y1="102" x2="98" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/><line x1="98" y1="102" x2="82" y2="118" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"/></svg></div></div><div class="bs2"><span class="ghost"></span><span class="au"></span></div></div></div>
 
-  <div class="sblk" data-tags="数据" data-tpl="c6"><div class="stag">⑥ Data + 环形图 <span class="tag-badge">数据</span></div><div class="card c6"><div class="gbg"></div><div class="ct"><div class="tg">ANALYSIS</div><div class="tt">出海准备<br><strong>完成了多少？</strong></div><div class="drow"><div class="donut" id="donut"><div class="dh"><span class="pct">43%</span><span class="pl">DONE</span></div></div><div class="leg"><div class="li"><div class="ld ss"></div>已完成：产品/物流/上架</div><div class="li"><div class="ld pp"></div>未完成：内容/SEO/社媒</div></div></div><div class="ins"><strong>关键缺口：</strong>所有「被发现」的环节都是空白。</div><div class="ft"><span>VIBE MARKETING OS</span><span>DATA #01</span></div></div></div></div>
+  <div class="sblk" data-tags="数据" data-tpl="c6"><div class="stag">⑥ Data + 环形图 <span class="tag-badge">数据</span></div><div class="card c6"><div class="gbg"></div><div class="ct"><div class="tg"></div><div class="tt"></div><div class="drow"><div class="donut deco" id="donut"><div class="dh"><span class="pct"></span><span class="pl"></span></div></div><div class="leg deco"><div class="li"><div class="ld ss"></div></div><div class="li"><div class="ld pp"></div></div></div></div><div class="ins"></div><div class="ft"><span></span><span></span></div></div></div></div>
 
-  <div class="sblk" data-tags="重点" data-tpl="c7"><div class="stag">⑦ 暗色图文叠加 <span class="tag-badge">重点</span></div><div class="card c7"><div class="iz" id="iz"><div class="psvg"><svg width="110" height="130" viewBox="0 0 110 130" fill="none"><rect x="25" y="10" width="60" height="28" rx="14" stroke="var(--muted)" stroke-width="2" fill="none"/><path d="M55 38C55 68,33 78,43 110" stroke="var(--muted)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="55" cy="65" r="28" fill="var(--secS)"/></svg></div><div class="ot"><div class="sm">宠物牵引绳</div><div class="bg2">在 Google<br>隐身了</div></div><div class="gf"></div></div><div class="tz"><p class="bt3">搜 <strong>"best dog harness"</strong>，前两页全是竞品。他的产品？不存在。</p><div class="cr"><span class="lb2">VIBE MARKETING · CASE 01</span><span class="ar ghost">→</span></div></div></div></div>
+  <div class="sblk" data-tags="重点" data-tpl="c7"><div class="stag">⑦ 暗色图文叠加 <span class="tag-badge">重点</span></div><div class="card c7"><div class="iz" id="iz"><div class="psvg deco"><svg width="110" height="130" viewBox="0 0 110 130" fill="none"><rect x="25" y="10" width="60" height="28" rx="14" stroke="var(--muted)" stroke-width="2" fill="none"/><path d="M55 38C55 68,33 78,43 110" stroke="var(--muted)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="55" cy="65" r="28" fill="var(--secS)"/></svg></div><div class="ot"><div class="sm"></div><div class="bg2"></div></div><div class="gf deco"></div></div><div class="tz"><p class="bt3"></p><div class="cr"><span class="lb2"></span><span class="ar ghost">&rarr;</span></div></div></div></div>
   <!-- C8 · 手绘笔记风 -->
   <div class="sblk" data-tags="金句" data-tpl="c8"><div class="stag">⑧ 手绘笔记风 <span class="tag-badge">金句</span></div><div class="card c8 hd-lined hd-font">
-    <div class="margin-line"></div>
-    <div class="tape"></div>
+    <div class="margin-line deco"></div>
+    <div class="tape deco"></div>
     <div class="body">
-      <h2>朋友的产品<br>上了亚马逊<br>却没人找到
+      <h2>
         <svg class="wave-ul" viewBox="0 0 200 8" fill="none"><path d="M0 5 Q10 0,20 5 T40 5 T60 5 T80 5 T100 5 T120 5 T140 5 T160 5 T180 5 T200 5" stroke="var(--accent)" stroke-width="2.5" class="hd-stroke" fill="none"/></svg>
       </h2>
-      <p class="sub">产品没问题，供应链没问题，<br>卡在「被发现」这一步。<br>搜 best dog harness，前两页全是竞品。</p>
+      <p class="sub"></p>
       <div class="doodle-foot">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1 L10.5 6.5 L16 7 L11.8 10.5 L13 16 L9 12.8 L5 16 L6.2 10.5 L2 7 L7.5 6.5Z" stroke="var(--accent)" stroke-width="1.5" fill="none" class="hd-stroke"/></svg>
-        <span class="tag8">#出海营销</span>
-        <span class="tag8">#一人公司</span>
+        <svg class="deco" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1 L10.5 6.5 L16 7 L11.8 10.5 L13 16 L9 12.8 L5 16 L6.2 10.5 L2 7 L7.5 6.5Z" stroke="var(--accent)" stroke-width="1.5" fill="none" class="hd-stroke"/></svg>
+        <span class="tag8"></span>
       </div>
     </div>
   </div></div>
@@ -205,98 +207,92 @@
     <svg viewBox="0 0 360 480" fill="none">
       <!-- Center node -->
       <rect x="110" y="195" width="140" height="52" rx="4" stroke="var(--fg)" stroke-width="2.5" fill="var(--bg)" class="hd-stroke" transform="rotate(-0.8 180 221)"/>
-      <text x="180" y="226" text-anchor="middle" fill="var(--fg)" font-size="18">出海营销</text>
+      <text x="180" y="226" text-anchor="middle" fill="var(--fg)" font-size="18"></text>
       <!-- Top-left node -->
       <rect x="22" y="62" width="110" height="42" rx="4" stroke="var(--accent)" stroke-width="2" fill="var(--bg)" class="hd-stroke" transform="rotate(1.2 77 83)"/>
-      <text x="77" y="88" text-anchor="middle" fill="var(--accent)" font-size="13">SEO 优化</text>
-      <path d="M77 104 C82 145,125 175,140 195" stroke="var(--accent)" stroke-width="2" fill="none" class="hd-stroke"/>
-      <polygon points="138,190 144,198 134,196" fill="var(--accent)"/>
+      <text x="77" y="88" text-anchor="middle" fill="var(--accent)" font-size="13"></text>
+      <g class="deco"><path d="M77 104 C82 145,125 175,140 195" stroke="var(--accent)" stroke-width="2" fill="none" class="hd-stroke"/>
+      <polygon points="138,190 144,198 134,196" fill="var(--accent)"/></g>
       <!-- Top-right node -->
       <rect x="228" y="72" width="110" height="42" rx="4" stroke="var(--sec)" stroke-width="2" fill="var(--bg)" class="hd-stroke" transform="rotate(-1.5 283 93)"/>
-      <text x="283" y="98" text-anchor="middle" fill="var(--sec)" font-size="13">社媒内容</text>
-      <path d="M283 114 C278 150,240 180,220 198" stroke="var(--sec)" stroke-width="2" fill="none" class="hd-stroke"/>
-      <polygon points="223,193 217,201 225,199" fill="var(--sec)"/>
+      <text x="283" y="98" text-anchor="middle" fill="var(--sec)" font-size="13"></text>
+      <g class="deco"><path d="M283 114 C278 150,240 180,220 198" stroke="var(--sec)" stroke-width="2" fill="none" class="hd-stroke"/>
+      <polygon points="223,193 217,201 225,199" fill="var(--sec)"/></g>
       <!-- Bottom node -->
       <rect x="115" y="330" width="130" height="42" rx="4" stroke="var(--sec)" stroke-width="2" fill="var(--bg)" class="hd-stroke" transform="rotate(0.6 180 351)"/>
-      <text x="180" y="356" text-anchor="middle" fill="var(--sec)" font-size="13">测评合作</text>
-      <path d="M180 247 C178 278,179 305,180 330" stroke="var(--sec)" stroke-width="2" fill="none" class="hd-stroke"/>
-      <polygon points="176,325 184,325 180,333" fill="var(--sec)"/>
+      <text x="180" y="356" text-anchor="middle" fill="var(--sec)" font-size="13"></text>
+      <g class="deco"><path d="M180 247 C178 278,179 305,180 330" stroke="var(--sec)" stroke-width="2" fill="none" class="hd-stroke"/>
+      <polygon points="176,325 184,325 180,333" fill="var(--sec)"/></g>
       <!-- Doodle stars -->
+      <g class="deco">
       <path d="M310 400 L315 385 L320 400 L305 390 L325 390Z" stroke="var(--accent)" stroke-width="1.2" fill="none" class="hd-stroke"/>
       <circle cx="48" cy="420" r="12" stroke="var(--muted)" stroke-width="1.5" fill="none" stroke-dasharray="4 3"/>
-      <!-- Label -->
-      <text x="180" y="460" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="'Space Mono',monospace">VIBE MARKETING · MIND MAP</text>
+      <text x="180" y="460" text-anchor="middle" fill="var(--muted)" font-size="10" font-family="'Space Mono',monospace"></text>
+      </g>
     </svg>
   </div></div>
 
   <!-- C10 · 手绘清单风 -->
   <div class="sblk" data-tags="流程" data-tpl="c10"><div class="stag">⑩ 手绘清单风 <span class="tag-badge">流程</span></div><div class="card c10 hd-font" style="background:var(--bg)">
-    <h2>出海 Checklist ✓</h2>
+    <h2></h2>
     <div class="item done">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--muted)" stroke-width="1.8" class="hd-stroke"/><path d="M5 5 L15 15 M15 5 L5 15" stroke="var(--accent)" stroke-width="2.2" class="hd-stroke"/></svg>
-      产品上架亚马逊
-    </div>
-    <div class="item done">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--muted)" stroke-width="1.8" class="hd-stroke"/><path d="M5 5 L15 15 M15 5 L5 15" stroke="var(--accent)" stroke-width="2.2" class="hd-stroke"/></svg>
-      物流链路打通
     </div>
     <div class="item done">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--muted)" stroke-width="1.8" class="hd-stroke"/><path d="M5 5 L15 15 M15 5 L5 15" stroke="var(--accent)" stroke-width="2.2" class="hd-stroke"/></svg>
-      定价策略确定
     </div>
-    <svg class="divider-line" viewBox="0 0 300 8" fill="none"><path d="M0 4 C30 2,60 6,90 4 C120 2,150 6,180 4 C210 2,240 6,270 4 L300 4" stroke="var(--border)" stroke-width="1.5" class="hd-stroke"/></svg>
+    <div class="item done">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--muted)" stroke-width="1.8" class="hd-stroke"/><path d="M5 5 L15 15 M15 5 L5 15" stroke="var(--accent)" stroke-width="2.2" class="hd-stroke"/></svg>
+    </div>
+    <svg class="divider-line deco" viewBox="0 0 300 8" fill="none"><path d="M0 4 C30 2,60 6,90 4 C120 2,150 6,180 4 C210 2,240 6,270 4 L300 4" stroke="var(--border)" stroke-width="1.5" class="hd-stroke"/></svg>
     <div class="item">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--sec)" stroke-width="1.8" class="hd-stroke"/></svg>
-      关键词 SEO 优化
-    </div>
-    <div class="item">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--sec)" stroke-width="1.8" class="hd-stroke"/></svg>
-      社媒内容投放
     </div>
     <div class="item">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--sec)" stroke-width="1.8" class="hd-stroke"/></svg>
-      测评博主合作
+    </div>
+    <div class="item">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--sec)" stroke-width="1.8" class="hd-stroke"/></svg>
     </div>
     <div class="highlight-circle">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--accent)" stroke-width="2" fill="none" class="hd-stroke" stroke-dasharray="3 2"/></svg>
-      3 项待完成 — 全是「被发现」的环节
+      <svg class="deco" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="var(--accent)" stroke-width="2" fill="none" class="hd-stroke" stroke-dasharray="3 2"/></svg>
     </div>
   </div></div>
 
   <!-- C11 · 手绘数据卡 -->
   <div class="sblk" data-tags="数据" data-tpl="c11"><div class="stag">⑪ 手绘数据卡 <span class="tag-badge">数据</span></div><div class="card c11 hd-dotgrid hd-font">
-    <div class="tag11">Case Study · 成本对比</div>
-    <h2>¥3-5万 <span>/月</span></h2>
-    <p style="font-size:13px;color:var(--muted);line-height:1.6;">传统外包海外营销的月均报价。<br>而 AI + 一人团队，接近零成本。</p>
-    <div class="chart-area">
+    <div class="tag11"></div>
+    <h2><span></span></h2>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;"></p>
+    <div class="chart-area deco">
       <svg viewBox="0 0 310 160" fill="none">
         <!-- Axes -->
         <path d="M42 10 L42 128 L298 128" stroke="var(--fg)" stroke-width="2.2" class="hd-stroke"/>
         <!-- Bar 1: tallest -->
         <rect x="62" y="24" width="52" height="104" rx="3" stroke="var(--sec)" stroke-width="2.2" fill="var(--secS)" class="hd-stroke" transform="rotate(-0.5 88 76)"/>
-        <text x="88" y="148" text-anchor="middle" fill="var(--muted)" font-size="10">外包</text>
+        <text x="88" y="148" text-anchor="middle" fill="var(--muted)" font-size="10"></text>
         <!-- Bar 2 -->
         <rect x="138" y="58" width="52" height="70" rx="3" stroke="var(--accent)" stroke-width="2.2" fill="var(--accentS)" class="hd-stroke" transform="rotate(0.8 164 93)"/>
-        <text x="164" y="148" text-anchor="middle" fill="var(--muted)" font-size="10">Freelance</text>
+        <text x="164" y="148" text-anchor="middle" fill="var(--muted)" font-size="10"></text>
         <!-- Bar 3: shortest -->
         <rect x="214" y="108" width="52" height="20" rx="3" stroke="var(--sec)" stroke-width="2.5" fill="var(--sec)" class="hd-stroke" transform="rotate(-0.3 240 118)"/>
-        <text x="240" y="148" text-anchor="middle" fill="var(--muted)" font-size="10">AI+1人</text>
+        <text x="240" y="148" text-anchor="middle" fill="var(--muted)" font-size="10"></text>
         <!-- Arrow pointing to bar 1 -->
         <path d="M110 18 C135 14,148 20,152 28" stroke="var(--accent)" stroke-width="1.8" fill="none" class="hd-stroke"/>
         <polygon points="150,24 156,30 148,30" fill="var(--accent)"/>
-        <text x="110" y="14" fill="var(--accent)" font-size="9">贵!</text>
+        <text x="110" y="14" fill="var(--accent)" font-size="9"></text>
       </svg>
     </div>
-    <div class="note11">DATA · VIBE MARKETING OS</div>
+    <div class="note11"></div>
   </div></div>
 
   <!-- C12 · 涂鸦标注风 -->
   <div class="sblk" data-tags="金句" data-tpl="c12"><div class="stag">⑫ 涂鸦标注风 <span class="tag-badge">金句</span></div><div class="card c12 hd-font">
-    <div class="label12">Field Notes · 出海观察</div>
-    <h2>产品已上架，<br>但完全「隐身」了</h2>
+    <div class="label12"></div>
+    <h2></h2>
     <div class="body12" style="position:relative;">
-      <p>搜 <strong>best dog harness</strong>，Google 前两页全是测评博客。他的产品？不在任何结果里。<br><br>产品没问题，供应链没问题，价格也有竞争力。唯独缺了一件事：<strong>被看到</strong>。</p>
-      <div class="anno-layer">
+      <p></p>
+      <div class="anno-layer deco">
         <svg viewBox="0 0 304 140" fill="none">
           <!-- Circle around keyword area -->
           <ellipse cx="95" cy="15" rx="72" ry="14" stroke="var(--accent)" stroke-width="2" fill="none" class="hd-stroke" transform="rotate(-2 95 15)"/>
@@ -308,76 +304,76 @@
         </svg>
       </div>
     </div>
-    <div class="bubble">💡 所有「被发现」的环节都是空白 —— 这就是 Vibe Marketing 要解决的</div>
+    <div class="bubble"></div>
   </div></div>
 
   <!-- C13 · 手绘速记 -->
   <div class="sblk" data-tags="金句" data-tpl="c13"><div class="stag">⑬ 手绘速记 <span class="tag-badge">金句</span></div><div class="card c13 hd-dotgrid hd-font">
     <div class="content13">
       <div class="kicker-row13">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--accent)" stroke-width="2" class="hd-stroke"/></svg>
-        <span class="kicker13">DESIGN TIPS</span>
+        <svg class="deco" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="var(--accent)" stroke-width="2" class="hd-stroke"/></svg>
+        <span class="kicker13"></span>
       </div>
-      <h2>一个人也能做<br>出好设计</h2>
-      <svg class="wave-ul13" viewBox="0 0 120 8" fill="none"><path d="M2 5 C20 2, 40 7, 60 4 S100 6, 118 3" stroke="var(--accent)" stroke-width="2.5" class="hd-stroke"/></svg>
-      <div class="sub13">Don't overthink it.<br>Start with what you have,<br>iterate from there.</div>
-      <svg class="arrow13" width="48" height="64" viewBox="0 0 48 64" fill="none">
+      <h2></h2>
+      <svg class="wave-ul13 deco" viewBox="0 0 120 8" fill="none"><path d="M2 5 C20 2, 40 7, 60 4 S100 6, 118 3" stroke="var(--accent)" stroke-width="2.5" class="hd-stroke"/></svg>
+      <div class="sub13"></div>
+      <svg class="arrow13 deco" width="48" height="64" viewBox="0 0 48 64" fill="none">
         <path d="M8 56 C12 32, 20 16, 40 8" stroke="var(--accent)" stroke-width="2" class="hd-stroke" fill="none"/>
         <path d="M34 4 L42 8 L34 14" stroke="var(--accent)" stroke-width="2" class="hd-stroke" fill="none"/>
       </svg>
       <div class="foot13">
-        <span>@derek.design</span>
-        <span class="tag13">VOL.01</span>
+        <span></span>
+        <span class="tag13"></span>
       </div>
     </div>
   </div></div>
 
   <!-- C14 · 便签清单 -->
   <div class="sblk" data-tags="流程" data-tpl="c14"><div class="stag">⑭ 便签清单 <span class="tag-badge">流程</span></div><div class="card c14 hd-crossgrid hd-font">
-    <div class="tape14"></div>
+    <div class="tape14 deco"></div>
     <div class="content14">
-      <h2>本周待办清单</h2>
-      <svg class="divider14" viewBox="0 0 300 3" fill="none" preserveAspectRatio="none"><path d="M0 1.5 C50 0, 100 3, 150 1 S250 2, 300 1" stroke="var(--sec)" stroke-width="1.5" class="hd-stroke"/></svg>
+      <h2></h2>
+      <svg class="divider14 deco" viewBox="0 0 300 3" fill="none" preserveAspectRatio="none"><path d="M0 1.5 C50 0, 100 3, 150 1 S250 2, 300 1" stroke="var(--sec)" stroke-width="1.5" class="hd-stroke"/></svg>
       <div class="checklist14">
         <div class="item14 done">
           <div class="box14"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7 L6 10 L11 4" stroke="var(--fg)" stroke-width="2" class="hd-stroke"/></svg></div>
-          <span>完成首页设计稿</span>
+          <span></span>
         </div>
         <div class="item14 done">
           <div class="box14"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7 L6 10 L11 4" stroke="var(--fg)" stroke-width="2" class="hd-stroke"/></svg></div>
-          <span>组件库整理归档</span>
+          <span></span>
         </div>
         <div class="item14">
           <div class="box14"></div>
-          <span>用户访谈 × 3</span>
+          <span></span>
         </div>
         <div class="item14">
           <div class="box14"></div>
-          <span>写周报总结</span>
+          <span></span>
         </div>
       </div>
-      <svg class="arrow14" width="48" height="48" viewBox="0 0 48 48" fill="none">
+      <svg class="arrow14 deco" width="48" height="48" viewBox="0 0 48 48" fill="none">
         <path d="M8 40 C8 20, 28 8, 44 12" stroke="var(--sec)" stroke-width="2" class="hd-stroke" stroke-dasharray="4 3"/>
         <path d="M38 8 L44 12 L40 18" stroke="var(--sec)" stroke-width="2" class="hd-stroke"/>
       </svg>
-      <div class="foot14">✎ keep going!</div>
+      <div class="foot14 deco"></div>
     </div>
   </div></div>
 
   <!-- C15 · 笔记本 -->
   <div class="sblk" data-tags="金句" data-tpl="c15"><div class="stag">⑮ 笔记本 <span class="tag-badge">金句</span></div><div class="card c15 hd-lined hd-font">
-    <div class="margin-line15"></div>
+    <div class="margin-line15 deco"></div>
     <div class="content15">
-      <div class="kicker15">Mar 6, 2026</div>
-      <h2>关于极简设计<br>的三点思考</h2>
-      <div class="quote15">"Less, but better."<br>— Dieter Rams</div>
-      <div class="sub15">1. Remove until it breaks<br>2. Every pixel must earn<br>&nbsp;&nbsp;&nbsp;its place on screen<br>3. White space is not empty</div>
-      <svg class="arrow-margin15" width="32" height="80" viewBox="0 0 32 80" fill="none">
+      <div class="kicker15"></div>
+      <h2></h2>
+      <div class="quote15"></div>
+      <div class="sub15"></div>
+      <svg class="arrow-margin15 deco" width="32" height="80" viewBox="0 0 32 80" fill="none">
         <path d="M16 72 L16 8" stroke="var(--accent)" stroke-width="1.5" class="hd-stroke" stroke-dasharray="4 3"/>
         <path d="M10 16 L16 8 L22 16" stroke="var(--accent)" stroke-width="1.5" class="hd-stroke" fill="none"/>
         <circle cx="16" cy="76" r="3" fill="var(--accent)" opacity=".5"/>
       </svg>
-      <div class="page15">— pg. 07 —</div>
+      <div class="page15"></div>
     </div>
   </div></div>
 </div>
@@ -408,9 +404,10 @@
 <script src="js/presets.js"></script>
 <script>
 
-let cc=3,locked={bg:false,accent:false,sec:false,text:false},rStyle='any',saved=[],editMode=false;
+let cc=3,locked={bg:false,accent:false,sec:false,text:false},rStyle='any',saved=[],editMode=false,contentOnly=false;
 let currentPlatform='xhs',currentSize=null;
 let colorHistory=[];
+let _exploreActive=false,_exploreOrigHTML='';
 function pushHistory(){colorHistory.push({bg:gS('bg'),accent:gS('accent'),sec:gS('sec'),text:gS('text')});if(colorHistory.length>50)colorHistory.shift();document.getElementById('undoBtn').disabled=false;}
 function undoColor(){if(!colorHistory.length)return;const prev=colorHistory.pop();sS('bg',prev.bg);sS('accent',prev.accent);sS('sec',prev.sec);sS('text',prev.text);refresh();if(!colorHistory.length)document.getElementById('undoBtn').disabled=true;}
 
@@ -472,7 +469,12 @@ function setSize(sizeId){
   document.querySelectorAll('#sizeTog .cbtn').forEach(b=>
     b.classList.toggle('active',b.dataset.sizeId===currentSize.id));
   const previewH=Math.round(360*currentSize.h/currentSize.w);
-  document.querySelectorAll('.card').forEach(c=>c.style.height=previewH+'px');
+  // --card-scale: proportional to height, base=480 (3:4 ratio)
+  const scale=Math.max(0.5,Math.min(1,previewH/480));
+  document.querySelectorAll('.card').forEach(c=>{
+    c.style.height=previewH+'px';
+    c.style.setProperty('--card-scale',scale.toFixed(3));
+  });
 }
 
 // Random: ensure accent & secondary are visually distinct
@@ -492,7 +494,7 @@ function gen(){
   refresh();
 }
 
-document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable)return;if(e.code==='Space'){e.preventDefault();gen();}if(e.key==='z'&&(e.metaKey||e.ctrlKey)){e.preventDefault();undoColor();}});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable)return;if(_exploreActive){if(e.code==='Space'){e.preventDefault();refreshExplorePalettes();}return;}if(e.code==='Space'){e.preventDefault();gen();}if(e.key==='z'&&(e.metaKey||e.ctrlKey)){e.preventDefault();undoColor();}if(e.code==='Enter'){e.preventDefault();document.querySelectorAll('.sblk.selected:not(.filtered-out):not(.removed) .card').forEach(c=>exportCard(c));}});
 function updJ(){const bg=gS('bg'),a=gS('accent');let ps=[`<span class="v">"bg"</span>:"${bg}"`,`<span class="v">"accent"</span>:"${a}"`];if(cc>=3)ps.push(`<span class="v">"secondary"</span>:"${gS('sec')}"`);if(cc>=4)ps.push(`<span class="v">"text"</span>:"${gS('text')}"`);document.getElementById('jout').innerHTML=`<span class="k">"theme"</span>:{${ps.join(',')}}  `;}
 function copyJ(){const bg=gS('bg'),a=gS('accent');let o={bg,accent:a};if(cc>=3)o.secondary=gS('sec');if(cc>=4)o.text=gS('text');navigator.clipboard.writeText(JSON.stringify({theme:o},null,2)).then(()=>{const b=document.querySelector('.cpb');b.textContent='COPIED!';setTimeout(()=>b.textContent='COPY',1500);});}
 
@@ -500,6 +502,13 @@ function copyJ(){const bg=gS('bg'),a=gS('accent');let o={bg,accent:a};if(cc>=3)o
 // ===== EDIT MODE =====
 const EDIT_SELS='.card h2,.card p,.card .sub,.card .kk,.card .dk,.card .cp,.card .bt3,.card .body12 p,.card .item,.card .bubble,.card .sm,.card .bg2,.card .tt,.card .ins,.card .tag,.card .tg,.card .iss,.card .mh .logo,.card .mh .dt,.card .hl2,.card .ps,.card .bs2,.card .au,.card .lb2,.card .tag8,.card .tag11,.card .note11,.card .label12,.card .sb span,.card .dl,.card .dv,.card .bt,.card .bl,.card .bv,.card .pct,.card .pl,.card .ft span,.card .hl3,.card .vol,.card .cr .lb2';
 
+function toggleContentOnly(){
+  contentOnly=!contentOnly;
+  const btn=document.getElementById('contentOnlyBtn');
+  btn.classList.toggle('on',contentOnly);
+  btn.textContent=contentOnly?'完整视图':'仅内容';
+  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('content-only',contentOnly));
+}
 function toggleEdit(){
   editMode=!editMode;
   const btn=document.getElementById('editToggle');
@@ -547,10 +556,14 @@ function openSvgEdit(textEl){
 // ===== ZOOM =====
 let currentZoom=1;
 function setZoom(s){
-  currentZoom=Math.max(.3,Math.min(1,s));
-  const wrap=document.getElementById('zoomWrap');
-  wrap.style.transform=`scale(${currentZoom})`;
-  wrap.style.height=currentZoom<1?wrap.scrollHeight*currentZoom+'px':'auto';
+  currentZoom=Math.max(.1,Math.min(1,s));
+  if(_exploreActive){
+    const grid=document.querySelector('.explore-grid');
+    if(grid){grid.style.transform=`scale(${currentZoom})`;grid.style.transformOrigin='top center';grid.style.height=currentZoom<1?grid.scrollHeight*currentZoom+'px':'auto';}
+  }else{
+    const wrap=document.getElementById('zoomWrap');
+    if(wrap){wrap.style.transform=`scale(${currentZoom})`;wrap.style.height=currentZoom<1?wrap.scrollHeight*currentZoom+'px':'auto';}
+  }
   document.getElementById('zoomRange').value=Math.round(currentZoom*100);
   document.getElementById('zoomVal').textContent=Math.round(currentZoom*100)+'%';
 }
@@ -609,8 +622,20 @@ function setZoom(s){
   });
 })();
 
+function injectCardInteractions(){
+  document.querySelectorAll('.sblk').forEach(blk=>{
+    const card=blk.querySelector('.card');
+    if(!card||card._interactionBound) return;
+    card._interactionBound=true;
+    card.addEventListener('click',e=>{
+      if(editMode||e.target.closest('[contenteditable]')||e.target.closest('.export-btn')) return;
+      blk.classList.toggle('selected');
+    });
+  });
+}
+
 window.addEventListener('DOMContentLoaded',async()=>{
-  loadS();refresh();setPlatform('xhs');injectExportBtns();injectSelectUI();loadSeriesList();
+  loadS();refresh();setPlatform('xhs');injectExportBtns();injectSelectUI();injectCardInteractions();loadSeriesList();
   // Bind content input events
   ['f-main','f-kicker','f-author','f-series'].forEach(id=>{
     const el=document.getElementById(id);
@@ -618,6 +643,8 @@ window.addEventListener('DOMContentLoaded',async()=>{
   });
   snapshotDefaults();
   document.getElementById('f-highlight').addEventListener('input',debouncedHighlight);
+  // ESC key exits explore mode
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&_exploreActive)exitExplore();});
   // SortableJS — drag to reorder cards within each grid
   try{
     const{default:Sortable}=await import('https://esm.sh/sortablejs@1.15.6');
@@ -631,6 +658,195 @@ window.addEventListener('DOMContentLoaded',async()=>{
     });
   }catch(e){/* SortableJS load failed — drag disabled, no-op */}
 });
+
+// ===== EXPLORE MODE =====
+function genPalette(){
+  const cur={bg:gS('bg'),accent:gS('accent'),sec:gS('sec'),text:gS('text')};
+  const hBase=randInt(0,360);
+  const isDark=Math.random()>.35;
+  const bg=locked.bg?cur.bg:(()=>{const l=isDark?randInt(3,10):randInt(90,97);return hsl2hex(hBase,randInt(0,10),l);})();
+  const accent=locked.accent?cur.accent:(()=>{const h2=(hBase+randInt(-20,20)+360)%360;return hsl2hex(h2,randInt(55,95),randInt(42,62));})();
+  const sec=locked.sec?cur.sec:(()=>{const aH=randInt(0,360);const offset=randInt(40,180)*(Math.random()>.5?1:-1);const h3=(aH+offset+360)%360;return hsl2hex(h3,randInt(50,90),randInt(40,60));})();
+  const text=locked.text?cur.text:(()=>{const bgL=lum(bg);return bgL<.45?hsl2hex(0,0,randInt(88,96)):hsl2hex(0,0,randInt(6,15));})();
+  return {bg,accent,sec,text};
+}
+
+function enterExplore(){
+  if(_exploreActive)return;
+  _exploreActive=true;
+  document.getElementById('exploreBtn').classList.add('on');
+  const scrollArea=document.getElementById('scrollArea');
+  _exploreOrigHTML=scrollArea.innerHTML;
+  // Find first visible card to clone as template
+  const firstBlk=document.querySelector('.sblk:not(.filtered-out):not(.removed)');
+  if(!firstBlk){_exploreActive=false;document.getElementById('exploreBtn').classList.remove('on');return;}
+  const srcCard=firstBlk.querySelector('.card');
+  if(!srcCard){_exploreActive=false;document.getElementById('exploreBtn').classList.remove('on');return;}
+  // Compute current preview height
+  const previewH=currentSize?Math.round(360*currentSize.h/currentSize.w):480;
+  // Generate 10 palettes
+  const palettes=[];
+  for(let i=0;i<10;i++) palettes.push(genPalette());
+  // Build explore panel
+  const bar=document.createElement('div');
+  bar.className='explore-bar';
+  bar.innerHTML='<span class="explore-label">探索配色 · '+palettes.length+' 套方案</span><button class="explore-exit" onclick="exitExplore()">退出探索</button>';
+  const grid=document.createElement('div');
+  grid.className='explore-grid';
+  palettes.forEach((pal,i)=>{
+    const vars=derive(pal.bg,pal.accent,cc>=3?pal.sec:null,cc>=4?pal.text:null);
+    const item=document.createElement('div');
+    item.className='explore-item';
+    item.onclick=()=>applyExplore(i);
+    // Set CSS variables as inline style on the wrapper
+    Object.entries(vars).forEach(([k,v])=>item.style.setProperty(k,v));
+    // Index label
+    const idx=document.createElement('div');
+    idx.className='explore-idx';
+    idx.textContent='#'+(i+1);
+    item.appendChild(idx);
+    // Clone card
+    const clone=srcCard.cloneNode(true);
+    clone.style.height=previewH+'px';
+    if(contentOnly) clone.classList.add('content-only');
+    // Remove export buttons from clones
+    clone.querySelectorAll('.export-btn').forEach(b=>b.remove());
+    // Handle donut (C6)
+    const donutEl=clone.querySelector('#donut');
+    if(donutEl){
+      donutEl.removeAttribute('id');
+      donutEl.style.background='conic-gradient('+vars['--sec']+' 0deg 300deg, '+vars['--accent']+' 300deg 360deg)';
+    }
+    // Handle iz (C7) gradient
+    const izEl=clone.querySelector('#iz');
+    if(izEl){
+      izEl.removeAttribute('id');
+      const{r,g:gg,b}=h2r(vars['--sec']);
+      izEl.style.background='radial-gradient(ellipse at 60% 40%,rgba('+r+','+gg+','+b+',.12) 0%,'+vars['--bg']+' 70%)';
+    }
+    item.appendChild(clone);
+    // Color dots preview row
+    const dots=document.createElement('div');
+    dots.style.cssText='display:flex;gap:4px;margin-top:6px;padding:0 2px;';
+    [pal.bg,pal.accent,pal.sec,pal.text].forEach(c=>{
+      if(!c)return;
+      const d=document.createElement('div');
+      d.style.cssText='width:16px;height:16px;border-radius:3px;border:1px solid rgba(255,255,255,.1);background:'+c;
+      dots.appendChild(d);
+    });
+    item.appendChild(dots);
+    grid.appendChild(item);
+  });
+  // Store palettes for apply
+  grid._palettes=palettes;
+  scrollArea.innerHTML='';
+  scrollArea.appendChild(bar);
+  scrollArea.appendChild(grid);
+  // Apply current zoom to explore grid
+  if(currentZoom<1){grid.style.transform=`scale(${currentZoom})`;grid.style.transformOrigin='top center';grid.style.height=grid.scrollHeight*currentZoom+'px';}
+}
+
+function applyExplore(idx){
+  const grid=document.querySelector('.explore-grid');
+  if(!grid||!grid._palettes)return;
+  const pal=grid._palettes[idx];
+  pushHistory();
+  sS('bg',pal.bg);
+  sS('accent',pal.accent);
+  if(cc>=3)sS('sec',pal.sec);
+  if(cc>=4)sS('text',pal.text);
+  exitExplore();
+  refresh();
+}
+
+function exitExplore(){
+  if(!_exploreActive)return;
+  _exploreActive=false;
+  document.getElementById('exploreBtn').classList.remove('on');
+  const scrollArea=document.getElementById('scrollArea');
+  scrollArea.innerHTML=_exploreOrigHTML;
+  _exploreOrigHTML='';
+  // Re-inject dynamic UI
+  injectExportBtns();
+  injectSelectUI();
+  injectCardInteractions();
+  // Re-apply current card size
+  if(currentSize){
+    const previewH=Math.round(360*currentSize.h/currentSize.w);
+    const scale=Math.max(0.5,Math.min(1,previewH/480));
+    document.querySelectorAll('.card').forEach(c=>{
+      c.style.height=previewH+'px';
+      c.style.setProperty('--card-scale',scale.toFixed(3));
+    });
+  }
+  // Re-apply content and colors
+  propagateContent();
+  refresh();
+}
+
+function refreshExploreContent(){
+  if(!_exploreActive)return;
+  const grid=document.querySelector('.explore-grid');
+  if(!grid)return;
+  const raw=document.getElementById('f-main').value;
+  const parsed=parseContent(raw);
+  const fixed={
+    kicker:document.getElementById('f-kicker').value,
+    author:document.getElementById('f-author').value,
+    series:document.getElementById('f-series').value
+  };
+  grid.querySelectorAll('.explore-item .card').forEach(card=>{
+    const cls=Array.from(card.classList).find(c=>/^c\d+$/.test(c));
+    if(!cls)return;
+    const map=CONTENT_MAP[cls];
+    if(!map)return;
+    if(GROUP_A.includes(cls)){
+      applyField(card,map,'headline',parsed.headline,cls);
+      applyField(card,map,'subtitle',parsed.subtitle,cls);
+      applyField(card,map,'quote',parsed.quote,cls);
+      applyField(card,map,'author',fixed.author,cls);
+      applyField(card,map,'kicker',fixed.kicker,cls);
+      applyField(card,map,'series',fixed.series,cls);
+    }else if(GROUP_B.includes(cls)){
+      applyField(card,map,'kicker',fixed.kicker,cls);
+      applyField(card,map,'series',fixed.series,cls);
+    }
+    if(cls==='c10'||cls==='c14') applyField(card,map,'headline',parsed.headline,cls);
+  });
+}
+
+function refreshExplorePalettes(){
+  if(!_exploreActive)return;
+  const grid=document.querySelector('.explore-grid');
+  if(!grid)return;
+  const items=grid.querySelectorAll('.explore-item');
+  const newPalettes=[];
+  for(let i=0;i<items.length;i++) newPalettes.push(genPalette());
+  grid._palettes=newPalettes;
+  const previewH=currentSize?Math.round(360*currentSize.h/currentSize.w):480;
+  items.forEach((item,i)=>{
+    const pal=newPalettes[i];
+    const vars=derive(pal.bg,pal.accent,cc>=3?pal.sec:null,cc>=4?pal.text:null);
+    // Update CSS variables
+    Object.entries(vars).forEach(([k,v])=>item.style.setProperty(k,v));
+    // Update donut if present
+    const donutEl=item.querySelector('.donut');
+    if(donutEl) donutEl.style.background='conic-gradient('+vars['--sec']+' 0deg 300deg, '+vars['--accent']+' 300deg 360deg)';
+    // Update iz gradient if present
+    const izEl=item.querySelector('.iz');
+    if(izEl){const{r,g:gg,b}=h2r(vars['--sec']);izEl.style.background='radial-gradient(ellipse at 60% 40%,rgba('+r+','+gg+','+b+',.12) 0%,'+vars['--bg']+' 70%)';}
+    // Update color dots
+    const dots=item.querySelector('div[style*="display:flex"][style*="gap:4px"]');
+    if(dots){
+      const swatches=dots.querySelectorAll('div');
+      const colors=[pal.bg,pal.accent,pal.sec,pal.text].filter(Boolean);
+      swatches.forEach((d,j)=>{if(colors[j])d.style.background=colors[j];});
+    }
+  });
+  // Update bar label
+  const label=grid.parentElement.querySelector('.explore-label');
+  if(label) label.textContent='探索配色 · '+newPalettes.length+' 套方案';
+}
 </script>
 
 </body>

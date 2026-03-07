@@ -64,7 +64,7 @@ function restoreVarsAfterExport(saved){
 
 async function exportCard(card,btn){
   const hti=await loadHTI();
-  btn.classList.add('loading');btn.textContent='导出中…';
+  if(btn){btn.classList.add('loading');btn.textContent='导出中…';}
   // Temporarily hide edit outlines and export buttons
   const wasEdit=editMode;
   if(wasEdit)toggleEdit();
@@ -74,9 +74,9 @@ async function exportCard(card,btn){
   try{
     const expW=currentSize?.w||1080;
     const expH=currentSize?.h||1440;
-    const previewH=Math.round(360*expH/expW);
-    const pxRatio=expW/360;
-    const dataUrl=await hti.toPng(card,{pixelRatio:pxRatio,width:360,height:previewH,cacheBust:true,
+    const cardRect=card.getBoundingClientRect();
+    const pxRatio=expW/cardRect.width;
+    const dataUrl=await hti.toPng(card,{pixelRatio:pxRatio,width:cardRect.width,height:cardRect.height,cacheBust:true,
       filter:n=>!n.classList||!n.classList.contains('export-btn')});
     const link=document.createElement('a');
     const name=card.closest('.sblk')?.querySelector('.stag')?.textContent?.replace(/[^\w\u4e00-\u9fff]/g,'')||'poster';
@@ -88,7 +88,7 @@ async function exportCard(card,btn){
   }finally{
     restoreVarsAfterExport(svgSaved);
     card.querySelectorAll('.export-btn').forEach(b=>b.style.display='');
-    btn.classList.remove('loading');btn.textContent='导出 PNG';
+    if(btn){btn.classList.remove('loading');btn.textContent='导出 PNG';}
     if(wasEdit)toggleEdit();
   }
 }
