@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Batch 3 — 三种新模板风格预览</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+@font-face{
+  font-family:'Excalifont';
+  src:url('https://unpkg.com/@excalidraw/excalidraw@0.17.0/dist/prod/Excalifont-Regular-a88b72a0.woff2') format('woff2');
+  font-weight:normal;font-style:normal;font-display:swap;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: #f5f5f0;
+  font-family: 'Noto Sans SC', sans-serif;
+  min-height: 100vh;
+  padding: 48px 20px;
+}
+
+.page-title {
+  text-align: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.page-sub {
+  text-align: center;
+  font-size: 14px;
+  color: #999;
+  margin-bottom: 56px;
+}
+
+.section {
+  max-width: 900px;
+  margin: 0 auto 64px;
+}
+
+.section-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.section-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+}
+
+.section-desc {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.pair {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.card-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-wrap .mode-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #aaa;
+  text-transform: uppercase;
+}
+
+/* ===== Base card ===== */
+.card {
+  width: 360px;
+  height: 480px;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s ease, box-shadow .25s ease;
+  cursor: default;
+}
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 48px rgba(0,0,0,.12);
+}
+
+/* ============================================================
+   STYLE 1: 手绘标注风 (Annotation Map)
+   中央大标题 + 手绘箭头指向关键词气泡, Excalidraw 风格
+   ============================================================ */
+
+.anno-map {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.anno-map .dot-bg {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, var(--dot) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: .5;
+}
+
+.anno-map .center-block {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 40px;
+}
+
+.anno-map .center-block h2 {
+  font-family: 'ZCOOL KuaiLe', 'Excalifont', cursive;
+  font-size: 34px;
+  line-height: 1.35;
+  color: var(--title);
+}
+
+.anno-map .center-block .sub-line {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  color: var(--sub);
+  margin-top: 8px;
+}
+
+/* Bubbles - positioned absolutely */
+.anno-map .bubble {
+  position: absolute;
+  z-index: 5;
+  font-family: 'ZCOOL KuaiLe', 'Excalifont', cursive;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 2px solid var(--bbl-border);
+  background: var(--bbl-bg);
+  color: var(--bbl-text);
+  white-space: nowrap;
+  box-shadow: 2px 3px 0 var(--bbl-shadow);
+}
+
+.anno-map .bubble.b1 { top: 48px; left: 24px; transform: rotate(-3deg); }
+.anno-map .bubble.b2 { top: 38px; right: 20px; transform: rotate(2deg); }
+.anno-map .bubble.b3 { bottom: 80px; left: 16px; transform: rotate(1.5deg); }
+.anno-map .bubble.b4 { bottom: 60px; right: 28px; transform: rotate(-2deg); }
+
+/* Arrow SVG layer */
+.anno-map .arrow-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.anno-map .arrow-layer svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Light variant --- */
+.anno-map.light {
+  background: #fefcf6;
+  --dot: #d4cfc0;
+  --title: #2c2c2c;
+  --sub: #999;
+  --bbl-border: #e8590c;
+  --bbl-bg: rgba(232,89,12,.08);
+  --bbl-text: #c2410c;
+  --bbl-shadow: rgba(232,89,12,.1);
+  --arrow: #e8590c;
+}
+
+/* --- Dark variant --- */
+.anno-map.dark {
+  background: #1a1a1f;
+  --dot: #2a2a30;
+  --title: #f0ece4;
+  --sub: #777;
+  --bbl-border: #ff6b35;
+  --bbl-bg: rgba(255,107,53,.1);
+  --bbl-text: #ff8c5a;
+  --bbl-shadow: rgba(0,0,0,.3);
+  --arrow: #ff6b35;
+}
+
+/* ============================================================
+   STYLE 2: 撞色强调风 (Color Clash)
+   高饱和度纯色背景 + 对比色超大字 + 底部小字
+   ============================================================ */
+
+.color-clash {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 36px 36px;
+  position: relative;
+}
+
+.color-clash .corner-deco {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border: 3px solid var(--deco);
+  opacity: .2;
+}
+.color-clash .corner-deco.tl { top: -8px; left: -8px; border-right: none; border-bottom: none; }
+.color-clash .corner-deco.br { bottom: -8px; right: -8px; border-left: none; border-top: none; }
+
+.color-clash h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 52px;
+  line-height: 1.1;
+  color: var(--headline);
+  letter-spacing: -1px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.color-clash .tagline {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--tagline);
+  letter-spacing: 1px;
+  margin-top: auto;
+}
+
+.color-clash .bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--bar-text);
+  background: var(--bar-bg);
+}
+
+/* --- Light variant: Electric Blue bg + Yellow headline --- */
+.color-clash.light {
+  background: #2563eb;
+  --headline: #facc15;
+  --tagline: rgba(255,255,255,.7);
+  --bar-text: rgba(255,255,255,.5);
+  --bar-bg: rgba(0,0,0,.08);
+  --deco: #facc15;
+}
+
+/* --- Dark variant: Hot Pink bg + Cyan headline --- */
+.color-clash.dark {
+  background: #111113;
+  --headline: #06b6d4;
+  --tagline: rgba(255,255,255,.45);
+  --bar-text: rgba(255,255,255,.3);
+  --bar-bg: rgba(255,255,255,.03);
+  --deco: #06b6d4;
+}
+.color-clash.dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(6,182,212,.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ============================================================
+   STYLE 3: 数字冲击风 (Number Impact)
+   巨大数字占上半部分 + 下方标题 + 极简布局
+   ============================================================ */
+
+.num-impact {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.num-impact .top-zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.num-impact .big-number {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 140px;
+  line-height: 1;
+  color: var(--num);
+  letter-spacing: -6px;
+  position: relative;
+  z-index: 2;
+}
+
+.num-impact .big-number .unit {
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--unit);
+  vertical-align: top;
+  margin-left: 2px;
+}
+
+.num-impact .glow {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: var(--glow);
+  filter: blur(60px);
+  opacity: .4;
+  z-index: 1;
+}
+
+.num-impact .bottom-zone {
+  padding: 0 36px 36px;
+  position: relative;
+  z-index: 2;
+}
+
+.num-impact .bottom-zone .divider-line {
+  width: 48px;
+  height: 3px;
+  background: var(--accent);
+  margin-bottom: 16px;
+  border-radius: 2px;
+}
+
+.num-impact .bottom-zone h2 {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--title);
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+
+.num-impact .bottom-zone .meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--meta);
+}
+
+/* --- Light variant --- */
+.num-impact.light {
+  background: #fafaf8;
+  --num: #111;
+  --unit: #bbb;
+  --glow: rgba(232,89,12,.25);
+  --accent: #e8590c;
+  --title: #1a1a1a;
+  --meta: #bbb;
+}
+
+/* --- Dark variant --- */
+.num-impact.dark {
+  background: #0d0d0f;
+  --num: #fff;
+  --unit: #555;
+  --glow: rgba(99,102,241,.35);
+  --accent: #818cf8;
+  --title: #e5e5e5;
+  --meta: #555;
+}
+
+/* ===== SVG hand-drawn filter ===== */
+svg.deco { overflow: visible; }
+
+@media (max-width: 820px) {
+  .pair { flex-direction: column; align-items: center; }
+  .card { width: 340px; height: 450px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SVG defs for hand-drawn effect -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="4" result="noise" seed="2"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<div class="page-title">Batch 3 — New Templates</div>
+<div class="page-sub">3 种新模板风格 · 浅色 / 深色双版预览</div>
+
+
+<!-- ================================================================
+     STYLE 1: 手绘标注风
+     ================================================================ -->
+<div class="section">
+  <div class="section-title">TEMPLATE 01</div>
+  <div class="section-name">手绘标注风 · Annotation Map</div>
+  <div class="section-desc">中央大标题，四周手绘箭头指向关键词气泡，Excalidraw 手绘风格</div>
+
+  <div class="pair">
+    <!-- Light -->
+    <div class="card-wrap">
+      <div class="mode-label">Light</div>
+      <div class="card anno-map light">
+        <div class="dot-bg"></div>
+
+        <!-- Arrow SVG layer -->
+        <div class="arrow-layer">
+          <svg viewBox="0 0 360 480" fill="none">
+            <!-- Arrow to b1 (top-left) -->
+            <path d="M150 210 C120 180, 80 130, 65 90" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" filter="url(#pencil)"/>
+            <path d="M70 98 L62 86 L56 100" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" fill="none" filter="url(#pencil)"/>
+
+            <!-- Arrow to b2 (top-right) -->
+            <path d="M220 210 C250 170, 280 120, 300 82" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" filter="url(#pencil)"/>
+            <path d="M294 90 L302 78 L308 92" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" fill="none" filter="url(#pencil)"/>
+
+            <!-- Arrow to b3 (bottom-left) -->
+            <path d="M140 270 C110 310, 70 350, 55 380" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" filter="url(#pencil)"/>
+            <path d="M60 372 L52 384 L46 370" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" fill="none" filter="url(#pencil)"/>
+
+            <!-- Arrow to b4 (bottom-right) -->
+            <path d="M230 270 C260 320, 290 360, 310 395" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" filter="url(#pencil)"/>
+            <path d="M304 388 L312 400 L318 386" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" fill="none" filter="url(#pencil)"/>
+          </svg>
+        </div>
+
+        <!-- Center title -->
+        <div class="center-block">
+          <h2>为什么你需要<br>学设计思维</h2>
+          <div class="sub-line">design thinking matters</div>
+        </div>
+
+        <!-- Keyword bubbles -->
+        <div class="bubble b1">共情力</div>
+        <div class="bubble b2">原型验证</div>
+        <div class="bubble b3">用户洞察</div>
+        <div class="bubble b4">快速迭代</div>
+      </div>
+    </div>
+
+    <!-- Dark -->
+    <div class="card-wrap">
+      <div class="mode-label">Dark</div>
+      <div class="card anno-map dark">
+        <div class="dot-bg"></div>
+
+        <div class="arrow-layer">
+          <svg viewBox="0 0 360 480" fill="none">
+            <path d="M150 210 C120 180, 80 130, 65 90" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" filter="url(#pencil)"/>
+            <path d="M70 98 L62 86 L56 100" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" fill="none" filter="url(#pencil)"/>
+            <path d="M220 210 C250 170, 280 120, 300 82" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" filter="url(#pencil)"/>
+            <path d="M294 90 L302 78 L308 92" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" fill="none" filter="url(#pencil)"/>
+            <path d="M140 270 C110 310, 70 350, 55 380" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" filter="url(#pencil)"/>
+            <path d="M60 372 L52 384 L46 370" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" fill="none" filter="url(#pencil)"/>
+            <path d="M230 270 C260 320, 290 360, 310 395" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" filter="url(#pencil)"/>
+            <path d="M304 388 L312 400 L318 386" stroke="var(--arrow)" stroke-width="2.5" stroke-linecap="round" fill="none" filter="url(#pencil)"/>
+          </svg>
+        </div>
+
+        <div class="center-block">
+          <h2>为什么你需要<br>学设计思维</h2>
+          <div class="sub-line">design thinking matters</div>
+        </div>
+
+        <div class="bubble b1">共情力</div>
+        <div class="bubble b2">原型验证</div>
+        <div class="bubble b3">用户洞察</div>
+        <div class="bubble b4">快速迭代</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     STYLE 2: 撞色强调风
+     ================================================================ -->
+<div class="section">
+  <div class="section-title">TEMPLATE 02</div>
+  <div class="section-name">撞色强调风 · Color Clash</div>
+  <div class="section-desc">高饱和度纯色背景，标题用对比色超大字，底部一行小字说明</div>
+
+  <div class="pair">
+    <!-- Light (Electric Blue + Yellow) -->
+    <div class="card-wrap">
+      <div class="mode-label">Light</div>
+      <div class="card color-clash light">
+        <div class="corner-deco tl"></div>
+        <div class="corner-deco br"></div>
+        <h2>停止<br>过度<br>思考</h2>
+        <div class="tagline">完成比完美重要 100 倍</div>
+        <div class="bottom-bar">
+          <span>@DEREK.DESIGN</span>
+          <span>VOL.03</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dark (Deep Black + Cyan glow) -->
+    <div class="card-wrap">
+      <div class="mode-label">Dark</div>
+      <div class="card color-clash dark">
+        <div class="corner-deco tl"></div>
+        <div class="corner-deco br"></div>
+        <h2>停止<br>过度<br>思考</h2>
+        <div class="tagline">完成比完美重要 100 倍</div>
+        <div class="bottom-bar">
+          <span>@DEREK.DESIGN</span>
+          <span>VOL.03</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     STYLE 3: 数字冲击风
+     ================================================================ -->
+<div class="section">
+  <div class="section-title">TEMPLATE 03</div>
+  <div class="section-name">数字冲击风 · Number Impact</div>
+  <div class="section-desc">巨大数字占卡片上半部分，下方标题文字，极简布局</div>
+
+  <div class="pair">
+    <!-- Light -->
+    <div class="card-wrap">
+      <div class="mode-label">Light</div>
+      <div class="card num-impact light">
+        <div class="top-zone">
+          <div class="glow" style="top:30%;left:35%"></div>
+          <div class="big-number">97<span class="unit">%</span></div>
+        </div>
+        <div class="bottom-zone">
+          <div class="divider-line"></div>
+          <h2>的人高估了一年能做的事<br>低估了十年的复利</h2>
+          <div class="meta">DATA · 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dark -->
+    <div class="card-wrap">
+      <div class="mode-label">Dark</div>
+      <div class="card num-impact dark">
+        <div class="top-zone">
+          <div class="glow" style="top:30%;left:35%"></div>
+          <div class="big-number">97<span class="unit">%</span></div>
+        </div>
+        <div class="bottom-zone">
+          <div class="divider-line"></div>
+          <h2>的人高估了一年能做的事<br>低估了十年的复利</h2>
+          <div class="meta">DATA · 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

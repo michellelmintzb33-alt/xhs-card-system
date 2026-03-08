@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>卡片特效预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0a;
+    color: #fff;
+    font-family: -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 48px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 32px;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .card-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .effect-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #aaa;
+    font-weight: 500;
+  }
+
+  .effect-label .num {
+    background: #fff;
+    color: #000;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .effect-label .tech {
+    color: #666;
+    font-size: 11px;
+    font-family: "SF Mono", "Fira Code", monospace;
+  }
+
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 28px;
+  }
+
+  .card-title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.8;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ========== 1. 粒子背景 ========== */
+  .card-particles {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+  }
+
+  .card-particles canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  /* ========== 2. 毛玻璃 ========== */
+  .card-glass {
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="533"><defs><linearGradient id="g" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%23667eea"/><stop offset="50%25" stop-color="%23764ba2"/><stop offset="100%25" stop-color="%23f093fb"/></linearGradient></defs><rect fill="url(%23g)" width="400" height="533"/><circle cx="100" cy="120" r="80" fill="%23ff6b6b" opacity="0.6"/><circle cx="300" cy="200" r="100" fill="%2348dbfb" opacity="0.5"/><circle cx="200" cy="400" r="120" fill="%23feca57" opacity="0.4"/></svg>') center / cover;
+    padding: 0;
+  }
+
+  .glass-bg {
+    position: absolute;
+    inset: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="533"><defs><linearGradient id="g" x1="0%25" y1="0%25" x2="100%25" y2="100%25"><stop offset="0%25" stop-color="%23667eea"/><stop offset="50%25" stop-color="%23764ba2"/><stop offset="100%25" stop-color="%23f093fb"/></linearGradient></defs><rect fill="url(%23g)" width="400" height="533"/><circle cx="100" cy="120" r="80" fill="%23ff6b6b" opacity="0.6"/><circle cx="300" cy="200" r="100" fill="%2348dbfb" opacity="0.5"/><circle cx="200" cy="400" r="120" fill="%23feca57" opacity="0.4"/></svg>') center / cover;
+  }
+
+  .glass-overlay {
+    position: absolute;
+    inset: 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(20px) saturate(1.8);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 28px;
+    z-index: 2;
+  }
+
+  /* ========== 3. 渐变动画 ========== */
+  .card-gradient {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradientShift 6s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* ========== 4. 噪点纹理 ========== */
+  .card-noise {
+    background: linear-gradient(160deg, #2d1b69, #11998e);
+  }
+
+  .card-noise::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    opacity: 0.35;
+    filter: url(#noiseFilter);
+    background: rgba(255, 255, 255, 0.5);
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* ========== 5. 光晕效果 ========== */
+  .card-glow {
+    background: #111;
+    overflow: visible;
+  }
+
+  .glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    z-index: 1;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  .glow-orb-1 {
+    width: 200px;
+    height: 200px;
+    background: rgba(99, 102, 241, 0.6);
+    top: -20px;
+    right: -30px;
+    animation-delay: 0s;
+  }
+
+  .glow-orb-2 {
+    width: 180px;
+    height: 180px;
+    background: rgba(236, 72, 153, 0.5);
+    bottom: 40px;
+    left: -20px;
+    animation-delay: -2s;
+  }
+
+  .glow-orb-3 {
+    width: 140px;
+    height: 140px;
+    background: rgba(16, 185, 129, 0.4);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -1s;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(10px, -15px) scale(1.05); }
+    66% { transform: translate(-8px, 10px) scale(0.95); }
+  }
+
+  .glow-orb-3 {
+    animation-name: floatCenter;
+  }
+
+  @keyframes floatCenter {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    33% { transform: translate(-50%, -50%) translate(10px, -15px) scale(1.05); }
+    66% { transform: translate(-50%, -50%) translate(-8px, 10px) scale(0.95); }
+  }
+
+  /* ========== 6. 描边文字 ========== */
+  .card-stroke {
+    background: linear-gradient(145deg, #ffecd2, #fcb69f);
+  }
+
+  .stroke-text {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1.1;
+    -webkit-text-stroke: 2px #333;
+    color: transparent;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+  }
+
+  .stroke-text-filled {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: #333;
+    -webkit-text-stroke: 1px #333;
+    paint-order: stroke fill;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 8px;
+  }
+
+  .card-stroke .card-desc {
+    color: #555;
+    opacity: 1;
+  }
+
+  /* ========== Hover ========== */
+  .card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG 噪点滤镜 -->
+<svg style="position:absolute;width:0;height:0">
+  <filter id="noiseFilter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+</svg>
+
+<h1>卡片特效预览</h1>
+<p class="subtitle">点击选择你想加入主项目的效果</p>
+
+<div class="grid">
+
+  <!-- 1. 粒子背景 -->
+  <div class="card-wrapper">
+    <div class="effect-label">
+      <span class="num">1</span>
+      粒子背景
+      <span class="tech">canvas particles</span>
+    </div>
+    <div class="card card-particles" id="particleCard">
+      <canvas id="particleCanvas"></canvas>
+      <div class="card-title">Canvas 粒子系统</div>
+      <div class="card-desc">轻量级粒子动画，支持连线效果，适合科技感、数据类卡片背景</div>
+    </div>
+  </div>
+
+  <!-- 2. 毛玻璃 -->
+  <div class="card-wrapper">
+    <div class="effect-label">
+      <span class="num">2</span>
+      毛玻璃 / 磨砂
+      <span class="tech">backdrop-filter: blur</span>
+    </div>
+    <div class="card card-glass">
+      <div class="glass-bg"></div>
+      <div class="glass-overlay">
+        <div class="card-title">Glassmorphism</div>
+        <div class="card-desc">半透明磨砂质感，适合叠加在彩色背景或图片上，营造层次感</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 渐变动画 -->
+  <div class="card-wrapper">
+    <div class="effect-label">
+      <span class="num">3</span>
+      渐变动画背景
+      <span class="tech">CSS gradient animation</span>
+    </div>
+    <div class="card card-gradient">
+      <div class="card-title">流动渐变</div>
+      <div class="card-desc">多色渐变缓慢流动，视觉吸引力强，适合封面类、情绪类卡片</div>
+    </div>
+  </div>
+
+  <!-- 4. 噪点纹理 -->
+  <div class="card-wrapper">
+    <div class="effect-label">
+      <span class="num">4</span>
+      噪点纹理叠加
+      <span class="tech">SVG feTurbulence filter</span>
+    </div>
+    <div class="card card-noise">
+      <div class="card-title">Noise Texture</div>
+      <div class="card-desc">SVG 噪点叠加营造纸质/胶片颗粒感，让纯色背景更有质感</div>
+    </div>
+  </div>
+
+  <!-- 5. 光晕效果 -->
+  <div class="card-wrapper">
+    <div class="effect-label">
+      <span class="num">5</span>
+      光晕效果
+      <span class="tech">radial-gradient + blur glow</span>
+    </div>
+    <div class="card card-glow">
+      <div class="glow-orb glow-orb-1"></div>
+      <div class="glow-orb glow-orb-2"></div>
+      <div class="glow-orb glow-orb-3"></div>
+      <div class="card-title">Aurora Glow</div>
+      <div class="card-desc">多色光晕叠加，极光般的氛围感，适合暗色系高级感卡片</div>
+    </div>
+  </div>
+
+  <!-- 6. 描边文字 -->
+  <div class="card-wrapper">
+    <div class="effect-label">
+      <span class="num">6</span>
+      描边文字
+      <span class="tech">-webkit-text-stroke</span>
+    </div>
+    <div class="card card-stroke">
+      <div class="stroke-text">BIG<br>IDEA</div>
+      <div class="stroke-text-filled">描边标题效果</div>
+      <div class="card-desc">镂空描边 + 实心描边组合，适合强视觉冲击的封面标题</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// 粒子系统
+(function () {
+  const canvas = document.getElementById('particleCanvas');
+  const card = document.getElementById('particleCard');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let w, h;
+
+  function resize() {
+    w = canvas.width = card.offsetWidth;
+    h = canvas.height = card.offsetHeight;
+  }
+
+  function createParticles() {
+    particles = [];
+    const count = Math.floor((w * h) / 6000);
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
+        r: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.5 + 0.3
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, w, h);
+
+    // 连线
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(100, 180, 255, ${0.15 * (1 - dist / 100)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // 粒子
+    for (const p of particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0 || p.x > w) p.vx *= -1;
+      if (p.y < 0 || p.y > h) p.vy *= -1;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(100, 180, 255, ${p.alpha})`;
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  createParticles();
+  draw();
+
+  window.addEventListener('resize', () => {
+    resize();
+    createParticles();
+  });
+})();
+</script>
+
+</body>
+</html>

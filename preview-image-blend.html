@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图片融合效果 Demo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  /* ===== Upload + Controls ===== */
+  .top-controls {
+    max-width: 520px;
+    margin: 0 auto 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .upload-area {
+    border: 2px dashed #333;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .upload-area:hover { border-color: #666; background: rgba(255,255,255,0.02); }
+  .upload-area.has-image { border-color: #4a9eff; border-style: solid; padding: 8px; }
+  .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .upload-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+  .upload-text { font-size: 15px; color: #888; }
+  .upload-text strong { color: #4a9eff; }
+  .upload-preview { display: none; max-width: 240px; max-height: 140px; border-radius: 8px; margin: 0 auto; object-fit: cover; }
+  .upload-area.has-image .upload-preview { display: block; }
+  .upload-area.has-image .upload-icon,
+  .upload-area.has-image .upload-text { display: none; }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 4px;
+  }
+  .slider-row .lbl {
+    font-size: 13px;
+    color: #888;
+    min-width: 48px;
+    flex-shrink: 0;
+  }
+  .slider-row input[type="range"] {
+    flex: 1;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #333;
+    border-radius: 2px;
+    outline: none;
+  }
+  .slider-row input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #4a9eff;
+    cursor: pointer;
+    border: 2px solid #0a0a0a;
+  }
+  .slider-row .val {
+    font-size: 13px;
+    color: #666;
+    min-width: 40px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .drag-hint {
+    text-align: center;
+    font-size: 12px;
+    color: #555;
+    display: none;
+  }
+  .drag-hint.visible { display: block; }
+
+  /* ===== Grid ===== */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .card-wrapper { display: flex; flex-direction: column; gap: 12px; }
+  .card-label { font-size: 13px; color: #999; font-weight: 500; letter-spacing: 0.5px; padding-left: 4px; }
+  .card-label span { color: #4a9eff; font-weight: 600; }
+
+  /* ===== Base Card ===== */
+  .card {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+  }
+  .card .placeholder { color: #444; font-size: 14px; text-align: center; line-height: 1.6; }
+
+  /* Drag cursor when image loaded */
+  .card.draggable { cursor: grab; }
+  .card.draggable:active { cursor: grabbing; }
+
+  /* Shared text */
+  .card-text { position: relative; z-index: 2; padding: 32px; }
+  .card-text h2 { font-size: 24px; font-weight: 700; line-height: 1.4; margin-bottom: 12px; }
+  .card-text p { font-size: 14px; line-height: 1.8; opacity: 0.85; }
+
+  /* ===== 1. Dark Overlay ===== */
+  .card-overlay { background-size: 100%; background-position: center 50%; background-repeat: no-repeat; }
+  .card-overlay::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.55); z-index: 1; }
+  .card-overlay .card-text { color: #fff; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+
+  /* ===== 2. Blur Background ===== */
+  .card-blur { background: #1a1a1a; }
+  .card-blur .blur-bg {
+    position: absolute; inset: -20px;
+    background-size: 100%; background-position: center 50%; background-repeat: no-repeat;
+    filter: blur(20px) brightness(0.4);
+    transform: scale(1.1); z-index: 0;
+  }
+  .card-blur .card-text { color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; }
+  .card-blur .card-text h2 { font-size: 28px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
+  .card-blur .card-text p { text-shadow: 0 1px 10px rgba(0,0,0,0.5); max-width: 80%; }
+
+  /* ===== 3. Split Layout ===== */
+  .card-split { flex-direction: column; display: flex; }
+  .card-split .split-image { width: 100%; height: 55%; background-size: 100%; background-position: center 50%; background-repeat: no-repeat; flex-shrink: 0; }
+  .card-split .split-text { flex: 1; background: #f5f0eb; color: #1a1a1a; padding: 24px 28px; display: flex; flex-direction: column; justify-content: center; }
+  .card-split .split-text h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; }
+  .card-split .split-text p { font-size: 13px; color: #666; line-height: 1.8; }
+
+  /* ===== 4. Mix Blend Mode ===== */
+  .card-blend { background: #c45e3a; }
+  .card-blend .blend-image { position: absolute; inset: 0; background-size: 100%; background-position: center 50%; background-repeat: no-repeat; mix-blend-mode: multiply; opacity: 0.9; }
+  .card-blend .card-text { color: #fff; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+  .card-blend .card-text h2 { text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+
+  /* ===== 5. Circle Crop ===== */
+  .card-circle { background: #faf5f0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px; }
+  .card-circle .circle-image { width: 180px; height: 180px; border-radius: 50%; background-size: 100%; background-position: center 50%; background-repeat: no-repeat; margin-bottom: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.12); flex-shrink: 0; }
+  .card-circle .circle-text { text-align: center; color: #1a1a1a; }
+  .card-circle .circle-text h2 { font-size: 20px; margin-bottom: 8px; color: #1a1a1a; }
+  .card-circle .circle-text p { font-size: 13px; color: #888; line-height: 1.8; max-width: 260px; }
+
+  /* ===== 6. Mask Fade ===== */
+  .card-mask { background: #1a1a1a; }
+  .card-mask .mask-image {
+    position: absolute; inset: 0;
+    background-size: 100%; background-position: center 50%; background-repeat: no-repeat;
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 70%);
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 20%, rgba(0,0,0,0) 70%);
+    z-index: 0;
+  }
+  .card-mask .card-text { color: #fff; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+  .card-mask .card-text h2 { font-size: 22px; }
+  .card-mask .card-text p { opacity: 0.7; }
+
+  .footer { text-align: center; margin-top: 48px; color: #444; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>图文融合效果</h1>
+<p class="subtitle">上传一张图片，预览 6 种不同的图文融合方式</p>
+
+<!-- Upload + Controls -->
+<div class="top-controls">
+  <div class="upload-area" id="uploadArea">
+    <input type="file" accept="image/*" id="fileInput">
+    <div class="upload-icon">🖼</div>
+    <p class="upload-text">点击或拖拽上传图片<br><strong>支持 JPG / PNG / WebP</strong></p>
+    <img class="upload-preview" id="uploadPreview" alt="preview">
+  </div>
+  <div class="slider-row" id="zoomRow" style="display:none">
+    <span class="lbl">缩放</span>
+    <input type="range" id="zoomSlider" min="100" max="300" value="100">
+    <span class="val" id="zoomVal">100%</span>
+  </div>
+  <div class="drag-hint" id="dragHint">在卡片上按住拖拽可调整图片上下位置</div>
+</div>
+
+<!-- Cards Grid -->
+<div class="cards-grid" id="cardsGrid">
+
+  <!-- 1. Dark Overlay -->
+  <div class="card-wrapper">
+    <div class="card-label"><span>01</span> — 深色遮罩 + 白色文字</div>
+    <div class="card card-overlay" id="card1" data-img-target="self">
+      <div class="placeholder">上传图片查看效果</div>
+      <div class="card-text" style="display:none">
+        <h2>在旅途中<br>找到自己</h2>
+        <p>每一次出发，都是一场与自我的对话。不必追赶，慢慢走，风景自然来。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Blur Background -->
+  <div class="card-wrapper">
+    <div class="card-label"><span>02</span> — 模糊背景 + 清晰文字</div>
+    <div class="card card-blur" id="card2" data-img-target=".blur-bg">
+      <div class="placeholder">上传图片查看效果</div>
+      <div class="blur-bg" style="display:none"></div>
+      <div class="card-text" style="display:none">
+        <h2>此刻即永恒</h2>
+        <p>把注意力放在当下，每一个瞬间都值得被认真对待。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Split Layout -->
+  <div class="card-wrapper">
+    <div class="card-label"><span>03</span> — 上图下文分区</div>
+    <div class="card card-split" id="card3" data-img-target=".split-image">
+      <div class="placeholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">上传图片查看效果</div>
+      <div class="split-image" style="display:none"></div>
+      <div class="split-text" style="display:none">
+        <h2>简单生活指南</h2>
+        <p>少即是多。学会做减法，把时间留给真正重要的事。断舍离不只是整理物品，更是整理人生。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Mix Blend Mode -->
+  <div class="card-wrapper">
+    <div class="card-label"><span>04</span> — Multiply 混合模式</div>
+    <div class="card card-blend" id="card4" data-img-target=".blend-image">
+      <div class="placeholder">上传图片查看效果</div>
+      <div class="blend-image" style="display:none"></div>
+      <div class="card-text" style="display:none">
+        <h2>色彩中的<br>情绪表达</h2>
+        <p>当图片与色彩融合，产生意想不到的视觉化学反应。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Circle Crop -->
+  <div class="card-wrapper">
+    <div class="card-label"><span>05</span> — 圆形裁剪 + 文字环绕</div>
+    <div class="card card-circle" id="card5" data-img-target=".circle-image">
+      <div class="placeholder">上传图片查看效果</div>
+      <div class="circle-image" style="display:none"></div>
+      <div class="circle-text" style="display:none">
+        <h2>关于我</h2>
+        <p>一个热爱生活的创作者，用镜头记录世界，用文字表达内心。每天都在变得更好。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Mask Fade -->
+  <div class="card-wrapper">
+    <div class="card-label"><span>06</span> — 渐隐遮罩 + 底部文字</div>
+    <div class="card card-mask" id="card6" data-img-target=".mask-image">
+      <div class="placeholder">上传图片查看效果</div>
+      <div class="mask-image" style="display:none"></div>
+      <div class="card-text" style="display:none">
+        <h2>光影之间</h2>
+        <p>在明与暗的交界处，藏着最动人的故事。让画面自然地融入文字，不争不抢。</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="footer">Image Blend Effects Demo · 独立预览文件</p>
+
+<script>
+// ===== State =====
+let imageUrl = null;
+let posY = 50;   // background-position Y (0-100%)
+let zoom = 100;  // background-size percentage
+
+// ===== Elements =====
+const fileInput = document.getElementById('fileInput');
+const uploadArea = document.getElementById('uploadArea');
+const uploadPreview = document.getElementById('uploadPreview');
+const zoomSlider = document.getElementById('zoomSlider');
+const zoomVal = document.getElementById('zoomVal');
+const zoomRow = document.getElementById('zoomRow');
+const dragHint = document.getElementById('dragHint');
+
+// ===== Upload =====
+fileInput.addEventListener('change', handleFile);
+
+uploadArea.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadArea.style.borderColor = '#4a9eff';
+});
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.style.borderColor = uploadArea.classList.contains('has-image') ? '#4a9eff' : '#333';
+});
+uploadArea.addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.dataTransfer.files.length) {
+    fileInput.files = e.dataTransfer.files;
+    handleFile({ target: fileInput });
+  }
+});
+
+function handleFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    imageUrl = ev.target.result;
+    uploadPreview.src = imageUrl;
+    uploadArea.classList.add('has-image');
+    zoomRow.style.display = '';
+    dragHint.classList.add('visible');
+    posY = 50;
+    zoom = 100;
+    zoomSlider.value = 100;
+    zoomVal.textContent = '100%';
+    showCards();
+    applyImageStyles();
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== Zoom Slider =====
+zoomSlider.addEventListener('input', () => {
+  zoom = parseInt(zoomSlider.value);
+  zoomVal.textContent = zoom + '%';
+  applyImageStyles();
+});
+
+// ===== Show card content =====
+function showCards() {
+  const bg = `url('${imageUrl}')`;
+
+  // Card 1 — overlay (image on self)
+  const c1 = document.getElementById('card1');
+  c1.style.backgroundImage = bg;
+  c1.querySelector('.placeholder').style.display = 'none';
+  c1.querySelector('.card-text').style.display = 'flex';
+  c1.classList.add('draggable');
+
+  // Card 2 — blur
+  const c2 = document.getElementById('card2');
+  const blurBg = c2.querySelector('.blur-bg');
+  blurBg.style.backgroundImage = bg;
+  blurBg.style.display = 'block';
+  c2.querySelector('.placeholder').style.display = 'none';
+  c2.querySelector('.card-text').style.display = 'flex';
+  c2.classList.add('draggable');
+
+  // Card 3 — split
+  const c3 = document.getElementById('card3');
+  const splitImg = c3.querySelector('.split-image');
+  splitImg.style.backgroundImage = bg;
+  splitImg.style.display = 'block';
+  c3.querySelector('.placeholder').style.display = 'none';
+  c3.querySelector('.split-text').style.display = 'flex';
+  c3.classList.add('draggable');
+
+  // Card 4 — blend
+  const c4 = document.getElementById('card4');
+  const blendImg = c4.querySelector('.blend-image');
+  blendImg.style.backgroundImage = bg;
+  blendImg.style.display = 'block';
+  c4.querySelector('.placeholder').style.display = 'none';
+  c4.querySelector('.card-text').style.display = 'flex';
+  c4.classList.add('draggable');
+
+  // Card 5 — circle
+  const c5 = document.getElementById('card5');
+  const circleImg = c5.querySelector('.circle-image');
+  circleImg.style.backgroundImage = bg;
+  circleImg.style.display = 'block';
+  c5.querySelector('.placeholder').style.display = 'none';
+  c5.querySelector('.circle-text').style.display = 'block';
+  c5.classList.add('draggable');
+
+  // Card 6 — mask
+  const c6 = document.getElementById('card6');
+  const maskImg = c6.querySelector('.mask-image');
+  maskImg.style.backgroundImage = bg;
+  maskImg.style.display = 'block';
+  c6.querySelector('.placeholder').style.display = 'none';
+  c6.querySelector('.card-text').style.display = 'flex';
+  c6.classList.add('draggable');
+}
+
+// ===== Apply position + zoom to all image targets =====
+function getImageTargets() {
+  const targets = [];
+  document.querySelectorAll('.card[data-img-target]').forEach(card => {
+    const sel = card.dataset.imgTarget;
+    const el = sel === 'self' ? card : card.querySelector(sel);
+    if (el) targets.push(el);
+  });
+  return targets;
+}
+
+function applyImageStyles() {
+  const size = zoom + '%';
+  const pos = `center ${posY}%`;
+  getImageTargets().forEach(el => {
+    el.style.backgroundSize = size;
+    el.style.backgroundPosition = pos;
+  });
+}
+
+// ===== Drag to reposition =====
+let dragging = false;
+let dragStartY = 0;
+let dragStartPos = 0;
+
+document.addEventListener('mousedown', e => {
+  const card = e.target.closest('.card.draggable');
+  if (!card) return;
+  // Don't drag if clicking on text
+  if (e.target.closest('.card-text, .split-text, .circle-text')) return;
+  e.preventDefault();
+  dragging = true;
+  dragStartY = e.clientY;
+  dragStartPos = posY;
+  document.body.style.cursor = 'grabbing';
+});
+
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const card = document.querySelector('.card.draggable');
+  if (!card) return;
+  const cardH = card.offsetHeight;
+  const dy = e.clientY - dragStartY;
+  // Map pixel movement to percentage (inverted: drag down = image moves up = higher %)
+  const sensitivity = 100 / cardH;
+  posY = Math.max(0, Math.min(100, dragStartPos - dy * sensitivity));
+  applyImageStyles();
+});
+
+document.addEventListener('mouseup', () => {
+  if (!dragging) return;
+  dragging = false;
+  document.body.style.cursor = '';
+});
+
+// Touch support
+document.addEventListener('touchstart', e => {
+  const card = e.target.closest('.card.draggable');
+  if (!card) return;
+  if (e.target.closest('.card-text, .split-text, .circle-text')) return;
+  dragging = true;
+  dragStartY = e.touches[0].clientY;
+  dragStartPos = posY;
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  if (!dragging) return;
+  const card = document.querySelector('.card.draggable');
+  if (!card) return;
+  const cardH = card.offsetHeight;
+  const dy = e.touches[0].clientY - dragStartY;
+  const sensitivity = 100 / cardH;
+  posY = Math.max(0, Math.min(100, dragStartPos - dy * sensitivity));
+  applyImageStyles();
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+  dragging = false;
+});
+</script>
+
+</body>
+</html>

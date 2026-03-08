@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excalidraw 纯净卡片 + 装饰元素库</title>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#0a0a0a;color:#fff;font-family:'Noto Sans SC',sans-serif;padding:40px 20px 80px;}
+
+/* Header */
+h1{text-align:center;font-size:26px;font-weight:600;letter-spacing:1px;margin-bottom:6px;}
+.subtitle{text-align:center;color:#666;font-size:13px;margin-bottom:40px;}
+
+/* Section */
+.section-title{
+  font-size:13px;color:#555;letter-spacing:4px;text-transform:uppercase;
+  font-family:'Space Mono',monospace;margin-bottom:20px;padding-left:4px;
+  border-left:3px solid #333;padding-left:12px;
+}
+
+/* Card Grid */
+.card-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:28px;max-width:1200px;margin:0 auto 60px;
+}
+.card-wrap{display:flex;flex-direction:column;gap:8px;}
+.card-label{font-size:12px;color:#666;display:flex;align-items:center;gap:8px;}
+.card-label .num{
+  background:#fff;color:#000;width:20px;height:20px;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;
+}
+
+/* Cards */
+.card{
+  width:100%;aspect-ratio:3/4;border-radius:6px;overflow:hidden;position:relative;
+  display:flex;align-items:center;justify-content:center;padding:10%;
+  transition:transform .3s,box-shadow .3s;cursor:pointer;
+}
+.card:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.4);}
+
+.card-title{
+  font-family:'ZCOOL KuaiLe',cursive;font-size:28px;line-height:1.5;
+  text-align:center;position:relative;z-index:2;color:#1a1a1a;
+}
+.card-title .hl{position:relative;display:inline;padding:0 4px;}
+.card-title .hl::before{
+  content:'';position:absolute;left:-2px;right:-2px;bottom:2px;height:40%;
+  border-radius:2px;z-index:-1;transform:rotate(-1deg);
+}
+
+/* Highlight colors */
+.hl-green::before{background:rgba(34,197,94,.45);}
+.hl-yellow::before{background:rgba(250,204,21,.5);}
+.hl-pink::before{background:rgba(244,114,182,.45);}
+.hl-blue::before{background:rgba(96,165,250,.45);}
+.hl-orange::before{background:rgba(251,146,60,.5);}
+.hl-purple::before{background:rgba(168,85,247,.4);}
+
+/* Paper backgrounds */
+.paper-grid{
+  background:#faf9f6;
+  background-image:
+    linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,0,0,.06) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+.paper-lined{
+  background:#faf9f6;
+  background-image:repeating-linear-gradient(
+    transparent,transparent 31px,rgba(0,0,0,.07) 31px,rgba(0,0,0,.08) 32px
+  );
+  background-position:0 16px;
+}
+.paper-dot{
+  background:#faf9f6;
+  background-image:radial-gradient(circle,rgba(0,0,0,.12) 1px,transparent 1px);
+  background-size:20px 20px;
+}
+.paper-blank{
+  background:#faf9f6;
+}
+
+/* ===== Element Library ===== */
+.lib-section{max-width:1200px;margin:0 auto 40px;}
+.cat-title{
+  font-size:14px;color:#888;margin:28px 0 14px;padding-bottom:8px;
+  border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:8px;
+}
+.cat-title .cat-icon{font-size:16px;}
+.elem-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px;
+}
+.elem{
+  aspect-ratio:1;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:6px;padding:12px;transition:all .25s;cursor:default;
+}
+.elem:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12);transform:translateY(-2px);}
+.elem svg{width:48px;height:48px;flex-shrink:0;}
+.elem-name{font-size:10px;color:#555;text-align:center;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<h1>纯净卡片模板 + 装饰元素库</h1>
+<p class="subtitle">区域一：6 张纯净背景卡片 · 区域二：Excalidraw 手绘装饰元素</p>
+
+<!-- ===== 区域一：纯净卡片 ===== -->
+<div style="max-width:1200px;margin:0 auto;">
+  <div class="section-title">SECTION 1 · 纯净卡片模板</div>
+</div>
+
+<div class="card-grid">
+  <!-- 1. 方格纸 + 绿色荧光笔 -->
+  <div class="card-wrap">
+    <div class="card-label"><span class="num">1</span>方格纸 + 绿色荧光笔</div>
+    <div class="card paper-grid">
+      <div class="card-title">好的设计<br>是<span class="hl hl-green">减法</span>的艺术</div>
+    </div>
+  </div>
+
+  <!-- 2. 横线纸 + 黄色荧光笔 -->
+  <div class="card-wrap">
+    <div class="card-label"><span class="num">2</span>横线纸 + 黄色荧光笔</div>
+    <div class="card paper-lined">
+      <div class="card-title">把复杂的事情<br><span class="hl hl-yellow">简单说</span></div>
+    </div>
+  </div>
+
+  <!-- 3. 点阵纸 + 粉色荧光笔 -->
+  <div class="card-wrap">
+    <div class="card-label"><span class="num">3</span>点阵纸 + 粉色荧光笔</div>
+    <div class="card paper-dot">
+      <div class="card-title">每一天都是<br><span class="hl hl-pink">重新开始</span>的机会</div>
+    </div>
+  </div>
+
+  <!-- 4. 方格纸 + 蓝色荧光笔 -->
+  <div class="card-wrap">
+    <div class="card-label"><span class="num">4</span>方格纸 + 蓝色荧光笔</div>
+    <div class="card paper-grid">
+      <div class="card-title">数据不会说谎<br>但会<span class="hl hl-blue">讲故事</span></div>
+    </div>
+  </div>
+
+  <!-- 5. 空白纸 + 橙色荧光笔 -->
+  <div class="card-wrap">
+    <div class="card-label"><span class="num">5</span>空白纸 + 橙色荧光笔</div>
+    <div class="card paper-blank">
+      <div class="card-title">先完成<br>再<span class="hl hl-orange">完美</span></div>
+    </div>
+  </div>
+
+  <!-- 6. 横线纸 + 紫色荧光笔 -->
+  <div class="card-wrap">
+    <div class="card-label"><span class="num">6</span>横线纸 + 紫色荧光笔</div>
+    <div class="card paper-lined">
+      <div class="card-title">灵感来自<br><span class="hl hl-purple">观察生活</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 区域二：装饰元素库 ===== -->
+<div class="lib-section">
+  <div class="section-title">SECTION 2 · EXCALIDRAW 装饰元素库</div>
+
+  <!-- 表情类 -->
+  <div class="cat-title">表情类</div>
+  <div class="elem-grid">
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="20" r="2" fill="#555"/>
+        <circle cx="31" cy="20" r="2" fill="#555"/>
+        <path d="M16 32 Q24 28,32 32" stroke="#555" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <path d="M32 14 C34 10,38 10,40 14" stroke="#555" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="elem-name">思考脸</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="20" r="2.2" fill="#555"/>
+        <circle cx="31" cy="20" r="2.2" fill="#555"/>
+        <path d="M15 30 Q24 38,33 30" stroke="#555" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="elem-name">笑脸</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 18 L17 22 L22 18 M26 18 L31 22 L36 18" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M15 32 Q24 38,33 32" stroke="#555" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="elem-name">星星眼</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="17" cy="19" r="2.5" fill="#555"/>
+        <circle cx="31" cy="19" r="2.5" fill="#555"/>
+        <ellipse cx="24" cy="34" rx="6" ry="5" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="elem-name">惊讶脸</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M14 18 Q17 14,20 18" stroke="#555" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M28 18 Q31 14,34 18" stroke="#555" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        <path d="M15 30 Q24 38,33 30" stroke="#555" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <path d="M30 28 L34 24" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="elem-name">哭笑脸</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13 22 L17 18 L21 22" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M27 22 L31 18 L35 22" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M16 32 Q24 37,32 32" stroke="#555" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="elem-name">得意脸</span>
+    </div>
+  </div>
+
+  <!-- 手势类 -->
+  <div class="cat-title">手势类</div>
+  <div class="elem-grid">
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M24 38 C10 34,8 24,14 16 Q18 10,24 14 Q30 10,34 16 C40 24,38 34,24 38Z" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M18 22 Q24 14,30 22" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="elem-name">比心</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M20 40 L20 22 M20 22 C20 16,28 16,28 22 L28 28 M20 22 C20 14,14 14,14 22 L14 30 M28 22 C28 16,34 16,34 22 L34 28" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M14 30 Q14 40,24 42 Q34 40,34 28" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M20 12 L20 8 M16 14 L13 11 M24 14 L27 11" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="elem-name">举手</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="20" r="10" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M20 36 C20 28,16 24,16 24 M28 36 C28 28,32 24,32 24" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M20 36 Q24 40,28 36" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="elem-name">OK</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M16 28 L16 14 C16 10,22 10,22 14 L22 24 M22 14 C22 10,28 10,28 14 L28 24 M28 14 C28 10,34 10,34 14 L34 26 Q34 38,24 40 Q14 38,14 30 L14 28 C14 26,16 26,16 28Z" stroke="#e8e8e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M10 22 L16 14" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="elem-name">点赞</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M14 30 L14 18 Q14 12,20 12 L20 24 M20 12 Q20 8,24 8 L24 24 M24 8 Q28 8,28 12 L28 24 M28 12 Q34 12,34 18 L34 30 Q34 40,24 42 Q14 40,14 30Z" stroke="#e8e8e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M10 16 C6 14,6 10,10 8" stroke="#555" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        <path d="M38 16 C42 14,42 10,38 8" stroke="#555" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="elem-name">挥手</span>
+    </div>
+  </div>
+
+  <!-- 标注类 -->
+  <div class="cat-title">标注类</div>
+  <div class="elem-grid">
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M8 40 C12 28,20 16,40 8" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M34 6 L42 8 L36 14" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="elem-name">箭头</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <ellipse cx="24" cy="24" rx="18" ry="14" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="0" fill="none" transform="rotate(-5 24 24)"/>
+        <path d="M38 14 L42 10" stroke="#f87171" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span class="elem-name">圆圈圈注</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M4 32 Q10 26,16 32 T28 32 T40 32 T48 32" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="elem-name">波浪下划线</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M24 4 L27 18 L42 18 L30 27 L34 42 L24 33 L14 42 L18 27 L6 18 L21 18Z" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="elem-name">星标</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M24 8 L24 30" stroke="#f87171" stroke-width="3.5" stroke-linecap="round"/>
+        <circle cx="24" cy="38" r="3" fill="#f87171"/>
+      </svg>
+      <span class="elem-name">叹号</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M16 16 C16 8,32 8,32 16 C32 22,26 24,24 28" stroke="#60a5fa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="24" cy="38" r="3" fill="#60a5fa"/>
+      </svg>
+      <span class="elem-name">问号</span>
+    </div>
+  </div>
+
+  <!-- 装饰类 -->
+  <div class="cat-title">装饰类</div>
+  <div class="elem-grid">
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <rect x="6" y="8" width="36" height="32" rx="2" stroke="#fbbf24" stroke-width="2.2" fill="rgba(251,191,36,.1)" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-2 24 24)"/>
+        <path d="M12 18 L36 18 M12 26 L30 26 M12 34 L24 34" stroke="#c8a000" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+      </svg>
+      <span class="elem-name">便利贴</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <rect x="4" y="18" width="40" height="12" rx="1" stroke="#a8a29e" stroke-width="1.8" fill="rgba(168,162,158,.12)" stroke-linecap="round" stroke-linejoin="round" transform="rotate(3 24 24)"/>
+        <path d="M4 24 L44 24" stroke="#a8a29e" stroke-width="0.8" stroke-dasharray="3 3" opacity=".4"/>
+      </svg>
+      <span class="elem-name">胶带条</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M18 4 C8 4,4 10,4 16 C4 24,12 26,18 24 L18 4Z" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M18 24 L18 44" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M18 44 C28 44,34 38,34 32 C34 24,26 22,20 24" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="elem-name">回形针</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="10" r="6" stroke="#f87171" stroke-width="2.2" fill="rgba(248,113,113,.15)" stroke-linecap="round"/>
+        <path d="M24 16 L24 42" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M21 40 L24 44 L27 40" stroke="#a8a29e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="elem-name">图钉</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M12 4 L12 42 L24 34 L36 42 L36 4Z" stroke="#60a5fa" stroke-width="2.5" fill="rgba(96,165,250,.1)" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M18 14 L30 14 M18 22 L26 22" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" opacity=".5"/>
+      </svg>
+      <span class="elem-name">书签</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M14 38 C10 38,8 36,8 32 L8 22 C8 16,12 14,18 14 L30 14 C36 14,40 16,40 22 L40 32 C40 36,38 38,34 38 L32 38" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M18 14 L18 10 C18 8,20 6,22 6 L26 6 C28 6,30 8,30 10 L30 14" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <ellipse cx="24" cy="28" rx="4" ry="3.5" stroke="#8b5e34" stroke-width="1.5" fill="rgba(139,94,52,.15)"/>
+        <path d="M14 42 Q18 40,20 42 Q22 44,26 42 Q28 40,32 42" stroke="#a8a29e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="elem-name">咖啡杯</span>
+    </div>
+  </div>
+
+  <!-- 形状类 -->
+  <div class="cat-title">形状类</div>
+  <div class="elem-grid">
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M10 30 C10 36,6 38,4 34 C2 30,6 26,10 26 C8 22,10 16,16 16 C16 10,22 6,28 8 C32 4,40 6,40 14 C46 14,46 24,40 26 C44 32,38 34,34 32 C34 36,28 38,24 34 C20 38,14 36,10 30Z" stroke="#e8e8e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="elem-name">云朵</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M8 8 L40 8 Q42 8,42 10 L42 30 Q42 32,40 32 L26 32 L18 40 L20 32 L10 32 Q8 32,8 30Z" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M14 16 L34 16 M14 24 L28 24" stroke="#555" stroke-width="1.5" stroke-linecap="round" opacity=".3"/>
+      </svg>
+      <span class="elem-name">对话气泡</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M24 4 L28 14 L38 8 L32 18 L44 20 L34 26 L42 36 L30 32 L28 44 L24 34 L20 44 L18 32 L6 36 L14 26 L4 20 L16 18 L10 8 L20 14Z" stroke="#f87171" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="elem-name">爆炸框</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M24 40 C10 32,4 22,4 16 C4 10,10 4,16 4 C20 4,22 6,24 10 C26 6,28 4,32 4 C38 4,44 10,44 16 C44 22,38 32,24 40Z" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="elem-name">心形</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M28 4 L18 20 L30 20 L20 44" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="elem-name">闪电</span>
+    </div>
+    <div class="elem">
+      <svg viewBox="0 0 48 48" fill="none">
+        <path d="M14 44 L14 12 L36 8 L36 36 L14 40" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M14 12 L36 8" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M14 40 L36 36" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" opacity=".4"/>
+      </svg>
+      <span class="elem-name">小旗子</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
