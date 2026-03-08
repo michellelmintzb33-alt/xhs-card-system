@@ -524,8 +524,10 @@
   <div class="sblk" data-tags="重点" data-tpl="c23">
     <div class="stag">㉓ 纯净方格·绿 <span class="tag-badge">重点</span></div>
     <div class="card c23 hd-grid hd-font">
+      <div class="cln-kicker"></div>
       <h2></h2>
       <p class="cln-sub"></p>
+      <div class="cln-foot"><span class="cln-series"></span><span class="cln-author"></span></div>
     </div>
   </div>
 
@@ -533,8 +535,10 @@
   <div class="sblk" data-tags="重点" data-tpl="c24">
     <div class="stag">㉔ 纯净点阵·粉 <span class="tag-badge">重点</span></div>
     <div class="card c24 hd-dotgrid hd-font">
+      <div class="cln-kicker"></div>
       <h2></h2>
       <p class="cln-sub"></p>
+      <div class="cln-foot"><span class="cln-series"></span><span class="cln-author"></span></div>
     </div>
   </div>
 
@@ -542,8 +546,10 @@
   <div class="sblk" data-tags="重点" data-tpl="c25">
     <div class="stag">㉕ 纯净大格·蓝 <span class="tag-badge">重点</span></div>
     <div class="card c25 hd-grid-lg hd-font">
+      <div class="cln-kicker"></div>
       <h2></h2>
       <p class="cln-sub"></p>
+      <div class="cln-foot"><span class="cln-series"></span><span class="cln-author"></span></div>
     </div>
   </div>
 
@@ -551,8 +557,10 @@
   <div class="sblk" data-tags="重点" data-tpl="c26">
     <div class="stag">㉖ 纯净空白·橙 <span class="tag-badge">重点</span></div>
     <div class="card c26 hd-font">
+      <div class="cln-kicker"></div>
       <h2></h2>
       <p class="cln-sub"></p>
+      <div class="cln-foot"><span class="cln-series"></span><span class="cln-author"></span></div>
     </div>
   </div>
 
@@ -562,8 +570,10 @@
     <div class="card c27">
       <div class="c27-image"></div>
       <div class="c27-body">
+        <div class="cln-kicker"></div>
         <h2></h2>
         <p class="c27-sub"></p>
+        <div class="cln-foot"><span class="cln-series"></span><span class="cln-author"></span></div>
       </div>
     </div>
   </div>
@@ -574,8 +584,10 @@
     <div class="card c28">
       <div class="c28-circle"></div>
       <div class="c28-body">
+        <div class="cln-kicker"></div>
         <h2></h2>
         <p class="c28-sub"></p>
+        <div class="cln-foot"><span class="cln-series"></span><span class="cln-author"></span></div>
       </div>
     </div>
   </div>
@@ -707,7 +719,7 @@ function copyJ(){const bg=gS('bg'),a=gS('accent');let o={bg,accent:a};if(cc>=3)o
 
 
 // ===== EDIT MODE =====
-const EDIT_SELS='.card h2,.card p,.card .sub,.card .kk,.card .dk,.card .cp,.card .bt3,.card .body12 p,.card .item,.card .bubble,.card .sm,.card .bg2,.card .tt,.card .ins,.card .tag,.card .tg,.card .iss,.card .mh .logo,.card .mh .dt,.card .hl2,.card .ps,.card .bs2,.card .au,.card .lb2,.card .tag8,.card .tag11,.card .note11,.card .label12,.card .sb span,.card .dl,.card .dv,.card .bt,.card .bl,.card .bv,.card .pct,.card .pl,.card .ft span,.card .hl3,.card .vol,.card .cr .lb2';
+const EDIT_SELS='.card h2,.card p,.card .sub,.card .kk,.card .dk,.card .cp,.card .bt3,.card .body12 p,.card .item,.card .bubble,.card .sm,.card .bg2,.card .tt,.card .ins,.card .tag,.card .tg,.card .iss,.card .mh .logo,.card .mh .dt,.card .hl2,.card .ps,.card .bs2,.card .au,.card .lb2,.card .tag8,.card .tag11,.card .note11,.card .label12,.card .sb span,.card .dl,.card .dv,.card .bt,.card .bl,.card .bv,.card .pct,.card .pl,.card .ft span,.card .hl3,.card .vol,.card .cr .lb2,.card .cln-kicker,.card .cln-series,.card .cln-author';
 
 function toggleContentOnly(){
   contentOnly=!contentOnly;
@@ -948,7 +960,10 @@ function setImgZoom(val){
 }
 
 function getTargetCards(){
-  // Apply to selected cards; if none selected, apply to all visible
+  // Explore mode: all explore cards
+  const eg=document.querySelector('.explore-grid');
+  if(eg) return eg.querySelectorAll('.explore-item .card');
+  // Normal mode: selected cards, or all visible
   const sel=document.querySelectorAll('.sblk.selected:not(.filtered-out):not(.removed) .card');
   if(sel.length)return sel;
   return document.querySelectorAll('.sblk:not(.filtered-out):not(.removed) .card');
@@ -1195,35 +1210,34 @@ function refreshExploreContent(){
   if(!_exploreActive)return;
   const grid=document.querySelector('.explore-grid');
   if(!grid)return;
-  const parsed={
+  const fields={
     headline:document.getElementById('f-headline').value,
     subtitle:document.getElementById('f-subtitle').value,
-    quote:document.getElementById('f-quote').value
-  };
-  const fixed={
+    quote:document.getElementById('f-quote').value,
     kicker:document.getElementById('f-kicker').value,
     author:document.getElementById('f-author').value,
     series:document.getElementById('f-series').value
   };
+  const hasContent=!!fields.headline;
   grid.querySelectorAll('.explore-item .card').forEach(card=>{
     const cls=Array.from(card.classList).find(c=>/^c\d+$/.test(c));
     if(!cls)return;
     const map=CONTENT_MAP[cls];
     if(!map)return;
+    Object.keys(map).forEach(field=>{
+      if(fields[field]!=null) applyField(card,map,field,fields[field],cls);
+    });
+    // Ghost system
     if(GROUP_A.includes(cls)){
-      applyField(card,map,'headline',parsed.headline,cls);
-      applyField(card,map,'subtitle',parsed.subtitle,cls);
-      applyField(card,map,'quote',parsed.quote,cls);
-      applyField(card,map,'author',fixed.author,cls);
-      applyField(card,map,'kicker',fixed.kicker,cls);
-      applyField(card,map,'series',fixed.series,cls);
-    }else if(GROUP_B.includes(cls)){
-      applyField(card,map,'kicker',fixed.kicker,cls);
-      applyField(card,map,'series',fixed.series,cls);
+      card.classList.toggle('has-content',hasContent);
+      card.classList.remove('ghost-hide','ghost-show');
+      if(hasContent&&ghostMode==='hide') card.classList.add('ghost-hide');
+      else if(hasContent&&ghostMode==='show') card.classList.add('ghost-show');
     }
-    if(cls==='c10'||cls==='c14') applyField(card,map,'headline',parsed.headline,cls);
   });
   applyKeywordHighlights();
+  applyModuleVisibility();
+  applyFx();
 }
 
 function refreshExplorePalettes(){
@@ -1335,7 +1349,11 @@ function createDecoSticker(svgEl,card,leftPct,topPct,size){
 
 document.querySelectorAll('.deco-item').forEach(item=>{
   item.addEventListener('click',()=>{
-    const targets=document.querySelectorAll('.sblk.selected:not(.filtered-out):not(.removed) .card');
+    // Explore mode: all explore cards; normal mode: selected cards
+    const eg=document.querySelector('.explore-grid');
+    const targets=eg
+      ?eg.querySelectorAll('.explore-item .card')
+      :document.querySelectorAll('.sblk.selected:not(.filtered-out):not(.removed) .card');
     if(!targets.length) return;
     const svg=item.querySelector('svg');
     if(!svg) return;

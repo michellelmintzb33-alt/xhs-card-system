@@ -128,6 +128,9 @@ body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-hei
 /* Text overflow safety */
 .card h2,.card p,.card div,.card span{overflow:hidden;text-overflow:ellipsis;}
 .card h2{word-break:break-word;overflow-wrap:break-word;}
+/* Kicker/tag elements: allow wrapping, never truncate */
+.card .kk,.card .tg,.card .tag8,.card .tag11,.card .label12,.card .kicker13,.card .kicker15,.card .cln-kicker,
+.card .top .tag,.card .sb span,.card .iz .ot .sm{overflow:visible;text-overflow:clip;white-space:normal;word-break:break-word;max-width:90%;}
 
 /* Direct child: min-height:0 for overflow safety */
 .card>*:only-child{flex:1;min-height:0;}
@@ -619,11 +622,13 @@ body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-hei
 #G.mod-hide-kicker .c11 .tag11, .explore-grid.mod-hide-kicker .c11 .tag11,
 #G.mod-hide-kicker .c12 .label12, .explore-grid.mod-hide-kicker .c12 .label12,
 #G.mod-hide-kicker .c13 .kicker13, .explore-grid.mod-hide-kicker .c13 .kicker13,
-#G.mod-hide-kicker .c15 .kicker15, .explore-grid.mod-hide-kicker .c15 .kicker15{display:none!important;}
+#G.mod-hide-kicker .c15 .kicker15, .explore-grid.mod-hide-kicker .c15 .kicker15,
+#G.mod-hide-kicker .cln-kicker, .explore-grid.mod-hide-kicker .cln-kicker{display:none!important;}
 
 /* author */
 #G.mod-hide-author .c3 .ps .by, .explore-grid.mod-hide-author .c3 .ps .by,
-#G.mod-hide-author .c5 .bs2 .au, .explore-grid.mod-hide-author .c5 .bs2 .au{display:none!important;}
+#G.mod-hide-author .c5 .bs2 .au, .explore-grid.mod-hide-author .c5 .bs2 .au,
+#G.mod-hide-author .cln-author, .explore-grid.mod-hide-author .cln-author{display:none!important;}
 
 /* series */
 #G.mod-hide-series .c1 .iss, .explore-grid.mod-hide-series .c1 .iss,
@@ -635,7 +640,8 @@ body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-hei
 #G.mod-hide-series .c7 .cr .lb2, .explore-grid.mod-hide-series .c7 .cr .lb2,
 #G.mod-hide-series .c11 .note11, .explore-grid.mod-hide-series .c11 .note11,
 #G.mod-hide-series .c13 .foot13 .tag13, .explore-grid.mod-hide-series .c13 .foot13 .tag13,
-#G.mod-hide-series .c15 .page15, .explore-grid.mod-hide-series .c15 .page15{display:none!important;}
+#G.mod-hide-series .c15 .page15, .explore-grid.mod-hide-series .c15 .page15,
+#G.mod-hide-series .cln-series, .explore-grid.mod-hide-series .cln-series{display:none!important;}
 
 /* ===== LEFT PANEL ACTIONS ===== */
 .lp-actions{display:flex;gap:6px;margin-top:8px;}
@@ -808,6 +814,7 @@ body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-hei
 .card.bg-blend-overlay .kk,.card.bg-blend-overlay .tg,.card.bg-blend-overlay .sm,
 .card.bg-blend-overlay .tag8,.card.bg-blend-overlay .kicker13,.card.bg-blend-overlay .kicker15,
 .card.bg-blend-overlay .label12,.card.bg-blend-overlay .tag11,
+.card.bg-blend-overlay .cln-kicker,.card.bg-blend-overlay .cln-foot,
 .card.bg-blend-overlay .muted,.card.bg-blend-overlay .iss,.card.bg-blend-overlay .bt,
 .card.bg-blend-overlay .ft,.card.bg-blend-overlay .note11,.card.bg-blend-overlay .page15,
 .card.bg-blend-overlay .cr .lb2{color:rgba(255,255,255,.6)!important;}
@@ -868,9 +875,6 @@ body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-hei
 .c27-sub{
   font-size:13px;color:var(--sub-color);line-height:1.8;
 }
-#G.mod-hide-subtitle .c27 .c27-sub,
-.explore-grid.mod-hide-subtitle .c27 .c27-sub{display:none!important;}
-
 /* ===== C28 圆形裁剪头像 ===== */
 .c28{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -896,9 +900,6 @@ body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-hei
 .c28-sub{
   font-size:13px;color:var(--sub-color);line-height:1.8;max-width:80%;margin:0 auto;
 }
-#G.mod-hide-subtitle .c28 .c28-sub,
-.explore-grid.mod-hide-subtitle .c28 .c28-sub{display:none!important;}
-
 /* Highlighter effect */
 .cln-hl{position:relative;display:inline;padding:0 4px;}
 .cln-hl::after{
@@ -908,11 +909,20 @@ body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-hei
 .c23 .cln-hl::after,.c24 .cln-hl::after,.c26 .cln-hl::after{background:var(--accentA);}
 .c25 .cln-hl::after{background:var(--secS);}
 
-/* Module hide rules for C23-C26 */
+/* ===== Shared elements for C23-C28 ===== */
+.cln-kicker{font-family:'Space Mono',monospace;font-size:calc(9px * var(--cs));letter-spacing:calc(2px * var(--cs));color:var(--accent);font-weight:700;margin-bottom:8px;text-transform:uppercase;}
+.cln-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:12px;font-family:'Space Mono',monospace;font-size:calc(9px * var(--cs));color:var(--muted);letter-spacing:1px;}
+.cln-foot:empty,.cln-kicker:empty{display:none;}
+.cln-series:empty,.cln-author:empty{display:none;}
+.c28 .cln-foot{justify-content:center;gap:12px;}
+
+/* Module hide rules for C23-C28 */
 #G.mod-hide-subtitle .c23 .cln-sub, .explore-grid.mod-hide-subtitle .c23 .cln-sub,
 #G.mod-hide-subtitle .c24 .cln-sub, .explore-grid.mod-hide-subtitle .c24 .cln-sub,
 #G.mod-hide-subtitle .c25 .cln-sub, .explore-grid.mod-hide-subtitle .c25 .cln-sub,
-#G.mod-hide-subtitle .c26 .cln-sub, .explore-grid.mod-hide-subtitle .c26 .cln-sub{display:none!important;}
+#G.mod-hide-subtitle .c26 .cln-sub, .explore-grid.mod-hide-subtitle .c26 .cln-sub,
+#G.mod-hide-subtitle .c27 .c27-sub, .explore-grid.mod-hide-subtitle .c27 .c27-sub,
+#G.mod-hide-subtitle .c28 .c28-sub, .explore-grid.mod-hide-subtitle .c28 .c28-sub{display:none!important;}
 
 /* ===== UNIFIED TITLE POSITIONING ===== */
 /* All templates share the same --title-top percentage (default 35%).
@@ -938,11 +948,14 @@ body{background:#060606;color:#fff;font-family:'Noto Sans SC',sans-serif;min-hei
 .c4 .ct{padding-top:var(--title-top,35%);}
 .c5 .ht{padding-top:var(--title-top,35%);}
 .c6 .ct{padding-top:var(--title-top,35%);}
-.c7 .tz{padding-top:var(--title-top,35%);justify-content:flex-start;}
+.c7 .iz .ot{top:var(--title-top,35%);bottom:auto;}
+.c7 .tz{padding-top:12px;justify-content:flex-start;}
 .c8 .body{padding-top:var(--title-top,35%);}
 .c13 .content13{padding-top:var(--title-top,35%);}
 .c14 .content14{padding-top:var(--title-top,35%);}
 .c15 .content15{padding-top:var(--title-top,35%);}
+.c27 .c27-body{padding-top:var(--title-top,10%);justify-content:flex-start;}
+.card.c28{padding-top:var(--title-top,20%);justify-content:flex-start;}
 .c21 .body21{justify-content:flex-start;padding-top:var(--title-top,35%);align-items:flex-start;text-align:left;}
 
 /* --- Left alignment for centered templates --- */

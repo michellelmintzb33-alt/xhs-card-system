@@ -92,12 +92,12 @@ const CONTENT_MAP={
   c13:{headline:'h2',subtitle:'.sub13',kicker:'.kicker13',series:'.foot13 .tag13'},
   c14:{headline:'h2'},
   c15:{headline:'h2',subtitle:'.sub15',kicker:'.kicker15',quote:'.quote15',series:'.page15'},
-  c23:{headline:'h2',subtitle:'.cln-sub'},
-  c24:{headline:'h2',subtitle:'.cln-sub'},
-  c25:{headline:'h2',subtitle:'.cln-sub'},
-  c26:{headline:'h2',subtitle:'.cln-sub'},
-  c27:{headline:'h2',subtitle:'.c27-sub'},
-  c28:{headline:'h2',subtitle:'.c28-sub'}
+  c23:{headline:'h2',subtitle:'.cln-sub',kicker:'.cln-kicker',author:'.cln-author',series:'.cln-series'},
+  c24:{headline:'h2',subtitle:'.cln-sub',kicker:'.cln-kicker',author:'.cln-author',series:'.cln-series'},
+  c25:{headline:'h2',subtitle:'.cln-sub',kicker:'.cln-kicker',author:'.cln-author',series:'.cln-series'},
+  c26:{headline:'h2',subtitle:'.cln-sub',kicker:'.cln-kicker',author:'.cln-author',series:'.cln-series'},
+  c27:{headline:'h2',subtitle:'.c27-sub',kicker:'.cln-kicker',author:'.cln-author',series:'.cln-series'},
+  c28:{headline:'h2',subtitle:'.c28-sub',kicker:'.cln-kicker',author:'.cln-author',series:'.cln-series'}
 };
 
 // ===== MODULE TOGGLE SYSTEM =====
@@ -171,17 +171,33 @@ function applyModuleVisibility(){
 function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // --- Title position & size controls ---
+function _getTargetCards(){
+  const sel=document.querySelectorAll('.sblk.selected .card');
+  return sel.length?Array.from(sel):null;
+}
 function setTitlePos(val){
   const pct=val+'%';
-  document.getElementById('G').style.setProperty('--title-top',pct);
   document.getElementById('titlePosVal').textContent=pct;
+  const targets=_getTargetCards();
+  if(targets){
+    targets.forEach(c=>c.style.setProperty('--title-top',pct));
+  }else{
+    const g=document.getElementById('G');
+    if(g) g.style.setProperty('--title-top',pct);
+  }
   const eg=document.querySelector('.explore-grid');
   if(eg) eg.querySelectorAll('.explore-item').forEach(it=>it.style.setProperty('--title-top',pct));
 }
 function setTitleSize(val){
   const scale=val/100;
-  document.getElementById('G').style.setProperty('--title-scale',scale);
   document.getElementById('titleSizeVal').textContent=val+'%';
+  const targets=_getTargetCards();
+  if(targets){
+    targets.forEach(c=>c.style.setProperty('--title-scale',scale));
+  }else{
+    const g=document.getElementById('G');
+    if(g) g.style.setProperty('--title-scale',scale);
+  }
   const eg=document.querySelector('.explore-grid');
   if(eg) eg.querySelectorAll('.explore-item').forEach(it=>it.style.setProperty('--title-scale',scale));
 }
@@ -244,65 +260,36 @@ function applyField(card,map,field,value,cls){
   el.innerHTML=value.replace(/\n/g,'<br>');
 }
 
-// --- Content distribution by template group ---
-const GROUP_A=['c1','c2','c3','c5','c7','c8','c12','c13','c15','c23','c24','c25','c26','c27','c28'];  // text templates
-const GROUP_B=['c4','c6','c11'];                        // data templates (fixed info only)
-// C9 = mindmap (receives nothing), C10 = checklist (headline only)
+// --- Content distribution: unified loop over all CONTENT_MAP entries ---
+const GROUP_A=['c1','c2','c3','c5','c7','c8','c12','c13','c15','c23','c24','c25','c26','c27','c28'];  // text templates (ghost system)
 
 function propagateContent(){
-  const parsed={
+  const fields={
     headline:document.getElementById('f-headline').value,
     subtitle:document.getElementById('f-subtitle').value,
-    quote:document.getElementById('f-quote').value
-  };
-  const fixed={
+    quote:document.getElementById('f-quote').value,
     kicker:document.getElementById('f-kicker').value,
     author:document.getElementById('f-author').value,
     series:document.getElementById('f-series').value
   };
 
-  const hasContent=!!parsed.headline;
+  const hasContent=!!fields.headline;
 
-  // A group: text templates — receive parsed + fixed
-  GROUP_A.forEach(cls=>{
+  // Iterate ALL templates in CONTENT_MAP — apply every mapped field
+  Object.entries(CONTENT_MAP).forEach(([cls,map])=>{
     const card=document.querySelector(`.card.${cls}`);
     if(!card) return;
-    const map=CONTENT_MAP[cls];
-    applyField(card,map,'headline',parsed.headline,cls);
-    applyField(card,map,'subtitle',parsed.subtitle,cls);
-    applyField(card,map,'quote',parsed.quote,cls);
-    applyField(card,map,'author',fixed.author,cls);
-    applyField(card,map,'kicker',fixed.kicker,cls);
-    applyField(card,map,'series',fixed.series,cls);
-    // Ghost: toggle has-content + apply current ghost mode
-    card.classList.toggle('has-content',hasContent);
-    card.classList.remove('ghost-hide','ghost-show');
-    if(hasContent&&ghostMode==='hide') card.classList.add('ghost-hide');
-    else if(hasContent&&ghostMode==='show') card.classList.add('ghost-show');
+    Object.keys(map).forEach(field=>{
+      if(fields[field]!=null) applyField(card,map,field,fields[field],cls);
+    });
+    // Ghost system only for text templates (GROUP_A)
+    if(GROUP_A.includes(cls)){
+      card.classList.toggle('has-content',hasContent);
+      card.classList.remove('ghost-hide','ghost-show');
+      if(hasContent&&ghostMode==='hide') card.classList.add('ghost-hide');
+      else if(hasContent&&ghostMode==='show') card.classList.add('ghost-show');
+    }
   });
-
-  // B group: data templates — only fixed (kicker + series)
-  GROUP_B.forEach(cls=>{
-    const card=document.querySelector(`.card.${cls}`);
-    if(!card) return;
-    const map=CONTENT_MAP[cls];
-    applyField(card,map,'kicker',fixed.kicker,cls);
-    applyField(card,map,'series',fixed.series,cls);
-  });
-
-  // C group: C10 checklist — headline only
-  const c10=document.querySelector('.card.c10');
-  if(c10&&parsed.headline){
-    applyField(c10,CONTENT_MAP.c10,'headline',parsed.headline,'c10');
-  }
-
-  // C14 checklist — headline only
-  const c14=document.querySelector('.card.c14');
-  if(c14&&parsed.headline){
-    applyField(c14,CONTENT_MAP.c14,'headline',parsed.headline,'c14');
-  }
-
-  // C9 mindmap: receives nothing
 
   // Re-apply keyword highlights after content propagation
   applyKeywordHighlights();
@@ -342,7 +329,10 @@ function setGhost(mode,btn){
 }
 
 let _contentTimer=null;
-function debouncedPropagate(){clearTimeout(_contentTimer);_contentTimer=setTimeout(()=>{propagateContent();if(typeof _exploreActive!=='undefined'&&_exploreActive)refreshExploreContent();},150);}
+function debouncedPropagate(){clearTimeout(_contentTimer);_contentTimer=setTimeout(()=>{
+  if(typeof _exploreActive!=='undefined'&&_exploreActive){refreshExploreContent();}
+  else{propagateContent();}
+},150);}
 
 // ===== KEYWORD HIGHLIGHT SYSTEM =====
 let _hlA={keywords:[],style:'wave'}; // accent 色
