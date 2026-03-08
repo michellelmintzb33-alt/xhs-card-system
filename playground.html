@@ -9,6 +9,22 @@
 </head>
 <body>
 
+<!-- SVG noise filter for fx-noise effect -->
+<svg style="position:absolute;width:0;height:0">
+  <filter id="fxNoise">
+    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+</svg>
+
+<!-- SVG marker filter for highlighter effect -->
+<svg style="position:absolute;width:0;height:0">
+  <filter id="fxMarker">
+    <feTurbulence type="turbulence" baseFrequency="0.03" numOctaves="4" seed="2" result="noise"/>
+    <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+
 <div class="workspace">
 <div class="left-panel">
   <!-- Group 1: 内容 -->
@@ -16,12 +32,80 @@
     <div class="lp-group-label">内容</div>
     <div class="lp-section">
       <div class="lp-section-title">主要内容</div>
-      <textarea class="lp-input" id="f-main" rows="5" placeholder="粘贴你的文案（50-200字），系统自动拆分为标题、副文案、金句..."></textarea>
-      <div class="cb-preview" id="parsePreview"></div>
-      <input class="lp-input" id="f-highlight" placeholder="高亮关键词（逗号分隔）...">
+      <input class="lp-input" id="f-headline" placeholder="主标题...">
+      <textarea class="lp-input" id="f-subtitle" rows="2" placeholder="副文案..."></textarea>
+      <input class="lp-input" id="f-quote" placeholder="金句...">
+      <div class="hl-style-row">
+        <span class="hl-dot" style="background:var(--accent)"></span>
+        <input class="lp-input" id="f-hl-a" placeholder="高亮词 A（逗号分隔）...">
+        <div class="hl-style-toggle">
+          <button class="hl-style-btn active" data-group="a" data-hl="wave" onclick="setHlStyle('a','wave')" title="波浪下划线">〰</button>
+          <button class="hl-style-btn" data-group="a" data-hl="marker" onclick="setHlStyle('a','marker')" title="荧光笔">■</button>
+        </div>
+      </div>
+      <div class="hl-style-row">
+        <span class="hl-dot" style="background:var(--sec)"></span>
+        <input class="lp-input" id="f-hl-b" placeholder="高亮词 B（逗号分隔）...">
+        <div class="hl-style-toggle">
+          <button class="hl-style-btn active" data-group="b" data-hl="wave" onclick="setHlStyle('b','wave')" title="波浪下划线">〰</button>
+          <button class="hl-style-btn" data-group="b" data-hl="marker" onclick="setHlStyle('b','marker')" title="荧光笔">■</button>
+        </div>
+      </div>
+    </div>
+    <div class="lp-section">
+      <div class="lp-section-title">标题控制</div>
+      <div class="slider-row">
+        <span class="lbl">位置</span>
+        <input type="range" class="zoom-slider" id="f-title-pos" min="0" max="70" step="1" value="35" oninput="setTitlePos(this.value)">
+        <span class="zoom-val" id="titlePosVal">35%</span>
+      </div>
+      <div class="slider-row">
+        <span class="lbl">字号</span>
+        <input type="range" class="zoom-slider" id="f-title-size" min="50" max="200" value="100" oninput="setTitleSize(this.value)">
+        <span class="zoom-val" id="titleSizeVal">100%</span>
+      </div>
+    </div>
+    <div class="lp-section">
       <div class="lp-actions">
         <button class="lp-action-btn" onclick="clearTemplateContent()">清空内容</button>
         <button class="lp-action-btn" onclick="restoreDefaults()">恢复默认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Group: 背景图 -->
+  <div class="lp-group" id="imgGroup">
+    <div class="lp-group-label">背景图</div>
+    <div class="lp-section">
+      <div class="img-upload-area" id="imgUploadArea">
+        <input type="file" accept="image/*" id="imgFileInput">
+        <div class="img-upload-hint" id="imgUploadHint">点击上传背景图<br><span>应用到选中的模板卡片</span></div>
+        <img class="img-upload-preview" id="imgUploadPreview">
+      </div>
+    </div>
+    <div class="lp-section" id="imgControls" style="display:none">
+      <div class="lp-section-title">融合模式</div>
+      <div class="blend-mode-grid" id="blendModeGrid">
+        <button class="blend-btn active" data-mode="overlay" onclick="setBlendMode('overlay',this)">遮罩覆盖</button>
+        <button class="blend-btn" data-mode="blur" onclick="setBlendMode('blur',this)">模糊背景</button>
+        <button class="blend-btn" data-mode="split" onclick="setBlendMode('split',this)">上图下文</button>
+        <button class="blend-btn" data-mode="multiply" onclick="setBlendMode('multiply',this)">混合模式</button>
+        <button class="blend-btn" data-mode="fade" onclick="setBlendMode('fade',this)">渐隐融合</button>
+        <button class="blend-btn" data-mode="direct" onclick="setBlendMode('direct',this)">直接覆盖</button>
+      </div>
+      <div class="lp-section-title" style="margin-top:12px">图片控制</div>
+      <div class="slider-row">
+        <span class="lbl">位置</span>
+        <input type="range" class="zoom-slider" id="f-img-pos" min="0" max="100" value="50" oninput="setImgPos(this.value)">
+        <span class="zoom-val" id="imgPosVal">50%</span>
+      </div>
+      <div class="slider-row">
+        <span class="lbl">缩放</span>
+        <input type="range" class="zoom-slider" id="f-img-zoom" min="100" max="300" value="100" oninput="setImgZoom(this.value)">
+        <span class="zoom-val" id="imgZoomVal">100%</span>
+      </div>
+      <div class="lp-actions" style="margin-top:8px">
+        <button class="lp-action-btn" onclick="clearCardImage()">清除图片</button>
       </div>
     </div>
   </div>
@@ -38,20 +122,13 @@
       <div class="lp-section-title">固定元素</div>
       <input class="lp-input" id="f-author" placeholder="署名...">
     </div>
+    <div class="lp-section" id="module-section">
+      <div class="lp-section-title">可添加模块</div>
+      <div id="module-toggles"></div>
+    </div>
   </div>
 
-  <!-- Group 3: 数据 -->
-  <div class="lp-group">
-    <div class="lp-group-label">数据</div>
-    <div class="lp-section">
-      <div class="lp-section-title">结构化数据</div>
-      <textarea class="lp-input" id="f-data" rows="3" placeholder="月均成本: ¥8000&#10;AI交付: 1周&#10;人数: 1人"></textarea>
-    </div>
-    <div class="lp-section">
-      <div class="lp-section-title">列表内容</div>
-      <textarea class="lp-input" id="f-list" rows="5" placeholder="已完成事项&#10;待完成事项&#10;用 --- 分隔已完成/待完成"></textarea>
-    </div>
-  </div>
+
 
   <!-- Group 4: 系列 -->
   <div class="lp-group">
@@ -65,6 +142,60 @@
         <button class="series-btn" onclick="document.getElementById('importFile').click()">导入</button>
         <input type="file" id="importFile" accept=".json" style="display:none" onchange="importSeries(event)">
       </div>
+    </div>
+  </div>
+
+  <!-- Group 5: 装饰元素库 -->
+  <div class="lp-group deco-group">
+    <div class="lp-group-label">装饰</div>
+
+    <div class="deco-cat-title">表情类</div>
+    <div class="deco-grid">
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="20" r="2" fill="#555"/><circle cx="31" cy="20" r="2" fill="#555"/><path d="M16 32 Q24 28,32 32" stroke="#555" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M32 14 C34 10,38 10,40 14" stroke="#555" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg><span class="deco-name">思考脸</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="20" r="2.2" fill="#555"/><circle cx="31" cy="20" r="2.2" fill="#555"/><path d="M15 30 Q24 38,33 30" stroke="#555" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg><span class="deco-name">笑脸</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18 L17 22 L22 18 M26 18 L31 22 L36 18" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M15 32 Q24 38,33 32" stroke="#555" stroke-width="2" stroke-linecap="round" fill="none"/></svg><span class="deco-name">星星眼</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="19" r="2.5" fill="#555"/><circle cx="31" cy="19" r="2.5" fill="#555"/><ellipse cx="24" cy="34" rx="6" ry="5" stroke="#555" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span class="deco-name">惊讶脸</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 18 Q17 14,20 18" stroke="#555" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M28 18 Q31 14,34 18" stroke="#555" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M15 30 Q24 38,33 30" stroke="#555" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M30 28 L34 24" stroke="#60a5fa" stroke-width="2" stroke-linecap="round"/></svg><span class="deco-name">哭笑脸</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M13 22 L17 18 L21 22" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M27 22 L31 18 L35 22" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M16 32 Q24 37,32 32" stroke="#555" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg><span class="deco-name">得意脸</span></div>
+    </div>
+
+    <div class="deco-cat-title">手势类</div>
+    <div class="deco-grid">
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M24 38 C10 34,8 24,14 16 Q18 10,24 14 Q30 10,34 16 C40 24,38 34,24 38Z" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M18 22 Q24 14,30 22" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg><span class="deco-name">比心</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M20 40 L20 22 M20 22 C20 16,28 16,28 22 L28 28 M20 22 C20 14,14 14,14 22 L14 30 M28 22 C28 16,34 16,34 22 L34 28" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M14 30 Q14 40,24 42 Q34 40,34 28" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M20 12 L20 8 M16 14 L13 11 M24 14 L27 11" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/></svg><span class="deco-name">举手</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="20" r="10" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M20 36 C20 28,16 24,16 24 M28 36 C28 28,32 24,32 24" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M20 36 Q24 40,28 36" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg><span class="deco-name">OK</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M16 28 L16 14 C16 10,22 10,22 14 L22 24 M22 14 C22 10,28 10,28 14 L28 24 M28 14 C28 10,34 10,34 14 L34 26 Q34 38,24 40 Q14 38,14 30 L14 28 C14 26,16 26,16 28Z" stroke="#e8e8e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M10 22 L16 14" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round"/></svg><span class="deco-name">点赞</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M14 30 L14 18 Q14 12,20 12 L20 24 M20 12 Q20 8,24 8 L24 24 M24 8 Q28 8,28 12 L28 24 M28 12 Q34 12,34 18 L34 30 Q34 40,24 42 Q14 40,14 30Z" stroke="#e8e8e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M10 16 C6 14,6 10,10 8" stroke="#555" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M38 16 C42 14,42 10,38 8" stroke="#555" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg><span class="deco-name">挥手</span></div>
+    </div>
+
+    <div class="deco-cat-title">标注类</div>
+    <div class="deco-grid">
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M8 40 C12 28,20 16,40 8" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" fill="none"/><path d="M34 6 L42 8 L36 14" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span class="deco-name">箭头</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><ellipse cx="24" cy="24" rx="18" ry="14" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" fill="none" transform="rotate(-5 24 24)"/><path d="M38 14 L42 10" stroke="#f87171" stroke-width="1.8" stroke-linecap="round"/></svg><span class="deco-name">圆圈圈注</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M4 32 Q10 26,16 32 T28 32 T40 32 T48 32" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" fill="none"/></svg><span class="deco-name">波浪线</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M24 4 L27 18 L42 18 L30 27 L34 42 L24 33 L14 42 L18 27 L6 18 L21 18Z" stroke="#f59e0b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span class="deco-name">星标</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M24 8 L24 30" stroke="#f87171" stroke-width="3.5" stroke-linecap="round"/><circle cx="24" cy="38" r="3" fill="#f87171"/></svg><span class="deco-name">叹号</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M16 16 C16 8,32 8,32 16 C32 22,26 24,24 28" stroke="#60a5fa" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="24" cy="38" r="3" fill="#60a5fa"/></svg><span class="deco-name">问号</span></div>
+    </div>
+
+    <div class="deco-cat-title">装饰类</div>
+    <div class="deco-grid">
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><rect x="6" y="8" width="36" height="32" rx="2" stroke="#fbbf24" stroke-width="2.2" fill="rgba(251,191,36,.1)" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-2 24 24)"/><path d="M12 18 L36 18 M12 26 L30 26 M12 34 L24 34" stroke="#c8a000" stroke-width="1.5" stroke-linecap="round" opacity=".4"/></svg><span class="deco-name">便利贴</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><rect x="4" y="18" width="40" height="12" rx="1" stroke="#a8a29e" stroke-width="1.8" fill="rgba(168,162,158,.12)" stroke-linecap="round" stroke-linejoin="round" transform="rotate(3 24 24)"/><path d="M4 24 L44 24" stroke="#a8a29e" stroke-width="0.8" stroke-dasharray="3 3" opacity=".4"/></svg><span class="deco-name">胶带条</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M18 4 C8 4,4 10,4 16 C4 24,12 26,18 24 L18 4Z" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M18 24 L18 44" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round"/><path d="M18 44 C28 44,34 38,34 32 C34 24,26 22,20 24" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span class="deco-name">回形针</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><circle cx="24" cy="10" r="6" stroke="#f87171" stroke-width="2.2" fill="rgba(248,113,113,.15)" stroke-linecap="round"/><path d="M24 16 L24 42" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round"/><path d="M21 40 L24 44 L27 40" stroke="#a8a29e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span class="deco-name">图钉</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M12 4 L12 42 L24 34 L36 42 L36 4Z" stroke="#60a5fa" stroke-width="2.5" fill="rgba(96,165,250,.1)" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 14 L30 14 M18 22 L26 22" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" opacity=".5"/></svg><span class="deco-name">书签</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M14 38 C10 38,8 36,8 32 L8 22 C8 16,12 14,18 14 L30 14 C36 14,40 16,40 22 L40 32 C40 36,38 38,34 38 L32 38" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M18 14 L18 10 C18 8,20 6,22 6 L26 6 C28 6,30 8,30 10 L30 14" stroke="#a8a29e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><ellipse cx="24" cy="28" rx="4" ry="3.5" stroke="#8b5e34" stroke-width="1.5" fill="rgba(139,94,52,.15)"/><path d="M14 42 Q18 40,20 42 Q22 44,26 42 Q28 40,32 42" stroke="#a8a29e" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg><span class="deco-name">咖啡杯</span></div>
+    </div>
+
+    <div class="deco-cat-title">形状类</div>
+    <div class="deco-grid">
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M10 30 C10 36,6 38,4 34 C2 30,6 26,10 26 C8 22,10 16,16 16 C16 10,22 6,28 8 C32 4,40 6,40 14 C46 14,46 24,40 26 C44 32,38 34,34 32 C34 36,28 38,24 34 C20 38,14 36,10 30Z" stroke="#e8e8e8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span class="deco-name">云朵</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M8 8 L40 8 Q42 8,42 10 L42 30 Q42 32,40 32 L26 32 L18 40 L20 32 L10 32 Q8 32,8 30Z" stroke="#e8e8e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M14 16 L34 16 M14 24 L28 24" stroke="#555" stroke-width="1.5" stroke-linecap="round" opacity=".3"/></svg><span class="deco-name">对话气泡</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M24 4 L28 14 L38 8 L32 18 L44 20 L34 26 L42 36 L30 32 L28 44 L24 34 L20 44 L18 32 L6 36 L14 26 L4 20 L16 18 L10 8 L20 14Z" stroke="#f87171" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span class="deco-name">爆炸框</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M24 40 C10 32,4 22,4 16 C4 10,10 4,16 4 C20 4,22 6,24 10 C26 6,28 4,32 4 C38 4,44 10,44 16 C44 22,38 32,24 40Z" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span class="deco-name">心形</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M28 4 L18 20 L30 20 L20 44" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><span class="deco-name">闪电</span></div>
+      <div class="deco-item"><svg viewBox="0 0 48 48" fill="none"><path d="M14 44 L14 12 L36 8 L36 36 L14 40" stroke="#f87171" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M14 12 L36 8" stroke="#f87171" stroke-width="2.5" stroke-linecap="round"/><path d="M14 40 L36 36" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" opacity=".4"/></svg><span class="deco-name">小旗子</span></div>
     </div>
   </div>
 </div>
@@ -84,7 +215,6 @@
       <div class="ctog" id="platformTog">
         <button class="cbtn active" onclick="setPlatform('xhs')">小红书</button>
         <button class="cbtn" onclick="setPlatform('douyin')">抖音</button>
-        <button class="cbtn" onclick="setPlatform('weixin')">微信</button>
       </div>
       <div class="sep"></div>
       <div class="ctog" id="sizeTog"></div>
@@ -130,6 +260,8 @@
       <button class="cbtn" onclick="filterCards('selected',this)">已选</button>
     </div>
     <div class="sep"></div>
+    <button class="tool-btn" id="selectAllBtn" onclick="selectAllVisible()">全选</button>
+    <button class="tool-btn" id="batchExportBtn" onclick="exportSelected()">批量导出</button>
     <button class="tool-btn" id="restoreBtn" onclick="restoreRemoved()">恢复</button>
     <div class="sep"></div>
     <div class="ctog" id="ghostTog">
@@ -143,6 +275,17 @@
       <button class="cbtn" onclick="setZoom(1)">100%</button>
       <input type="range" id="zoomRange" min="10" max="100" value="100" oninput="setZoom(this.value/100)" class="zoom-slider">
       <span class="zoom-val" id="zoomVal">100%</span>
+    </div>
+    <div class="sep"></div>
+    <div class="ctrl-group">
+      <span class="lbl">特效</span>
+      <div class="ctog" id="fxTog">
+        <button class="cbtn" onclick="toggleFx('glass',this)">毛玻璃</button>
+        <button class="cbtn" onclick="toggleFx('gradient',this)">渐变</button>
+        <button class="cbtn" onclick="toggleFx('noise',this)">噪点</button>
+        <button class="cbtn" onclick="toggleFx('glow',this)">光晕</button>
+        <button class="cbtn" onclick="toggleFx('stroke',this)">描边</button>
+      </div>
     </div>
   </div>
 
@@ -376,6 +519,66 @@
       <div class="page15"></div>
     </div>
   </div></div>
+
+  <!-- C23 · 纯净方格·绿 -->
+  <div class="sblk" data-tags="重点" data-tpl="c23">
+    <div class="stag">㉓ 纯净方格·绿 <span class="tag-badge">重点</span></div>
+    <div class="card c23 hd-grid hd-font">
+      <h2></h2>
+      <p class="cln-sub"></p>
+    </div>
+  </div>
+
+  <!-- C24 · 纯净点阵·粉 -->
+  <div class="sblk" data-tags="重点" data-tpl="c24">
+    <div class="stag">㉔ 纯净点阵·粉 <span class="tag-badge">重点</span></div>
+    <div class="card c24 hd-dotgrid hd-font">
+      <h2></h2>
+      <p class="cln-sub"></p>
+    </div>
+  </div>
+
+  <!-- C25 · 纯净大格·蓝 -->
+  <div class="sblk" data-tags="重点" data-tpl="c25">
+    <div class="stag">㉕ 纯净大格·蓝 <span class="tag-badge">重点</span></div>
+    <div class="card c25 hd-grid-lg hd-font">
+      <h2></h2>
+      <p class="cln-sub"></p>
+    </div>
+  </div>
+
+  <!-- C26 · 纯净空白·橙 -->
+  <div class="sblk" data-tags="重点" data-tpl="c26">
+    <div class="stag">㉖ 纯净空白·橙 <span class="tag-badge">重点</span></div>
+    <div class="card c26 hd-font">
+      <h2></h2>
+      <p class="cln-sub"></p>
+    </div>
+  </div>
+
+  <!-- C27 · 上图下文分区 -->
+  <div class="sblk" data-tags="重点" data-tpl="c27">
+    <div class="stag">㉗ 上图下文分区 <span class="tag-badge">重点</span></div>
+    <div class="card c27">
+      <div class="c27-image"></div>
+      <div class="c27-body">
+        <h2></h2>
+        <p class="c27-sub"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- C28 · 圆形裁剪头像 -->
+  <div class="sblk" data-tags="重点" data-tpl="c28">
+    <div class="stag">㉘ 圆形裁剪头像 <span class="tag-badge">重点</span></div>
+    <div class="card c28">
+      <div class="c28-circle"></div>
+      <div class="c28-body">
+        <h2></h2>
+        <p class="c28-sub"></p>
+      </div>
+    </div>
+  </div>
 </div>
 </div><!-- /zoomWrap -->
 </div><!-- /scrollArea -->
@@ -468,11 +671,14 @@ function setSize(sizeId){
   currentSize=sizes.find(s=>s.id===sizeId)||sizes[0];
   document.querySelectorAll('#sizeTog .cbtn').forEach(b=>
     b.classList.toggle('active',b.dataset.sizeId===currentSize.id));
-  const previewH=Math.round(360*currentSize.h/currentSize.w);
-  // --card-scale: proportional to height, base=480 (3:4 ratio)
-  const scale=Math.max(0.5,Math.min(1,previewH/480));
+  const ratio=currentSize.w/currentSize.h;
+  // --card-scale: proportional to aspect, base=3:4 (0.75 ratio → scale 1)
+  const baseH=1/0.75; // normalized height at 3:4
+  const curH=1/ratio;  // normalized height at current ratio
+  const scale=Math.max(0.5,Math.min(1,curH/baseH));
   document.querySelectorAll('.card').forEach(c=>{
-    c.style.height=previewH+'px';
+    c.style.aspectRatio=currentSize.w+'/'+currentSize.h;
+    c.style.height='auto';
     c.style.setProperty('--card-scale',scale.toFixed(3));
   });
 }
@@ -492,9 +698,10 @@ function gen(){
   }
   if(!locked.text&&cc>=4){const bgL=lum(gS('bg'));sS('text',bgL<.45?hsl2hex(0,0,randInt(88,96)):hsl2hex(0,0,randInt(6,15)));}
   refresh();
+  randomizeTextAccents();
 }
 
-document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable)return;if(_exploreActive){if(e.code==='Space'){e.preventDefault();refreshExplorePalettes();}return;}if(e.code==='Space'){e.preventDefault();gen();}if(e.key==='z'&&(e.metaKey||e.ctrlKey)){e.preventDefault();undoColor();}if(e.code==='Enter'){e.preventDefault();document.querySelectorAll('.sblk.selected:not(.filtered-out):not(.removed) .card').forEach(c=>exportCard(c));}});
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.isContentEditable)return;if(_exploreActive){if(e.code==='Space'){e.preventDefault();refreshExplorePalettes();}return;}if(e.code==='Space'){e.preventDefault();gen();}if(e.key==='z'&&(e.metaKey||e.ctrlKey)){e.preventDefault();undoColor();}if(e.code==='Enter'){e.preventDefault();exportSelected();}});
 function updJ(){const bg=gS('bg'),a=gS('accent');let ps=[`<span class="v">"bg"</span>:"${bg}"`,`<span class="v">"accent"</span>:"${a}"`];if(cc>=3)ps.push(`<span class="v">"secondary"</span>:"${gS('sec')}"`);if(cc>=4)ps.push(`<span class="v">"text"</span>:"${gS('text')}"`);document.getElementById('jout').innerHTML=`<span class="k">"theme"</span>:{${ps.join(',')}}  `;}
 function copyJ(){const bg=gS('bg'),a=gS('accent');let o={bg,accent:a};if(cc>=3)o.secondary=gS('sec');if(cc>=4)o.text=gS('text');navigator.clipboard.writeText(JSON.stringify({theme:o},null,2)).then(()=>{const b=document.querySelector('.cpb');b.textContent='COPIED!';setTimeout(()=>b.textContent='COPY',1500);});}
 
@@ -622,6 +829,7 @@ function setZoom(s){
   });
 })();
 
+let _lastSelectedBlk=null;
 function injectCardInteractions(){
   document.querySelectorAll('.sblk').forEach(blk=>{
     const card=blk.querySelector('.card');
@@ -629,20 +837,183 @@ function injectCardInteractions(){
     card._interactionBound=true;
     card.addEventListener('click',e=>{
       if(editMode||e.target.closest('[contenteditable]')||e.target.closest('.export-btn')) return;
-      blk.classList.toggle('selected');
+      const allBlks=Array.from(document.querySelectorAll('.sblk:not(.filtered-out):not(.removed)'));
+      if(e.shiftKey&&_lastSelectedBlk){
+        // Shift-click: range select
+        const fromIdx=allBlks.indexOf(_lastSelectedBlk);
+        const toIdx=allBlks.indexOf(blk);
+        if(fromIdx>=0&&toIdx>=0){
+          const lo=Math.min(fromIdx,toIdx),hi=Math.max(fromIdx,toIdx);
+          for(let i=lo;i<=hi;i++) allBlks[i].classList.add('selected');
+        }
+      }else if(e.metaKey||e.ctrlKey){
+        // Cmd/Ctrl-click: toggle single without clearing
+        blk.classList.toggle('selected');
+      }else{
+        // Plain click: toggle single (classic behavior)
+        blk.classList.toggle('selected');
+      }
+      _lastSelectedBlk=blk;
+      renderModuleToggles();
+      updateBatchBtn();
     });
   });
 }
 
+function selectAllVisible(){
+  const visible=document.querySelectorAll('.sblk:not(.filtered-out):not(.removed)');
+  const allSelected=Array.from(visible).every(b=>b.classList.contains('selected'));
+  visible.forEach(b=>{
+    if(allSelected) b.classList.remove('selected');
+    else b.classList.add('selected');
+  });
+  renderModuleToggles();
+  updateBatchBtn();
+}
+
+function updateBatchBtn(){
+  const btn=document.getElementById('batchExportBtn');
+  if(!btn)return;
+  const count=document.querySelectorAll('.sblk.selected:not(.filtered-out):not(.removed)').length;
+  btn.textContent=count>0?`批量导出(${count})`:'批量导出';
+  btn.disabled=count===0;
+}
+
+// ===== BACKGROUND IMAGE BLEND SYSTEM =====
+let _cardImageUrl=null;
+let _imgBlendMode='overlay';
+let _imgPosY=50;
+let _imgZoom=100;
+
+function initImageUpload(){
+  const area=document.getElementById('imgUploadArea');
+  const input=document.getElementById('imgFileInput');
+  if(!area||!input)return;
+  input.addEventListener('change',handleCardImage);
+  area.addEventListener('dragover',e=>{e.preventDefault();area.style.borderColor='#4a9eff';});
+  area.addEventListener('dragleave',()=>{area.style.borderColor=area.classList.contains('has-image')?'#4a9eff':'#333';});
+  area.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files.length){input.files=e.dataTransfer.files;handleCardImage({target:input});}});
+}
+
+function handleCardImage(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    _cardImageUrl=ev.target.result;
+    document.getElementById('imgUploadArea').classList.add('has-image');
+    document.getElementById('imgUploadPreview').src=_cardImageUrl;
+    document.getElementById('imgControls').style.display='';
+    // Reset sliders
+    _imgPosY=50;_imgZoom=100;
+    document.getElementById('f-img-pos').value=50;
+    document.getElementById('f-img-zoom').value=100;
+    document.getElementById('imgPosVal').textContent='50%';
+    document.getElementById('imgZoomVal').textContent='100%';
+    applyCardImage();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearCardImage(){
+  _cardImageUrl=null;
+  document.getElementById('imgUploadArea').classList.remove('has-image');
+  document.getElementById('imgUploadPreview').src='';
+  document.getElementById('imgFileInput').value='';
+  document.getElementById('imgControls').style.display='none';
+  // Remove all injected layers
+  document.querySelectorAll('.img-layer,.img-layer-blur,.img-tint').forEach(el=>el.remove());
+  document.querySelectorAll('.card').forEach(c=>{
+    c.classList.remove('has-bg-img','bg-blend-overlay','bg-blend-blur','bg-blend-split','bg-blend-multiply','bg-blend-fade','bg-blend-direct');
+  });
+}
+
+function setBlendMode(mode,btn){
+  _imgBlendMode=mode;
+  document.querySelectorAll('.blend-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  applyCardImage();
+}
+
+function setImgPos(val){
+  _imgPosY=parseInt(val);
+  document.getElementById('imgPosVal').textContent=val+'%';
+  updateImgLayers();
+}
+
+function setImgZoom(val){
+  _imgZoom=parseInt(val);
+  document.getElementById('imgZoomVal').textContent=val+'%';
+  updateImgLayers();
+}
+
+function getTargetCards(){
+  // Apply to selected cards; if none selected, apply to all visible
+  const sel=document.querySelectorAll('.sblk.selected:not(.filtered-out):not(.removed) .card');
+  if(sel.length)return sel;
+  return document.querySelectorAll('.sblk:not(.filtered-out):not(.removed) .card');
+}
+
+function applyCardImage(){
+  if(!_cardImageUrl)return;
+  const cards=getTargetCards();
+  const allCards=document.querySelectorAll('.card');
+  // Clear all injected layers first
+  allCards.forEach(c=>{
+    c.classList.remove('has-bg-img','bg-blend-overlay','bg-blend-blur','bg-blend-split','bg-blend-multiply','bg-blend-fade','bg-blend-direct');
+    c.querySelectorAll('.img-layer,.img-layer-blur,.img-tint').forEach(el=>el.remove());
+  });
+  const bgUrl=`url('${_cardImageUrl}')`;
+  const bgSize=_imgZoom+'%';
+  const bgPos=`center ${_imgPosY}%`;
+  // Apply to targets
+  cards.forEach(card=>{
+    // Main image layer
+    const layer=document.createElement('div');
+    layer.className='img-layer';
+    layer.style.backgroundImage=bgUrl;
+    layer.style.backgroundSize=bgSize;
+    layer.style.backgroundPosition=bgPos;
+    layer.style.backgroundRepeat='no-repeat';
+    card.insertBefore(layer,card.firstChild);
+    // Blur mode: extra blurred copy
+    if(_imgBlendMode==='blur'){
+      const blur=document.createElement('div');
+      blur.className='img-layer img-layer-blur';
+      blur.style.backgroundImage=bgUrl;
+      blur.style.backgroundSize=bgSize;
+      blur.style.backgroundPosition=bgPos;
+      blur.style.backgroundRepeat='no-repeat';
+      card.insertBefore(blur,card.firstChild);
+    }
+    // Tint overlay div (for overlay/direct modes — avoids ::after conflict with fx-noise)
+    if(_imgBlendMode==='overlay'||_imgBlendMode==='direct'){
+      const tint=document.createElement('div');
+      tint.className='img-tint';
+      card.insertBefore(tint,layer.nextSibling);
+    }
+    card.classList.add('has-bg-img','bg-blend-'+_imgBlendMode);
+  });
+}
+
+function updateImgLayers(){
+  document.querySelectorAll('.img-layer').forEach(layer=>{
+    layer.style.backgroundSize=_imgZoom+'%';
+    layer.style.backgroundPosition=`center ${_imgPosY}%`;
+  });
+}
+
 window.addEventListener('DOMContentLoaded',async()=>{
-  loadS();refresh();setPlatform('xhs');injectExportBtns();injectSelectUI();injectCardInteractions();loadSeriesList();
+  loadS();refresh();setPlatform('xhs');injectExportBtns();injectSelectUI();injectCardInteractions();loadSeriesList();renderModuleToggles();updateBatchBtn();
   // Bind content input events
-  ['f-main','f-kicker','f-author','f-series'].forEach(id=>{
+  ['f-headline','f-subtitle','f-quote','f-kicker','f-author','f-series'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.addEventListener('input',debouncedPropagate);
   });
   snapshotDefaults();
-  document.getElementById('f-highlight').addEventListener('input',debouncedHighlight);
+  initImageUpload();
+  document.getElementById('f-hl-a').addEventListener('input',debouncedHighlight);
+  document.getElementById('f-hl-b').addEventListener('input',debouncedHighlight);
   // ESC key exits explore mode
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&_exploreActive)exitExplore();});
   // SortableJS — drag to reorder cards within each grid
@@ -673,33 +1044,38 @@ function genPalette(){
 
 function enterExplore(){
   if(_exploreActive)return;
+  // Use selected template, fall back to first visible
+  const selBlk=document.querySelector('.sblk.selected:not(.filtered-out):not(.removed)')
+    ||document.querySelector('.sblk:not(.filtered-out):not(.removed)');
+  if(!selBlk) return;
+  const srcCard=selBlk.querySelector('.card');
+  if(!srcCard) return;
   _exploreActive=true;
   document.getElementById('exploreBtn').classList.add('on');
   const scrollArea=document.getElementById('scrollArea');
   _exploreOrigHTML=scrollArea.innerHTML;
-  // Find first visible card to clone as template
-  const firstBlk=document.querySelector('.sblk:not(.filtered-out):not(.removed)');
-  if(!firstBlk){_exploreActive=false;document.getElementById('exploreBtn').classList.remove('on');return;}
-  const srcCard=firstBlk.querySelector('.card');
-  if(!srcCard){_exploreActive=false;document.getElementById('exploreBtn').classList.remove('on');return;}
-  // Compute current preview height
-  const previewH=currentSize?Math.round(360*currentSize.h/currentSize.w):480;
+  const arW=currentSize?currentSize.w:3;
+  const arH=currentSize?currentSize.h:4;
+  const tplName=selBlk.querySelector('.stag span')?.textContent||'模板';
   // Generate 10 palettes
   const palettes=[];
   for(let i=0;i<10;i++) palettes.push(genPalette());
   // Build explore panel
   const bar=document.createElement('div');
   bar.className='explore-bar';
-  bar.innerHTML='<span class="explore-label">探索配色 · '+palettes.length+' 套方案</span><button class="explore-exit" onclick="exitExplore()">退出探索</button>';
+  bar.innerHTML='<span class="explore-label">探索配色 · '+tplName+' · '+palettes.length+' 套方案</span><button class="explore-exit" onclick="exitExplore()">退出探索</button>';
   const grid=document.createElement('div');
   grid.className='explore-grid';
+  const gEl=document.getElementById('G');
+  const titleTop=gEl.style.getPropertyValue('--title-top')||'35%';
+  const titleScale=gEl.style.getPropertyValue('--title-scale')||'1';
   palettes.forEach((pal,i)=>{
     const vars=derive(pal.bg,pal.accent,cc>=3?pal.sec:null,cc>=4?pal.text:null);
     const item=document.createElement('div');
     item.className='explore-item';
-    item.onclick=()=>applyExplore(i);
-    // Set CSS variables as inline style on the wrapper
     Object.entries(vars).forEach(([k,v])=>item.style.setProperty(k,v));
+    item.style.setProperty('--title-top',titleTop);
+    item.style.setProperty('--title-scale',titleScale);
     // Index label
     const idx=document.createElement('div');
     idx.className='explore-idx';
@@ -707,9 +1083,9 @@ function enterExplore(){
     item.appendChild(idx);
     // Clone card
     const clone=srcCard.cloneNode(true);
-    clone.style.height=previewH+'px';
+    clone.style.aspectRatio=arW+'/'+arH;
+    clone.style.height='auto';
     if(contentOnly) clone.classList.add('content-only');
-    // Remove export buttons from clones
     clone.querySelectorAll('.export-btn').forEach(b=>b.remove());
     // Handle donut (C6)
     const donutEl=clone.querySelector('#donut');
@@ -725,25 +1101,52 @@ function enterExplore(){
       izEl.style.background='radial-gradient(ellipse at 60% 40%,rgba('+r+','+gg+','+b+',.12) 0%,'+vars['--bg']+' 70%)';
     }
     item.appendChild(clone);
-    // Color dots preview row
+    // Randomize text accent colors per card
+    randomizeTextAccents(item);
+    // Bottom row: color dots + save button
+    const bottom=document.createElement('div');
+    bottom.className='explore-bottom';
     const dots=document.createElement('div');
-    dots.style.cssText='display:flex;gap:4px;margin-top:6px;padding:0 2px;';
+    dots.className='explore-dots';
     [pal.bg,pal.accent,pal.sec,pal.text].forEach(c=>{
       if(!c)return;
       const d=document.createElement('div');
-      d.style.cssText='width:16px;height:16px;border-radius:3px;border:1px solid rgba(255,255,255,.1);background:'+c;
+      d.className='explore-dot-swatch';
+      d.style.background=c;
       dots.appendChild(d);
     });
-    item.appendChild(dots);
+    bottom.appendChild(dots);
+    const saveBtn=document.createElement('button');
+    saveBtn.className='explore-save';
+    saveBtn.textContent='保存';
+    saveBtn.onclick=(e)=>{e.stopPropagation();saveExplorePalette(i,saveBtn);};
+    bottom.appendChild(saveBtn);
+    item.appendChild(bottom);
+    // Click card to apply
+    item.onclick=(e)=>{if(e.target.closest('.explore-save'))return;applyExplore(i);};
     grid.appendChild(item);
   });
-  // Store palettes for apply
   grid._palettes=palettes;
   scrollArea.innerHTML='';
   scrollArea.appendChild(bar);
   scrollArea.appendChild(grid);
-  // Apply current zoom to explore grid
+  // Sync current state to explore grid
+  applyModuleVisibility();
+  applyFx();
+  applyKeywordHighlights();
   if(currentZoom<1){grid.style.transform=`scale(${currentZoom})`;grid.style.transformOrigin='top center';grid.style.height=grid.scrollHeight*currentZoom+'px';}
+}
+
+function saveExplorePalette(idx,btn){
+  const grid=document.querySelector('.explore-grid');
+  if(!grid||!grid._palettes)return;
+  const pal=grid._palettes[idx];
+  const name='配色'+(saved.length+1);
+  saved.push({name,bg:pal.bg,accent:pal.accent,sec:pal.sec||null,text:pal.text||null});
+  persistS();renderC();
+  btn.textContent='已保存';
+  btn.classList.add('saved');
+  btn.disabled=true;
 }
 
 function applyExplore(idx){
@@ -772,24 +1175,31 @@ function exitExplore(){
   injectCardInteractions();
   // Re-apply current card size
   if(currentSize){
-    const previewH=Math.round(360*currentSize.h/currentSize.w);
-    const scale=Math.max(0.5,Math.min(1,previewH/480));
+    const ratio=currentSize.w/currentSize.h;
+    const baseH=1/0.75;
+    const curH=1/ratio;
+    const scale=Math.max(0.5,Math.min(1,curH/baseH));
     document.querySelectorAll('.card').forEach(c=>{
-      c.style.height=previewH+'px';
+      c.style.aspectRatio=currentSize.w+'/'+currentSize.h;
+      c.style.height='auto';
       c.style.setProperty('--card-scale',scale.toFixed(3));
     });
   }
   // Re-apply content and colors
   propagateContent();
   refresh();
+  applyFx();
 }
 
 function refreshExploreContent(){
   if(!_exploreActive)return;
   const grid=document.querySelector('.explore-grid');
   if(!grid)return;
-  const raw=document.getElementById('f-main').value;
-  const parsed=parseContent(raw);
+  const parsed={
+    headline:document.getElementById('f-headline').value,
+    subtitle:document.getElementById('f-subtitle').value,
+    quote:document.getElementById('f-quote').value
+  };
   const fixed={
     kicker:document.getElementById('f-kicker').value,
     author:document.getElementById('f-author').value,
@@ -813,6 +1223,7 @@ function refreshExploreContent(){
     }
     if(cls==='c10'||cls==='c14') applyField(card,map,'headline',parsed.headline,cls);
   });
+  applyKeywordHighlights();
 }
 
 function refreshExplorePalettes(){
@@ -823,7 +1234,6 @@ function refreshExplorePalettes(){
   const newPalettes=[];
   for(let i=0;i<items.length;i++) newPalettes.push(genPalette());
   grid._palettes=newPalettes;
-  const previewH=currentSize?Math.round(360*currentSize.h/currentSize.w):480;
   items.forEach((item,i)=>{
     const pal=newPalettes[i];
     const vars=derive(pal.bg,pal.accent,cc>=3?pal.sec:null,cc>=4?pal.text:null);
@@ -835,18 +1245,110 @@ function refreshExplorePalettes(){
     // Update iz gradient if present
     const izEl=item.querySelector('.iz');
     if(izEl){const{r,g:gg,b}=h2r(vars['--sec']);izEl.style.background='radial-gradient(ellipse at 60% 40%,rgba('+r+','+gg+','+b+',.12) 0%,'+vars['--bg']+' 70%)';}
+    // Randomize text accent colors per card
+    randomizeTextAccents(item);
     // Update color dots
-    const dots=item.querySelector('div[style*="display:flex"][style*="gap:4px"]');
+    const dots=item.querySelector('.explore-dots');
     if(dots){
-      const swatches=dots.querySelectorAll('div');
+      const swatches=dots.querySelectorAll('.explore-dot-swatch');
       const colors=[pal.bg,pal.accent,pal.sec,pal.text].filter(Boolean);
       swatches.forEach((d,j)=>{if(colors[j])d.style.background=colors[j];});
     }
+    // Reset save button
+    const saveBtn=item.querySelector('.explore-save');
+    if(saveBtn){saveBtn.textContent='保存';saveBtn.classList.remove('saved');saveBtn.disabled=false;}
   });
-  // Update bar label
-  const label=grid.parentElement.querySelector('.explore-label');
-  if(label) label.textContent='探索配色 · '+newPalettes.length+' 套方案';
 }
+
+// ===== CARD EFFECTS =====
+let activeFx=new Set();
+const FX_CLASSES=['fx-glass','fx-gradient','fx-noise','fx-glow','fx-stroke'];
+function toggleFx(fx,btn){
+  if(activeFx.has(fx)){activeFx.delete(fx);btn.classList.remove('active');}
+  else{activeFx.add(fx);btn.classList.add('active');}
+  applyFx();
+}
+function applyFx(){
+  document.querySelectorAll('.card').forEach(c=>{
+    FX_CLASSES.forEach(cls=>c.classList.remove(cls));
+    activeFx.forEach(fx=>c.classList.add('fx-'+fx));
+  });
+}
+
+// ===== DECO STICKER SYSTEM =====
+const DECO_MAX=4;
+const DECO_DEFAULT_SIZE=48;
+const DECO_MIN_SIZE=20;
+const DECO_MAX_SIZE=120;
+
+function createDecoSticker(svgEl,card,leftPct,topPct,size){
+  size=size||DECO_DEFAULT_SIZE;
+  const wrap=document.createElement('div');
+  wrap.className='card-deco';
+  wrap.style.left=leftPct+'%';
+  wrap.style.top=topPct+'%';
+  const s=svgEl.cloneNode(true);
+  const cs=parseFloat(getComputedStyle(card).getPropertyValue('--card-scale'))||1;
+  const px=Math.round(size*cs);
+  s.style.width=px+'px';
+  s.style.height=px+'px';
+  wrap.appendChild(s);
+  wrap._decoSize=size;
+  // Delete button
+  const del=document.createElement('div');
+  del.className='deco-del';
+  del.textContent='\u00d7';
+  del.addEventListener('mousedown',e=>{e.stopPropagation();});
+  del.addEventListener('click',e=>{e.stopPropagation();wrap.remove();});
+  wrap.appendChild(del);
+  // Drag
+  wrap.addEventListener('mousedown',e=>{
+    if(e.target.closest('.deco-del')) return;
+    e.preventDefault();e.stopPropagation();
+    wrap.classList.add('dragging');
+    const rect=card.getBoundingClientRect();
+    const offX=e.clientX-wrap.getBoundingClientRect().left;
+    const offY=e.clientY-wrap.getBoundingClientRect().top;
+    function onMove(ev){
+      const x=ev.clientX-rect.left-offX;
+      const y=ev.clientY-rect.top-offY;
+      wrap.style.left=Math.max(0,Math.min(rect.width-20,x))/rect.width*100+'%';
+      wrap.style.top=Math.max(0,Math.min(rect.height-20,y))/rect.height*100+'%';
+    }
+    function onUp(){wrap.classList.remove('dragging');window.removeEventListener('mousemove',onMove);window.removeEventListener('mouseup',onUp);}
+    window.addEventListener('mousemove',onMove);
+    window.addEventListener('mouseup',onUp);
+  });
+  // Wheel resize
+  wrap.addEventListener('wheel',e=>{
+    e.preventDefault();e.stopPropagation();
+    const delta=e.deltaY>0?-4:4;
+    wrap._decoSize=Math.max(DECO_MIN_SIZE,Math.min(DECO_MAX_SIZE,wrap._decoSize+delta));
+    const cs2=parseFloat(getComputedStyle(card).getPropertyValue('--card-scale'))||1;
+    const px2=Math.round(wrap._decoSize*cs2);
+    const sv=wrap.querySelector('svg');
+    sv.style.width=px2+'px';
+    sv.style.height=px2+'px';
+  },{passive:false});
+  card.appendChild(wrap);
+}
+
+document.querySelectorAll('.deco-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    const targets=document.querySelectorAll('.sblk.selected:not(.filtered-out):not(.removed) .card');
+    if(!targets.length) return;
+    const svg=item.querySelector('svg');
+    if(!svg) return;
+    targets.forEach(card=>{
+      const existing=card.querySelectorAll('.card-deco').length;
+      if(existing>=DECO_MAX) return;
+      // Stagger position for multiple stickers
+      const offsets=[[75,75],[60,70],[80,60],[65,85]];
+      const [lp,tp]=offsets[existing]||[70,70];
+      createDecoSticker(svg,card,lp,tp);
+    });
+  });
+});
 </script>
 
 </body>

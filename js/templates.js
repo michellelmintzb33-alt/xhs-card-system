@@ -18,9 +18,46 @@ function derive(bg,accent,sec,txt){
   return{
     '--bg':bg,'--fg':fg,
     '--accent':accent,'--accentA':rgba(accent,.3),'--accentS':rgba(accent,.12),
-    '--sec':sec,'--secS':rgba(sec,.1),
+    '--sec':sec,'--secA':rgba(sec,.3),'--secS':rgba(sec,.1),
     '--muted':muted,'--border':border,'--grid':grid,
+    // Text accent colors (overridden by randomizeTextAccents)
+    '--headline-color':fg,
+    '--sub-color':muted,
+    '--quote-color':accent,
   };
+}
+
+// Randomize text accent colors — called from gen() and explore mode
+function randomizeTextAccents(target){
+  const g=target||document.getElementById('G');
+  if(!g) return;
+  const accent=g.style.getPropertyValue('--accent');
+  const sec=g.style.getPropertyValue('--sec');
+  const fg=g.style.getPropertyValue('--fg');
+  const muted=g.style.getPropertyValue('--muted');
+  // Headline: 20% accent, 80% default fg
+  g.style.setProperty('--headline-color',Math.random()<.2?accent:fg);
+  // Subtitle: 60% secondary, 40% muted
+  g.style.setProperty('--sub-color',Math.random()<.6?sec:muted);
+  // Quote: always accent
+  g.style.setProperty('--quote-color',accent);
+  // Recolor deco stickers
+  recolorDecos(g,accent,sec);
+}
+
+function recolorDecos(root,accent,sec){
+  const decos=root.querySelectorAll('.card-deco svg');
+  decos.forEach((svg,i)=>{
+    const color=i%2===0?accent:sec;
+    svg.querySelectorAll('[stroke]:not([stroke="none"])').forEach(el=>{
+      const s=el.getAttribute('stroke');
+      if(s&&s!=='none') el.setAttribute('stroke',color);
+    });
+    svg.querySelectorAll('[fill]:not([fill="none"])').forEach(el=>{
+      const f=el.getAttribute('fill');
+      if(f&&f!=='none'&&!f.startsWith('rgba')&&!f.startsWith('url')) el.setAttribute('fill',color);
+    });
+  });
 }
 
 function applyV(v){
@@ -54,35 +91,100 @@ const CONTENT_MAP={
   c12:{headline:'h2',subtitle:'.body12 p',kicker:'.label12',quote:'.bubble'},
   c13:{headline:'h2',subtitle:'.sub13',kicker:'.kicker13',series:'.foot13 .tag13'},
   c14:{headline:'h2'},
-  c15:{headline:'h2',subtitle:'.sub15',kicker:'.kicker15',quote:'.quote15',series:'.page15'}
+  c15:{headline:'h2',subtitle:'.sub15',kicker:'.kicker15',quote:'.quote15',series:'.page15'},
+  c23:{headline:'h2',subtitle:'.cln-sub'},
+  c24:{headline:'h2',subtitle:'.cln-sub'},
+  c25:{headline:'h2',subtitle:'.cln-sub'},
+  c26:{headline:'h2',subtitle:'.cln-sub'},
+  c27:{headline:'h2',subtitle:'.c27-sub'},
+  c28:{headline:'h2',subtitle:'.c28-sub'}
 };
 
-// --- Auto-split raw text into headline / subtitle / quote ---
-function parseContent(text){
-  if(!text.trim()) return {headline:'',subtitle:'',quote:''};
-  const lines=text.split(/\n+/).map(l=>l.trim()).filter(Boolean);
+// ===== MODULE TOGGLE SYSTEM =====
+const MODULE_DEFS = {
+  subtitle: { inputId:'f-subtitle', label:'副文案' },
+  quote:    { inputId:'f-quote',    label:'金句' },
+  kicker:   { inputId:'f-kicker',   label:'标签' },
+  author:   { inputId:'f-author',   label:'署名' },
+  series:   { inputId:'f-series',   label:'期号' },
+};
+let _moduleToggles = { subtitle:true, quote:true, kicker:true, author:true, series:true };
 
-  if(lines.length===1){
-    const sents=lines[0].split(/(?<=[。！？!?；;])\s*/).filter(Boolean);
-    if(sents.length>=3) return {headline:sents[0],subtitle:sents[1],quote:sents.slice(2).join('')};
-    if(sents.length===2) return {headline:sents[0],subtitle:sents[1],quote:''};
-    return {headline:lines[0],subtitle:'',quote:''};
+function getAvailableModules(){
+  const sel = getSelectedTpls();
+  const pool = sel.length > 0 ? sel : Object.keys(CONTENT_MAP);
+  const avail = new Set();
+  pool.forEach(cls => {
+    const map = CONTENT_MAP[cls];
+    if (!map) return;
+    Object.keys(MODULE_DEFS).forEach(k => { if (map[k]) avail.add(k); });
+  });
+  return avail;
+}
+
+function renderModuleToggles(){
+  const wrap = document.getElementById('module-toggles');
+  const section = document.getElementById('module-section');
+  if (!wrap || !section) return;
+  const avail = getAvailableModules();
+  if (avail.size === 0) {
+    section.style.display = 'none';
+    return;
   }
-  if(lines.length===2) return {headline:lines[0],subtitle:lines[1],quote:''};
-  return {headline:lines[0],subtitle:lines[1],quote:lines.slice(2).join('\n')};
+  section.style.display = '';
+  wrap.innerHTML = '';
+  Object.entries(MODULE_DEFS).forEach(([key, def]) => {
+    if (!avail.has(key)) return;
+    const on = _moduleToggles[key];
+    const row = document.createElement('label');
+    row.className = 'mod-toggle-row';
+    row.innerHTML = `<span class="mod-toggle-label">${def.label}</span><div class="mod-toggle-track${on ? ' on' : ''}"><div class="mod-toggle-thumb"></div></div>`;
+    const track = row.querySelector('.mod-toggle-track');
+    track.addEventListener('click', () => {
+      _moduleToggles[key] = !_moduleToggles[key];
+      track.classList.toggle('on', _moduleToggles[key]);
+      applyModuleVisibility();
+    });
+    wrap.appendChild(row);
+  });
+  applyModuleVisibility();
+  updateDecoPanel();
 }
 
-function updatePreview(parsed){
-  const el=document.getElementById('parsePreview');
-  if(!el) return;
-  if(!parsed.headline&&!parsed.subtitle&&!parsed.quote){el.innerHTML='';return;}
-  const parts=[];
-  if(parsed.headline) parts.push('<span class="parse-label">标题:</span> <span>"'+escH(parsed.headline)+'"</span>');
-  if(parsed.subtitle) parts.push('<span class="parse-label">副标:</span> <span>"'+escH(parsed.subtitle)+'"</span>');
-  if(parsed.quote) parts.push('<span class="parse-label">金句:</span> <span>"'+escH(parsed.quote.replace(/\n/g,' '))+'"</span>');
-  el.innerHTML=parts.join('<br>');
+function updateDecoPanel(){
+  const panel=document.querySelector('.deco-group');
+  if(!panel) return;
+  const hasSelected=!!document.querySelector('.sblk.selected');
+  panel.classList.toggle('visible',hasSelected);
 }
+
+function applyModuleVisibility(){
+  // Apply to #G (normal mode) and .explore-grid (explore mode)
+  const targets=[document.getElementById('G'),document.querySelector('.explore-grid')].filter(Boolean);
+  Object.keys(MODULE_DEFS).forEach(key => {
+    targets.forEach(t=>t.classList.toggle('mod-hide-' + key, !_moduleToggles[key]));
+    const inp = document.getElementById(MODULE_DEFS[key].inputId);
+    if (inp) inp.style.display = _moduleToggles[key] ? '' : 'none';
+  });
+}
+
 function escH(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// --- Title position & size controls ---
+function setTitlePos(val){
+  const pct=val+'%';
+  document.getElementById('G').style.setProperty('--title-top',pct);
+  document.getElementById('titlePosVal').textContent=pct;
+  const eg=document.querySelector('.explore-grid');
+  if(eg) eg.querySelectorAll('.explore-item').forEach(it=>it.style.setProperty('--title-top',pct));
+}
+function setTitleSize(val){
+  const scale=val/100;
+  document.getElementById('G').style.setProperty('--title-scale',scale);
+  document.getElementById('titleSizeVal').textContent=val+'%';
+  const eg=document.querySelector('.explore-grid');
+  if(eg) eg.querySelectorAll('.explore-item').forEach(it=>it.style.setProperty('--title-scale',scale));
+}
 
 // --- Unified field writer with special-case handling ---
 function applyField(card,map,field,value,cls){
@@ -143,20 +245,21 @@ function applyField(card,map,field,value,cls){
 }
 
 // --- Content distribution by template group ---
-const GROUP_A=['c1','c2','c3','c5','c7','c8','c12','c13','c15'];  // text templates
+const GROUP_A=['c1','c2','c3','c5','c7','c8','c12','c13','c15','c23','c24','c25','c26','c27','c28'];  // text templates
 const GROUP_B=['c4','c6','c11'];                        // data templates (fixed info only)
 // C9 = mindmap (receives nothing), C10 = checklist (headline only)
 
 function propagateContent(){
-  const raw=document.getElementById('f-main').value;
-  const parsed=parseContent(raw);
+  const parsed={
+    headline:document.getElementById('f-headline').value,
+    subtitle:document.getElementById('f-subtitle').value,
+    quote:document.getElementById('f-quote').value
+  };
   const fixed={
     kicker:document.getElementById('f-kicker').value,
     author:document.getElementById('f-author').value,
     series:document.getElementById('f-series').value
   };
-
-  updatePreview(parsed);
 
   const hasContent=!!parsed.headline;
 
@@ -203,10 +306,11 @@ function propagateContent(){
 
   // Re-apply keyword highlights after content propagation
   applyKeywordHighlights();
+  applyModuleVisibility();
 }
 
 // --- Card filter (tag-based) ---
-const TEXT_CARDS=['c1','c2','c3','c5','c7','c8','c12','c13','c15'];
+const TEXT_CARDS=['c1','c2','c3','c5','c7','c8','c12','c13','c15','c23','c24','c25','c26','c27','c28'];
 const DATA_CARDS=['c4','c6','c9','c10','c11','c14'];
 function filterCards(tag,btn){
   document.querySelectorAll('#filterTog .cbtn').forEach(b=>b.classList.remove('active'));
@@ -221,6 +325,7 @@ function filterCards(tag,btn){
       blk.classList.toggle('filtered-out',!tags.includes(tag));
     }
   });
+  renderModuleToggles();
 }
 
 // --- Ghost system ---
@@ -240,90 +345,81 @@ let _contentTimer=null;
 function debouncedPropagate(){clearTimeout(_contentTimer);_contentTimer=setTimeout(()=>{propagateContent();if(typeof _exploreActive!=='undefined'&&_exploreActive)refreshExploreContent();},150);}
 
 // ===== KEYWORD HIGHLIGHT SYSTEM =====
-let _hlKeywords=[];
+let _hlA={keywords:[],style:'wave'}; // accent 色
+let _hlB={keywords:[],style:'wave'}; // secondary 色
 let _hlTimer=null;
 function debouncedHighlight(){clearTimeout(_hlTimer);_hlTimer=setTimeout(updateHighlightKeywords,200);}
 
 function updateHighlightKeywords(){
-  const raw=(document.getElementById('f-highlight')||{}).value||'';
-  _hlKeywords=raw.split(/[,，\s]+/).map(s=>s.trim()).filter(Boolean);
+  const rawA=(document.getElementById('f-hl-a')||{}).value||'';
+  _hlA.keywords=rawA.split(/[,，\s]+/).map(s=>s.trim()).filter(Boolean);
+  const rawB=(document.getElementById('f-hl-b')||{}).value||'';
+  _hlB.keywords=rawB.split(/[,，\s]+/).map(s=>s.trim()).filter(Boolean);
+  applyKeywordHighlights();
+}
+
+function setHlStyle(group,style){
+  const hl=group==='b'?_hlB:_hlA;
+  hl.style=style;
+  document.querySelectorAll(`.hl-style-btn[data-group="${group}"]`).forEach(b=>
+    b.classList.toggle('active',b.dataset.hl===style)
+  );
   applyKeywordHighlights();
 }
 
 function stripHighlights(el){
-  el.querySelectorAll('mark.kw-hl').forEach(mark=>{
+  el.querySelectorAll('mark.kw-hl-a,mark.kw-hl-b').forEach(mark=>{
     const parent=mark.parentNode;
     parent.replaceChild(document.createTextNode(mark.textContent),mark);
   });
   el.normalize();
 }
 
-function highlightTextNode(node,pattern){
-  const text=node.textContent;
-  const match=pattern.exec(text);
-  if(!match) return;
-  const before=text.slice(0,match.index);
-  const matched=text.slice(match.index,match.index+match[0].length);
-  const after=text.slice(match.index+match[0].length);
-  const frag=document.createDocumentFragment();
-  if(before) frag.appendChild(document.createTextNode(before));
-  const mark=document.createElement('mark');
-  mark.className='kw-hl';
-  mark.textContent=matched;
-  frag.appendChild(mark);
-  if(after) frag.appendChild(document.createTextNode(after));
-  node.parentNode.replaceChild(frag,node);
+function applyGroupHighlights(el,keywords,classBase,style){
+  if(!keywords.length) return;
+  const escaped=keywords.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+  const patternStr=escaped.join('|');
+  const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null);
+  const textNodes=[];
+  let n;
+  while(n=walker.nextNode()) textNodes.push(n);
+  textNodes.forEach(tn=>{
+    let current=tn;
+    while(current&&current.nodeType===Node.TEXT_NODE){
+      const regex=new RegExp(patternStr,'i');
+      const m=regex.exec(current.textContent);
+      if(!m) break;
+      const before=current.textContent.slice(0,m.index);
+      const matched=current.textContent.slice(m.index,m.index+m[0].length);
+      const after=current.textContent.slice(m.index+m[0].length);
+      const frag=document.createDocumentFragment();
+      if(before) frag.appendChild(document.createTextNode(before));
+      const mark=document.createElement('mark');
+      mark.className=style==='marker'?classBase+' kw-marker':classBase;
+      mark.textContent=matched;
+      frag.appendChild(mark);
+      const afterNode=after?document.createTextNode(after):null;
+      if(afterNode) frag.appendChild(afterNode);
+      current.parentNode.replaceChild(frag,current);
+      current=afterNode;
+    }
+  });
 }
 
 function applyKeywordHighlights(){
-  if(!_hlKeywords.length){
-    // Strip all highlights
-    Object.keys(CONTENT_MAP).forEach(cls=>{
-      const card=document.querySelector(`.card.${cls}`);
-      if(!card) return;
-      const map=CONTENT_MAP[cls];
+  const hasAny=_hlA.keywords.length||_hlB.keywords.length;
+  Object.keys(CONTENT_MAP).forEach(cls=>{
+    const cards=document.querySelectorAll(`.card.${cls}`);
+    if(!cards.length) return;
+    const map=CONTENT_MAP[cls];
+    cards.forEach(card=>{
       Object.keys(map).forEach(field=>{
         const el=card.querySelector(map[field]);
-        if(el&&el.tagName!=='text') stripHighlights(el);
-      });
-    });
-    return;
-  }
-  const escaped=_hlKeywords.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
-  const patternStr=escaped.join('|');
-
-  Object.keys(CONTENT_MAP).forEach(cls=>{
-    const card=document.querySelector(`.card.${cls}`);
-    if(!card) return;
-    const map=CONTENT_MAP[cls];
-    Object.keys(map).forEach(field=>{
-      const el=card.querySelector(map[field]);
-      if(!el||el.tagName==='text') return;
-      stripHighlights(el);
-      const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null);
-      const textNodes=[];
-      let n;
-      while(n=walker.nextNode()) textNodes.push(n);
-      textNodes.forEach(tn=>{
-        let current=tn;
-        while(current&&current.nodeType===Node.TEXT_NODE){
-          const regex=new RegExp(patternStr,'i');
-          const m=regex.exec(current.textContent);
-          if(!m) break;
-          const before=current.textContent.slice(0,m.index);
-          const matched=current.textContent.slice(m.index,m.index+m[0].length);
-          const after=current.textContent.slice(m.index+m[0].length);
-          const frag=document.createDocumentFragment();
-          if(before) frag.appendChild(document.createTextNode(before));
-          const mark=document.createElement('mark');
-          mark.className='kw-hl';
-          mark.textContent=matched;
-          frag.appendChild(mark);
-          const afterNode=after?document.createTextNode(after):null;
-          if(afterNode) frag.appendChild(afterNode);
-          current.parentNode.replaceChild(frag,current);
-          current=afterNode;
-        }
+        if(!el||el.tagName==='text') return;
+        stripHighlights(el);
+        if(!hasAny) return;
+        applyGroupHighlights(el,_hlA.keywords,'kw-hl-a',_hlA.style);
+        applyGroupHighlights(el,_hlB.keywords,'kw-hl-b',_hlB.style);
       });
     });
   });
@@ -403,13 +499,22 @@ function restoreDefaults(){
     card.classList.remove('has-content','ghost-hide','ghost-show');
   });
   // Clear all left panel inputs
-  ['f-main','f-kicker','f-author','f-series','f-data','f-list','f-highlight'].forEach(id=>{
+  ['f-headline','f-subtitle','f-quote','f-kicker','f-author','f-series','f-hl-a','f-hl-b'].forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.value='';
   });
-  _hlKeywords=[];
-  const preview=document.getElementById('parsePreview');
-  if(preview) preview.innerHTML='';
+  _hlA={keywords:[],style:'wave'};
+  _hlB={keywords:[],style:'wave'};
+  setHlStyle('a','wave');
+  setHlStyle('b','wave');
+  // Reset module toggles
+  Object.keys(_moduleToggles).forEach(k=>{ _moduleToggles[k]=true; });
+  renderModuleToggles();
+  // Reset title sliders
+  const posSlider=document.getElementById('f-title-pos');
+  if(posSlider){posSlider.value=35;setTitlePos(35);}
+  const sizeSlider=document.getElementById('f-title-size');
+  if(sizeSlider){sizeSlider.value=100;setTitleSize(100);}
 }
 
 // ===== SELECT & DELETE UI =====
@@ -449,6 +554,8 @@ function setSelectedTpls(ids){
       if(chk)chk.checked=false;
     }
   });
+  renderModuleToggles();
+  if(typeof updateBatchBtn==='function')updateBatchBtn();
 }
 
 function clearSelections(){
@@ -457,4 +564,6 @@ function clearSelections(){
     const chk=blk.querySelector('.tpl-check input');
     if(chk)chk.checked=false;
   });
+  renderModuleToggles();
+  if(typeof updateBatchBtn==='function')updateBatchBtn();
 }

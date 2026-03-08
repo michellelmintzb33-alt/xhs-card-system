@@ -55,13 +55,18 @@ function doSaveSeries(){
     colorCount:cc,
     ratio:currentRatio,
     content:{
-      main:document.getElementById('f-main').value,
+      headline:document.getElementById('f-headline').value,
+      subtitle:document.getElementById('f-subtitle').value,
+      quote:document.getElementById('f-quote').value,
       kicker:document.getElementById('f-kicker').value,
       series:document.getElementById('f-series').value,
       author:document.getElementById('f-author').value,
-      data:document.getElementById('f-data').value,
-      list:document.getElementById('f-list').value
-    }
+    },
+    titlePos:parseInt(document.getElementById('f-title-pos').value),
+    titleSize:parseInt(document.getElementById('f-title-size').value),
+    moduleToggles:{..._moduleToggles},
+    hlStyleA:_hlA.style,
+    hlStyleB:_hlB.style
   };
   seriesList.push(series);
   persistSeries();
@@ -83,14 +88,33 @@ function loadSeries(idx){
   if(s.ratio)setRatio(s.ratio);
   // Restore content
   if(s.content){
-    if(s.content.main!=null)document.getElementById('f-main').value=s.content.main;
+    // Support legacy 'main' field from old series
+    if(s.content.headline!=null)document.getElementById('f-headline').value=s.content.headline;
+    else if(s.content.main!=null)document.getElementById('f-headline').value=s.content.main;
+    if(s.content.subtitle!=null)document.getElementById('f-subtitle').value=s.content.subtitle;
+    if(s.content.quote!=null)document.getElementById('f-quote').value=s.content.quote;
     if(s.content.kicker!=null)document.getElementById('f-kicker').value=s.content.kicker;
     if(s.content.series!=null)document.getElementById('f-series').value=s.content.series;
     if(s.content.author!=null)document.getElementById('f-author').value=s.content.author;
-    if(s.content.data!=null)document.getElementById('f-data').value=s.content.data;
-    if(s.content.list!=null)document.getElementById('f-list').value=s.content.list;
     propagateContent();
   }
+  // Restore title position & size
+  if(s.titlePos!=null){
+    // Legacy 0/1/2 → convert to percentage
+    const tp=s.titlePos<=2?[0,35,60][s.titlePos]:s.titlePos;
+    document.getElementById('f-title-pos').value=tp;setTitlePos(tp);
+  }
+  if(s.titleSize!=null){document.getElementById('f-title-size').value=s.titleSize;setTitleSize(s.titleSize);}
+  // Restore module toggles
+  if(s.moduleToggles){
+    Object.assign(_moduleToggles,s.moduleToggles);
+    renderModuleToggles();
+  }
+  // Restore highlight styles
+  if(s.hlStyleA) setHlStyle('a',s.hlStyleA);
+  if(s.hlStyleB) setHlStyle('b',s.hlStyleB);
+  // Legacy: old single hlStyle → apply to A only
+  if(s.hlStyle&&!s.hlStyleA) setHlStyle('a',s.hlStyle);
   // Restore template selection + hide unselected
   setSelectedTpls(s.templates);
   document.querySelectorAll('.sblk').forEach(blk=>{
