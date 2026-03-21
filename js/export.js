@@ -92,7 +92,7 @@ function resolveVarsForExport(card){
     'background','background-image','background-color',
     'color','border-color','border-top-color','border-bottom-color',
     'border-left-color','border-right-color','outline-color',
-    'text-decoration-color','opacity'
+    'text-decoration-color','opacity','mix-blend-mode'
   ];
   [card,...card.querySelectorAll('*')].forEach(el=>{
     const cs=getComputedStyle(el);
@@ -162,6 +162,8 @@ async function exportCard(card,btn){
     // --- 1. Hidden container at EXPORT dimensions ---
     container=document.createElement('div');
     container.style.cssText=`position:fixed;left:-9999px;top:0;width:${expW}px;height:${expH}px;overflow:hidden;z-index:-9999;pointer-events:none;`;
+    // Apply current style class so .style-X .card selectors work in export
+    if(typeof currentStyle!=='undefined'&&currentStyle!=='default') container.classList.add('style-'+currentStyle);
     document.body.appendChild(container);
 
     // --- 2. Clone card at EXPORT dimensions ---

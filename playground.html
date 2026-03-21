@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>配色实验室 · XHS 海报工坊</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=DM+Serif+Display:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=DM+Serif+Display:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Instrument+Serif:ital@0;1&family=Syne:wght@400;500;600;700;800&family=ZCOOL+KuaiLe&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
@@ -106,6 +106,36 @@
       </div>
       <div class="lp-actions" style="margin-top:8px">
         <button class="lp-action-btn" onclick="clearCardImage()">清除图片</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Group: 自定义画布 -->
+  <div class="lp-group" id="canvasGroup" style="display:none">
+    <div class="lp-group-label">自定义画布</div>
+    <div class="lp-section">
+      <div class="img-upload-area" id="c33UploadArea">
+        <input type="file" accept="image/*" id="c33FileInput">
+        <div class="img-upload-hint" id="c33UploadHint">点击上传手绘底图<br><span>填满画布作为底图</span></div>
+        <img class="img-upload-preview" id="c33UploadPreview">
+      </div>
+    </div>
+    <div class="lp-section">
+      <div class="lp-section-title">文字融合模式</div>
+      <div class="blend-mode-grid" id="c33BlendGrid">
+        <button class="blend-btn active" data-mode="normal" onclick="setC33TextBlend('normal',this)">普通</button>
+        <button class="blend-btn" data-mode="difference" onclick="setC33TextBlend('difference',this)">差值</button>
+        <button class="blend-btn" data-mode="screen" onclick="setC33TextBlend('screen',this)">滤色</button>
+        <button class="blend-btn" data-mode="overlay" onclick="setC33TextBlend('overlay',this)">叠加</button>
+        <button class="blend-btn" data-mode="multiply" onclick="setC33TextBlend('multiply',this)">正片叠底</button>
+        <button class="blend-btn" data-mode="exclusion" onclick="setC33TextBlend('exclusion',this)">排除</button>
+        <button class="blend-btn" data-mode="color-dodge" onclick="setC33TextBlend('color-dodge',this)">颜色减淡</button>
+      </div>
+    </div>
+    <div class="lp-section">
+      <div class="c33-hint">拖拽文字自由定位，滚轮调整大小</div>
+      <div class="lp-actions" style="margin-top:8px">
+        <button class="lp-action-btn" onclick="clearC33Image()">清除底图</button>
       </div>
     </div>
   </div>
@@ -285,6 +315,18 @@
         <button class="cbtn" onclick="toggleFx('noise',this)">噪点</button>
         <button class="cbtn" onclick="toggleFx('glow',this)">光晕</button>
         <button class="cbtn" onclick="toggleFx('stroke',this)">描边</button>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="ctrl-group">
+      <span class="lbl">风格</span>
+      <div class="ctog" id="styleTog">
+        <button class="cbtn active" onclick="setStyle('default',this)">默认</button>
+        <button class="cbtn" onclick="setStyle('korea',this)">韩系</button>
+        <button class="cbtn" onclick="setStyle('luxury',this)">黑金</button>
+        <button class="cbtn" onclick="setStyle('pop',this)">潮流</button>
+        <button class="cbtn" onclick="setStyle('organic',this)">柔和</button>
+        <button class="cbtn" onclick="setStyle('swiss',this)">瑞士</button>
       </div>
     </div>
   </div>
@@ -591,6 +633,74 @@
       </div>
     </div>
   </div>
+
+  <!-- C29 · 极简图文风 -->
+  <div class="sblk" data-tags="重点" data-tpl="c29">
+    <div class="stag">㉙ 极简图文风 <span class="tag-badge">重点</span></div>
+    <div class="card c29">
+      <div class="c29-pill"></div>
+      <div class="c29-title"><span class="light">The Art of</span><br><em>Being</em> Present</div>
+      <div class="c29-circle"></div>
+      <div class="c29-foot"></div>
+    </div>
+  </div>
+
+  <!-- C30 · 拼贴混乱风 -->
+  <div class="sblk" data-tags="重点" data-tpl="c30">
+    <div class="stag">㉚ 拼贴混乱风 <span class="tag-badge">重点</span></div>
+    <div class="card c30">
+      <div class="c30-chaos" id="c30-chaos"></div>
+      <div class="c30-bar"><span class="b-name"></span><span class="b-tag"></span></div>
+    </div>
+  </div>
+
+  <!-- C31 · 双色调摄影风 -->
+  <div class="sblk" data-tags="重点" data-tpl="c31">
+    <div class="stag">㉛ 双色调摄影风 <span class="tag-badge">重点</span></div>
+    <div class="card c31">
+      <div class="c31-img"></div>
+      <div class="c31-tint"></div>
+      <div class="c31-content">
+        <h2></h2>
+        <span class="c31-sub"></span>
+      </div>
+      <div class="c31-corner"></div>
+    </div>
+  </div>
+
+  <!-- C32 · 手绘边框照片风 -->
+  <div class="sblk" data-tags="重点" data-tpl="c32">
+    <div class="stag">㉜ 手绘边框照片风 <span class="tag-badge">重点</span></div>
+    <div class="card c32">
+      <div class="c32-frame"></div>
+      <svg class="c32-border" id="c32-border" viewBox="0 0 400 533" fill="none" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="c32-corner tl"><span class="big"></span></div>
+      <div class="c32-corner tr"><span class="big"></span></div>
+      <div class="c32-corner bl"></div>
+      <div class="c32-corner br"><span class="big"></span></div>
+    </div>
+  </div>
+
+  <!-- C33 · 自定义画布 -->
+  <div class="sblk" data-tags="重点" data-tpl="c33">
+    <div class="stag">㉝ 自定义画布 <span class="tag-badge">重点</span></div>
+    <div class="card c33">
+      <div class="c33-bg"></div>
+      <div class="c33-upload-hint">上传手绘图</div>
+      <div class="c33-zone" data-zone="kicker" style="left:10%;top:5%">
+        <span class="c33-kicker"></span>
+      </div>
+      <div class="c33-zone" data-zone="headline" style="left:10%;top:15%">
+        <span class="c33-headline">标题文字</span>
+      </div>
+      <div class="c33-zone" data-zone="subtitle" style="left:10%;top:45%">
+        <span class="c33-subtitle"></span>
+      </div>
+      <div class="c33-zone" data-zone="series" style="left:65%;top:90%">
+        <span class="c33-series"></span>
+      </div>
+    </div>
+  </div>
 </div>
 </div><!-- /zoomWrap -->
 </div><!-- /scrollArea -->
@@ -622,13 +732,34 @@
 let cc=3,locked={bg:false,accent:false,sec:false,text:false},rStyle='any',saved=[],editMode=false,contentOnly=false;
 let currentPlatform='xhs',currentSize=null;
 let colorHistory=[];
+let currentStyle='default';
 let _exploreActive=false,_exploreOrigHTML='';
 function pushHistory(){colorHistory.push({bg:gS('bg'),accent:gS('accent'),sec:gS('sec'),text:gS('text')});if(colorHistory.length>50)colorHistory.shift();document.getElementById('undoBtn').disabled=false;}
 function undoColor(){if(!colorHistory.length)return;const prev=colorHistory.pop();sS('bg',prev.bg);sS('accent',prev.accent);sS('sec',prev.sec);sS('text',prev.text);refresh();if(!colorHistory.length)document.getElementById('undoBtn').disabled=true;}
 
 function gS(id){return document.getElementById('in-'+id).value;}
 function sS(id,v){document.getElementById('in-'+id).value=v;document.getElementById('sw-'+id).style.background=v;const nc=document.querySelector('#s-'+id+' input[type=color]');if(nc)nc.value=v;}
-function refresh(){const bg=gS('bg'),a=gS('accent'),s=cc>=3?gS('sec'):null,t=cc>=4?gS('text'):null;applyV(derive(bg,a,s,t));updJ();}
+function refresh(){const bg=gS('bg'),a=gS('accent'),s=cc>=3?gS('sec'):null,t=cc>=4?gS('text'):null;applyV(transformForStyle(derive(bg,a,s,t),currentStyle));updJ();}
+
+function setStyle(id,btn){
+  const g=document.getElementById('G');
+  // Remove all style-* classes
+  Array.from(g.classList).filter(c=>c.startsWith('style-')).forEach(c=>g.classList.remove(c));
+  // Also apply to explore grid if active
+  const eg=document.querySelector('.explore-grid');
+  if(eg) Array.from(eg.classList).filter(c=>c.startsWith('style-')).forEach(c=>eg.classList.remove(c));
+  currentStyle=id;
+  if(id!=='default'){
+    g.classList.add('style-'+id);
+    if(eg) eg.classList.add('style-'+id);
+  }
+  // Update button active state
+  document.querySelectorAll('#styleTog .cbtn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  refresh();
+  // Re-render explore palettes if active
+  if(_exploreActive) refreshExplorePalettes();
+}
 
 function setCount(n){cc=n;['cn2','cn3','cn4'].forEach(id=>document.getElementById(id).classList.remove('active'));document.getElementById('cn'+n).classList.add('active');document.getElementById('s-sec').classList.toggle('hidden',n<3);document.getElementById('s-text').classList.toggle('hidden',n<4);refresh();}
 
@@ -719,7 +850,7 @@ function copyJ(){const bg=gS('bg'),a=gS('accent');let o={bg,accent:a};if(cc>=3)o
 
 
 // ===== EDIT MODE =====
-const EDIT_SELS='.card h2,.card p,.card .sub,.card .kk,.card .dk,.card .cp,.card .bt3,.card .body12 p,.card .item,.card .bubble,.card .sm,.card .bg2,.card .tt,.card .ins,.card .tag,.card .tg,.card .iss,.card .mh .logo,.card .mh .dt,.card .hl2,.card .ps,.card .bs2,.card .au,.card .lb2,.card .tag8,.card .tag11,.card .note11,.card .label12,.card .sb span,.card .dl,.card .dv,.card .bt,.card .bl,.card .bv,.card .pct,.card .pl,.card .ft span,.card .hl3,.card .vol,.card .cr .lb2,.card .cln-kicker,.card .cln-series,.card .cln-author';
+const EDIT_SELS='.card h2,.card p,.card .sub,.card .kk,.card .dk,.card .cp,.card .bt3,.card .body12 p,.card .item,.card .bubble,.card .sm,.card .bg2,.card .tt,.card .ins,.card .tag,.card .tg,.card .iss,.card .mh .logo,.card .mh .dt,.card .hl2,.card .ps,.card .bs2,.card .au,.card .lb2,.card .tag8,.card .tag11,.card .note11,.card .label12,.card .sb span,.card .dl,.card .dv,.card .bt,.card .bl,.card .bv,.card .pct,.card .pl,.card .ft span,.card .hl3,.card .vol,.card .cr .lb2,.card .cln-kicker,.card .cln-series,.card .cln-author,.card .c33-headline,.card .c33-subtitle,.card .c33-kicker,.card .c33-series';
 
 function toggleContentOnly(){
   contentOnly=!contentOnly;
@@ -1018,6 +1149,78 @@ function updateImgLayers(){
   });
 }
 
+// ===== C30 CHAOS INIT =====
+function initC30Chaos(){
+  const container=document.getElementById('c30-chaos');
+  if(!container)return;
+  const words=['DESIGN','create','ART','MAKE','think','BOLD','vision','STYLE','色彩','TYPE',
+    '自由','flow','BREAK','rules','灵感','MIX','fresh','LOUD','wild','DREAM','节奏','PLAY','raw','REAL'];
+  const accent=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#ff6b35';
+  const sec=getComputedStyle(document.documentElement).getPropertyValue('--sec').trim()||'#4a9eff';
+  const fg=getComputedStyle(document.documentElement).getPropertyValue('--fg').trim()||'#f0f0f0';
+  const colors=[accent,sec,fg,'var(--accent)','var(--sec)','var(--fg)'];
+  const icons=[
+    `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="var(--accent)" stroke-width="1.5"/></svg>`,
+    `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><polygon points="9,1 17,17 1,17" stroke="var(--sec)" stroke-width="1.5"/></svg>`,
+    `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="var(--accent)" stroke-width="1.5"/></svg>`,
+    `<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 1L12 7H19L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L1 7H8Z" stroke="var(--sec)" stroke-width="1.2"/></svg>`,
+    `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><line x1="2" y1="2" x2="14" y2="14" stroke="var(--accent)" stroke-width="1.5"/><line x1="14" y1="2" x2="2" y2="14" stroke="var(--accent)" stroke-width="1.5"/></svg>`,
+  ];
+  let html='';
+  words.forEach(w=>{
+    const x=randInt(2,88),y=randInt(3,80),sz=randInt(12,48),rot=randInt(-35,35);
+    const op=(Math.random()*0.65+0.3).toFixed(2);
+    const c=colors[randInt(0,colors.length-1)];
+    const wt=[400,500,600,700,800][randInt(0,4)];
+    html+=`<div class="c30-word" style="left:${x}%;top:${y}%;font-size:${sz}px;transform:rotate(${rot}deg);opacity:${op};color:${c};font-weight:${wt}">${w}</div>`;
+  });
+  for(let i=0;i<8;i++){
+    const x=randInt(5,90),y=randInt(5,82),sc=(Math.random()*1.4+0.8).toFixed(1),rot=randInt(-45,45);
+    html+=`<div class="c30-icon" style="left:${x}%;top:${y}%;transform:rotate(${rot}deg) scale(${sc})">${icons[randInt(0,icons.length-1)]}</div>`;
+  }
+  container.innerHTML=html;
+}
+
+// ===== C32 HAND BORDER INIT =====
+function initC32Border(){
+  const svg=document.getElementById('c32-border');
+  if(!svg)return;
+  const rand=(a,b)=>Math.random()*(b-a)+a;
+  const jitter=(pts,amt)=>pts.map(p=>({x:p.x+rand(-amt,amt),y:p.y+rand(-amt,amt)}));
+  const top=533*0.12,bottom=533*0.80,left=400*0.09,right=400*0.91;
+  let paths='';
+  for(let pass=0;pass<2;pass++){
+    const j=3+pass*2;
+    const c=jitter([{x:left,y:top},{x:right,y:top},{x:right,y:bottom},{x:left,y:bottom}],j);
+    let d=`M${c[0].x},${c[0].y}`;
+    for(let i=1;i<=4;i++){
+      const cur=c[i%4],prev=c[(i-1)%4];
+      d+=` Q${(prev.x+cur.x)/2+rand(-4,4)},${(prev.y+cur.y)/2+rand(-4,4)} ${cur.x},${cur.y}`;
+    }
+    d+='Z';
+    paths+=`<path d="${d}" stroke="var(--accent)" stroke-width="${1.2+pass*0.5}" fill="none" opacity="${0.5+pass*0.2}"/>`;
+  }
+  // Corner flourishes
+  const fl=18;
+  paths+=`<path d="M${left-6},${top+fl} Q${left-8},${top-4} ${left+fl},${top-6}" stroke="var(--accent)" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round"/>`;
+  paths+=`<path d="M${right+6},${top+fl} Q${right+8},${top-4} ${right-fl},${top-6}" stroke="var(--accent)" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round"/>`;
+  paths+=`<path d="M${left-6},${bottom-fl} Q${left-8},${bottom+4} ${left+fl},${bottom+6}" stroke="var(--accent)" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round"/>`;
+  paths+=`<path d="M${right+6},${bottom-fl} Q${right+8},${bottom+4} ${right-fl},${bottom+6}" stroke="var(--accent)" stroke-width="1.2" fill="none" opacity="0.6" stroke-linecap="round"/>`;
+  // Decorative dashes
+  for(let i=0;i<10;i++){
+    const side=randInt(0,4);
+    let x,y,angle;
+    if(side===0){x=rand(left,right);y=top+rand(-12,-5);angle=rand(-10,10);}
+    else if(side===1){x=rand(left,right);y=bottom+rand(5,12);angle=rand(-10,10);}
+    else if(side===2){x=left+rand(-12,-5);y=rand(top,bottom);angle=rand(80,100);}
+    else{x=right+rand(5,12);y=rand(top,bottom);angle=rand(80,100);}
+    const len=rand(5,12);
+    const dx=Math.cos(angle*Math.PI/180)*len,dy=Math.sin(angle*Math.PI/180)*len;
+    paths+=`<line x1="${x}" y1="${y}" x2="${x+dx}" y2="${y+dy}" stroke="var(--accent)" stroke-width="1" opacity="${rand(0.3,0.6).toFixed(2)}" stroke-linecap="round"/>`;
+  }
+  svg.innerHTML=paths;
+}
+
 window.addEventListener('DOMContentLoaded',async()=>{
   loadS();refresh();setPlatform('xhs');injectExportBtns();injectSelectUI();injectCardInteractions();loadSeriesList();renderModuleToggles();updateBatchBtn();
   // Bind content input events
@@ -1025,6 +1228,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
     const el=document.getElementById(id);
     if(el)el.addEventListener('input',debouncedPropagate);
   });
+  initC30Chaos();initC32Border();initC33Upload();initC33Zones();
   snapshotDefaults();
   initImageUpload();
   document.getElementById('f-hl-a').addEventListener('input',debouncedHighlight);
@@ -1084,8 +1288,10 @@ function enterExplore(){
   const gEl=document.getElementById('G');
   const titleTop=gEl.style.getPropertyValue('--title-top')||'35%';
   const titleScale=gEl.style.getPropertyValue('--title-scale')||'1';
+  // Apply current style class to explore grid
+  if(currentStyle!=='default') grid.classList.add('style-'+currentStyle);
   palettes.forEach((pal,i)=>{
-    const vars=derive(pal.bg,pal.accent,cc>=3?pal.sec:null,cc>=4?pal.text:null);
+    const vars=transformForStyle(derive(pal.bg,pal.accent,cc>=3?pal.sec:null,cc>=4?pal.text:null),currentStyle);
     const item=document.createElement('div');
     item.className='explore-item';
     Object.entries(vars).forEach(([k,v])=>item.style.setProperty(k,v));
@@ -1149,6 +1355,12 @@ function enterExplore(){
   applyModuleVisibility();
   applyFx();
   applyKeywordHighlights();
+  if(typeof applyC33Image==='function') applyC33Image();
+  // Init draggable zones on explore clones
+  grid.querySelectorAll('.card.c33').forEach(card=>{
+    card.querySelectorAll('.c33-zone').forEach(zone=>makeZoneDraggable(zone,card));
+    if(_c33TextBlend) card.style.setProperty('--c33-text-blend',_c33TextBlend);
+  });
   if(currentZoom<1){grid.style.transform=`scale(${currentZoom})`;grid.style.transformOrigin='top center';grid.style.height=grid.scrollHeight*currentZoom+'px';}
 }
 
@@ -1188,6 +1400,9 @@ function exitExplore(){
   injectExportBtns();
   injectSelectUI();
   injectCardInteractions();
+  // Re-init C33 zones and image
+  if(typeof initC33Zones==='function') initC33Zones();
+  if(typeof applyC33Image==='function') applyC33Image();
   // Re-apply current card size
   if(currentSize){
     const ratio=currentSize.w/currentSize.h;
@@ -1250,7 +1465,7 @@ function refreshExplorePalettes(){
   grid._palettes=newPalettes;
   items.forEach((item,i)=>{
     const pal=newPalettes[i];
-    const vars=derive(pal.bg,pal.accent,cc>=3?pal.sec:null,cc>=4?pal.text:null);
+    const vars=transformForStyle(derive(pal.bg,pal.accent,cc>=3?pal.sec:null,cc>=4?pal.text:null),currentStyle);
     // Update CSS variables
     Object.entries(vars).forEach(([k,v])=>item.style.setProperty(k,v));
     // Update donut if present
@@ -1367,6 +1582,165 @@ document.querySelectorAll('.deco-item').forEach(item=>{
     });
   });
 });
+
+// ===== C33 CUSTOM CANVAS SYSTEM =====
+let _c33ImageUrl=null;
+let _c33TextBlend='normal';
+
+function initC33Upload(){
+  const area=document.getElementById('c33UploadArea');
+  const input=document.getElementById('c33FileInput');
+  if(!area||!input)return;
+  area.addEventListener('click',()=>input.click());
+  input.addEventListener('change',handleC33File);
+  // Also allow clicking the card bg/hint to trigger upload
+  document.querySelectorAll('.card.c33 .c33-upload-hint, .card.c33 .c33-bg').forEach(el=>{
+    el.style.cursor='pointer';
+    el.style.pointerEvents='auto';
+    el.addEventListener('click',e=>{
+      e.stopPropagation();
+      input.click();
+    });
+  });
+}
+
+function handleC33File(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const area=document.getElementById('c33UploadArea');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    _c33ImageUrl=ev.target.result;
+    area.classList.add('has-image');
+    document.getElementById('c33UploadPreview').src=_c33ImageUrl;
+    applyC33Image();
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyC33Image(){
+  if(!_c33ImageUrl)return;
+  // Normal mode cards
+  document.querySelectorAll('.card.c33 .c33-bg').forEach(bg=>{
+    bg.style.backgroundImage=`url('${_c33ImageUrl}')`;
+    bg.closest('.c33').classList.add('has-canvas-img');
+  });
+  // Explore mode clones
+  document.querySelectorAll('.explore-item .card.c33 .c33-bg').forEach(bg=>{
+    bg.style.backgroundImage=`url('${_c33ImageUrl}')`;
+    bg.closest('.c33').classList.add('has-canvas-img');
+  });
+}
+
+function clearC33Image(){
+  _c33ImageUrl=null;
+  document.getElementById('c33UploadArea').classList.remove('has-image');
+  document.getElementById('c33UploadPreview').src='';
+  document.querySelectorAll('.card.c33').forEach(c=>{
+    c.classList.remove('has-canvas-img');
+    c.querySelector('.c33-bg').style.backgroundImage='';
+  });
+}
+
+function initC33Zones(){
+  document.querySelectorAll('.card.c33').forEach(card=>{
+    card.querySelectorAll('.c33-zone').forEach(zone=>makeZoneDraggable(zone,card));
+  });
+}
+
+function makeZoneDraggable(zone,card){
+  let startX,startY,startLeft,startTop,moved;
+  zone.addEventListener('mousedown',e=>{
+    if(e.button!==0)return;
+    e.preventDefault();e.stopPropagation();
+    const rect=card.getBoundingClientRect();
+    startX=e.clientX;startY=e.clientY;
+    startLeft=parseFloat(zone.style.left)||0;
+    startTop=parseFloat(zone.style.top)||0;
+    moved=false;
+    zone.classList.add('dragging');
+    function onMove(ev){
+      const dx=ev.clientX-startX;
+      const dy=ev.clientY-startY;
+      if(!moved&&Math.abs(dx)<3&&Math.abs(dy)<3)return;
+      moved=true;
+      const newLeft=startLeft+dx/rect.width*100;
+      const newTop=startTop+dy/rect.height*100;
+      zone.style.left=Math.max(-5,Math.min(95,newLeft))+'%';
+      zone.style.top=Math.max(-5,Math.min(95,newTop))+'%';
+    }
+    function onUp(){
+      zone.classList.remove('dragging');
+      window.removeEventListener('mousemove',onMove);
+      window.removeEventListener('mouseup',onUp);
+    }
+    window.addEventListener('mousemove',onMove);
+    window.addEventListener('mouseup',onUp);
+  });
+  // Wheel resize
+  zone.addEventListener('wheel',e=>{
+    e.preventDefault();e.stopPropagation();
+    const span=zone.querySelector('span');
+    if(!span)return;
+    const cs=getComputedStyle(span);
+    const current=parseFloat(cs.fontSize);
+    const delta=e.deltaY>0?-1:1;
+    span.style.fontSize=Math.max(6,Math.min(80,current+delta))+'px';
+  },{passive:false});
+}
+
+function setC33TextBlend(mode,btn){
+  _c33TextBlend=mode;
+  document.querySelectorAll('#c33BlendGrid .blend-btn').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  // Apply to all c33 cards (normal + explore)
+  document.querySelectorAll('.card.c33').forEach(card=>{
+    card.style.setProperty('--c33-text-blend',mode);
+  });
+}
+
+function updateCanvasPanel(){
+  const panel=document.getElementById('canvasGroup');
+  if(!panel)return;
+  const hasC33=!!document.querySelector('.sblk.selected[data-tpl="c33"]');
+  panel.style.display=hasC33?'':'none';
+}
+
+// ===== GALLERY INTEGRATION: load template+palette from gallery =====
+(function(){
+  if(window.location.hash!=='#from-gallery') return;
+  try{
+    const raw=sessionStorage.getItem('gallery-selection');
+    if(!raw) return;
+    const data=JSON.parse(raw);
+    sessionStorage.removeItem('gallery-selection');
+    window.location.hash='';
+    // Apply colors
+    if(data.bg) sS('bg',data.bg);
+    if(data.accent) sS('accent',data.accent);
+    if(data.sec) sS('sec',data.sec);
+    if(data.text) sS('text',data.text);
+    refresh();
+    // Select the template
+    if(data.template){
+      clearSelections();
+      const blk=document.querySelector(`.sblk[data-tpl="${data.template}"]`);
+      if(blk){
+        blk.classList.add('selected');
+        const chk=blk.querySelector('.tpl-check input');
+        if(chk) chk.checked=true;
+        blk.scrollIntoView({behavior:'smooth',block:'center'});
+      }
+      renderModuleToggles();
+      updateBatchBtn();
+    }
+    // Set topic as headline if provided
+    if(data.topic){
+      document.getElementById('f-headline').value=data.topic+'的底层逻辑';
+      propagateContent();
+    }
+  }catch(e){}
+})();
 </script>
 
 </body>

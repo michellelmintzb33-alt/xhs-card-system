@@ -66,7 +66,9 @@ function doSaveSeries(){
     titleSize:parseInt(document.getElementById('f-title-size').value),
     moduleToggles:{..._moduleToggles},
     hlStyleA:_hlA.style,
-    hlStyleB:_hlB.style
+    hlStyleB:_hlB.style,
+    c33TextBlend:typeof _c33TextBlend!=='undefined'?_c33TextBlend:'normal',
+    style:typeof currentStyle!=='undefined'?currentStyle:'default'
   };
   seriesList.push(series);
   persistSeries();
@@ -115,6 +117,16 @@ function loadSeries(idx){
   if(s.hlStyleB) setHlStyle('b',s.hlStyleB);
   // Legacy: old single hlStyle → apply to A only
   if(s.hlStyle&&!s.hlStyleA) setHlStyle('a',s.hlStyle);
+  // Restore style
+  if(s.style&&typeof setStyle==='function'){
+    const styleBtn=document.querySelector(`#styleTog .cbtn[onclick*="'${s.style}'"]`);
+    setStyle(s.style,styleBtn);
+  }
+  // Restore C33 text blend mode
+  if(s.c33TextBlend&&typeof setC33TextBlend==='function'){
+    const btn=document.querySelector(`#c33BlendGrid .blend-btn[data-mode="${s.c33TextBlend}"]`);
+    setC33TextBlend(s.c33TextBlend,btn);
+  }
   // Restore template selection + hide unselected
   setSelectedTpls(s.templates);
   document.querySelectorAll('.sblk').forEach(blk=>{
